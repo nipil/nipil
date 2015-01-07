@@ -5,6 +5,8 @@ title:  GnuPG, plan de secours validé, ouf !
 
 Aujourd'hui, l'impensable est arrivé : j'ai perdu ma clé privée [GnuPG](http://www.gnupg.org/). Mais ça n'a été que temporaire, car j'avais tout prévu... Sauf que je n'avais pas testé ce plan de secours. On dit que "fail to plan = plan to fail", mais le billet d'aujourd'hui est là pour montrer que même si on a une solution de secours, si on la teste pas on risque pas d'en voir les écueils et d'être sûr que ça fonctionnera.
 
+<!--more-->
+
 Une clé GnuPG/PGP ça permet :
 - à tout le monde de vérifier que ce que je donne a bien été envoyé par moi
 - à tout le monde de vérifier que ce que je donne n'a pas été modifié

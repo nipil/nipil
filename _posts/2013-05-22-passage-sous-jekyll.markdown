@@ -14,6 +14,8 @@ Et on se rend compte qu'on passe environ 10-25% de notre temps à l'édition et 
 
 Aujourd'hui, je reprends une fois de plus ma copie pour l'adapter au mieux à mes besoins. Mais la méthodologie sera radicalement différente cette fois, car l'accent sera mis sur la facilité de produire du contenu plutôt que l'outillage du site.
 
+<!--more-->
+
 Ensuite, j'importerai un par un tous les anciens contenus issus de mes anciens sites.
 
 ## Les fonctionnalités souhaitées

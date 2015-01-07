@@ -12,6 +12,8 @@ En les gérant le nom de domaine soi-même :
 
 Allez, en avant pour l'aventure.
 
+<!--more-->
+
 # Fournisseur de service .. qui gère la zone DNS ?
 
 J'ai acheté auprès de lui un nom de domaine `nipil.org.` et maintenant quoi ? Plus précisément, je *loue* la zone `nipil` de la zone `org` de la zone racine `.`, c'est pour ça qu'on voit un `.` à la fin du nom de domaine ci-dessus.

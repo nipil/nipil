@@ -6,6 +6,8 @@ tags: jeux
 
 J'ai un backlog assez conséquent. Pour préciser, un *backlog* est une liste de choses à faire, qui est aux loisirs ce que la *todo-list* est aux corvées. Donc ça n'est pas coercitif, même si ça peut illustrer le "*tant de choses à faire, et si peu de temps*" de [Cecil Rhodes](https://fr.wikipedia.org/wiki/Cecil_Rhodes).
 
+<!--more-->
+
 L'inconvénient du backlog, c'est qu'on est toujours en retard vis à vis du reste du monde 
 - on est incapable de discuter des séries ou des livres qui viennent de sortir
 - on risque de se faire spoiler les histoires, gaffe aux sites communautaires et aux collègues

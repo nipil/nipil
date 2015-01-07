@@ -12,6 +12,8 @@ Sur Arstechnica, il y a l'article suivant [Bug in Bash shell creates big securit
 
 C'est du lourd, et facile à déclencher : ça fait donc environ 10-12h que "c'est connu", il faut réagir très vite. *Si c'est pas déjà trop tard !*
 
+<!--more-->
+
 # Patch et re-patch
 
 Je m'arrête de marcher, histoire de garder du réseau. Je dégaine [ConnectBot](https://play.google.com/store/apps/details?id=org.connectbot) pour me connecter sur mon serveur chez OVH, puis sur mon serveur de fichier à domicile.

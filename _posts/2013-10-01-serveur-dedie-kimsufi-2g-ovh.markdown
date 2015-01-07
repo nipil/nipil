@@ -10,6 +10,8 @@ L'intérêt pour moi d'un tel serveur ce n'est pas sa puissance, c'est le fait q
 
 Le but de ce post, c'est de faire le tour du propriétaire, à la fois du serveur lui-même et des service OVH qui y sont liés, et vu que je vais choisir une distribution Debian comme sur toutes mes machines, de regarder les différences entre ce serveur Debian-OVH, et l'ISO habituelle.
 
+<!--more-->
+
 Dans leur mail, OVH communique trois informations :
 - le nom de domaine du serveur
 - le mot de passe root (12 charactères alphanumériques)

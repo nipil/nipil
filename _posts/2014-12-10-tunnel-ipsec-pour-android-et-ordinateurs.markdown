@@ -15,6 +15,8 @@ opérateur fixe, réseau employeur, hotspot gratuits de restaurants ou
 boutiques ou hotels, réseau informatique de notre employeur, chez la
 famille et les amis, etc)
 
+<!--more-->
+
 Pour ce faire, on va utiliser :
 
 - un serveur sous Debian Wheezy pour la gateway (dédié ou VPS loué)

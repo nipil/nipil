@@ -8,6 +8,8 @@ On peut faire des captures réseau sur son téléphone... Ok, mais pourquoi fair
 
 Et bien que ça soit parce qu'on développe une application mobile, ou parce qu'on a l'impression que la connexion data du téléphone rame, ou par curiosité pour voir "ce qui passe", ça peut être intéressant de faire une capture réseau directement sur son téléphone android.
 
+<!--more-->
+
 Premier point, il faut que le téléphone soit rooté (ie "su" est disponible).
 
 Deuxième point, on va compiler nous même un tcpdump, car je préfère pas faire tourner en root un binaire téléchargé directement sur internet :-)

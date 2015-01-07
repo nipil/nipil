@@ -13,6 +13,10 @@
 				<dc:creator>{{ post.author.name | xml_escape }}</dc:creator>
 				{% if post.excerpt %}
 					<description>{{ post.excerpt | xml_escape }}</description>
+				{% elsif post.content contains '<!--more-->' %}
+					<description>
+						{{ post.content | split:'<!--more-->' | first | xml_escape }}
+					</description>
 				{% else %}
 					<description>{{ post.content | xml_escape }}</description>
 				{% endif %}

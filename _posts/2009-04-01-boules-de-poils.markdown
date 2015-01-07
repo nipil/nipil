@@ -8,6 +8,10 @@ Aujourd'hui, on a concrétisé une envie longue de plusieurs années pour Cécil
 
 Pour dire les choses clairement, on a jeté notre dévolu sur des chattons qui ont été recueillis par l'association [Le Chat Kremlinois](http://www.lechatkrem.com/) située au Kremlin-Bicêtre, association découverte sur internet.
 
+<a href='/files/chats-isis-vala-bebes.jpg'><img src='/files/chats-isis-vala-bebes_small.jpg' /></a>
+
+<!--more-->
+
 Il s'agit de deux petites chattes de 2 mois, qui ont été recueillies avec leurs deux frères dans un conduit de climatisation par hasard, après deux jours passés sans leur maman qui a sûrement dû périr en allant chercher de quoi les nourir. En tout cas, ces 4 chattons affamés ont trouvé refuge auprès d'une famille d'accueil de l'association, et sont tendrement soignés, et nourris par Gaëlle.
 
 Comment on en est arrivés là ? Par un raisonnement assez logique finalement, et beaucoup de lobbying de ma part pour arriver à celui-ci, je l'avoue, surtout au vu du postulat  de départ qui ne m'emballait pas trop.
@@ -51,7 +55,5 @@ On est allés les chercher chez Gaëlle, leur famille d'accueil, et après un tr
 Depuis leur sortie de la cage directement dans le bac à litière, histoire qu'elle la retrouve facilement par la suite, elles ont passé la journée à tâtonner dans l'appartement en reniflant tous les coins et les recoins. Vu leur toute petite taille, ça en a pris du temps !
 
 Puis épuisées, elles se sont roulées en boule et ont fait une sieste, collées l'une à l'autre comme à leur habitude. En tout cas, elles ont l'air bien contentes, et nous on est aux ange.
-
-<a href='/files/chats-isis-vala-bebes.jpg'><img src='/files/chats-isis-vala-bebes_small.jpg' /></a>
 
 C'est le début d'une nouvelle vie pour elles et pour nous !

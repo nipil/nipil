@@ -8,6 +8,8 @@ La virtualisation est utile pour isoler ou mutualiser des choses entre elles. Il
 
 Ces extensions sont disponibles sur toutes les machines récentes, mais pas sur les plus anciens modèles, ou les modèles embarqués, et les machines à faible consommation électriques. Ce qui est justement le cas du serveur Kimsufi 2G que j'ai loué chez OVH, et qui dispose d'un Céléron 220 qui n'a pas ces extensions (pas de "vmx" ni de "svm" dans le `cat /proc/cpuinfo`).
 
+<!--more-->
+
 Mais même sur ces petites machines on ne fait pas de virtualisation pour "rentabiliser" les ressources matérielles, elles sont néamoins super utiles :
 - pour isoler une application seule (un apache par exemple) pour éviter que la corruption d'une d'elles permette de corrompre tout le système
 - pour segmenter la partie "réseau", car chaque guest/conteneur a sa propre table de routage

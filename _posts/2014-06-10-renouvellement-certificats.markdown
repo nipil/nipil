@@ -8,6 +8,8 @@ En avril dernier la librairie OpenSSL a subit la catastrophique faille [Heartble
 
 Outre les "autres failles" ([historique](https://www.openssl.org/news/vulnerabilities.html)) qui ne nécessitent en général qu'une mise à jour de la librairie, celle là a demandé le renouvellement de la clé privée du certificat avant l'expiration annuelle habituelle, donc autant documenter ça pour les futurs renouvellements.
 
+<!--more-->
+
 La faille permet à un attaquant de récupérer la clé privée du certificat serveur.
 
 Qu'est ce que ça signifie ?

@@ -6,6 +6,8 @@ tags: linux
 
 Intéresons nous aujourd'hui à [SQLite](http://www.sqlite.org/). En effet, il semblerait que j'ai un train de retard ce coup ci : l'habitude de déployer toujours du MySQL, et le fait que j'ai déjà un service [SQL](http://en.wikipedia.org/wiki/SQL) qui tourne m'a détourné du droit chemin de la curiosité. Corrigeons ça tout de suite !
 
+<!--more-->
+
 Il existe [pleins](http://en.wikipedia.org/wiki/Comparison_of_relational_database_management_systems) de protagonistes, mais sur Debian on retrouve : [MySQL](http://packages.debian.org/fr/wheezy/database/mysql-server), [PostgreSQL](http://packages.debian.org/fr/wheezy/database/postgresql), [Drizzle](http://packages.debian.org/fr/wheezy/database/drizzle) qui est plutôt orienté cloud, [MongoDB](http://packages.debian.org/fr/wheezy/database/mongodb) qui est orienté orientée objets, [SQLite](http://packages.debian.org/fr/wheezy/database/sqlite3) qui foncitonne sans daemon, [Tarantool](http://packages.debian.org/fr/wheezy/database/tarantool) qui est en [NoSQL](http://en.wikipedia.org/wiki/NoSQL) en ram, et [Virtuoso](http://packages.debian.org/fr/wheezy/database/virtuoso-minimal).
 
 # SQLite, pour et contre

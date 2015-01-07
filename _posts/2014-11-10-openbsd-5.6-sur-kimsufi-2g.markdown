@@ -8,6 +8,8 @@ La dernière version OpenBSD 5.6 a été [publiée](http://www.openbsd.org/56.ht
 
 Cependant, ça ne va pas nous empêcher d'installer OpenBSD sur notre serveur ... Parce que oui, c'est possible !
 
+<!--more-->
+
 La démarche générale sera la suivante :
 
 1. installer une FreeBSD sur le KS-2G via la manager OVH

@@ -4,31 +4,11 @@ title:  Fibre optique & livebox play
 tags: server orange fibre
 ---
 
-**Update 2014-06-19** :
-
-Ce matin un commercial Orange m'appelle pour me proposer de passer d'un contrat Play à un contrat Jet. Si je dis "oui", je gagne  : Orange Cinema Series offert gratuitement à vie (au lieu de 12€/mois), 100Go d'Orange Cloud au lieu de 10go, dépannage en 24h, et surtout passage d'un débit down/up de max 200/50 à max 500/200. Tout ça pour +3€/mois.
-
-J'accepte verbalement l'offre à 10h31, je valide via le lien dans l'email de confirmation, le suivi de commande : "réalisation prévue lundi 23/6". A 12h14, email et sms "Prise en compte de ma commande". A 16h32, email et sms de confirmation que le changement est effectif.
-
-Les résultats sont sans appel :
-- débit ethernet : 475mbit (down) et 188mbit (up)
-- débit utile : **56Mo/s en download** et **22.5Mo/s en upload !**
-- soit un gain de +66% (down) et x4 (up) comparé à l'offre Play
-
-Pour faire un test de débit, depuis un pc linux debian :
-- installer les outils : `sudo aptitude install lftp nload`
-- dans une autre console : `sudo nload eth0`
-- dans une console : `lftp -c "pget -c -n 10 http://ipv4.rbx.proof.ovh.net/files/10Gio.dat -o /dev/null"`
-
-Pour faire un test de débit montant, depuis un pc linux debian :
-- installer les outils : `sudo aptitude install iperf`
-- dans une console : `iperf -c iperf.testdebit.info -i 1 -t 20`
-
-*Attention, les tests de débit en ligne ne sont pas capables (à part celui de testdebit.info) de remplir l'upload, et même celui-ci n'a pas réussi à dépasser les 280-300mbits de download. C'est pour ça que j'utilise des outils en ligne de commande, comme ça je m'affranchis du navigateur et du flash (qui montrent leurs limites)*
-
-**Article original** (publié le 2014-01-31)
-
 Après 4 ans d'attente et de travail au corps, notre immeuble a finit par être raccordé à la fibre optique, et après le passage du technicien ce matin, je dispose d'une bande passante de 285/47 mbit/s. Soit la bagatelle de 30Mo reçu en une seconde, et 5.5Mo envoyés chaque seconde... !
+
+**Update 2014-06-19** : passage à la livebox "Jet" ... débit amélioré et sinon c'est pareil.
+
+<!--more-->
 
 Pour info, l'upload est *la seule et unique raison* pour laquelle je voulais la fibre, car pour moi la vitesse de téléchargement n'a plus d'importance au delà d'un débit qui permette : de regarder une chaine de télé HD (4mbit/s), d'enregistrer une autre chaîne en HD (4mbit/s) et de télécharger à 1Mo/s, chiffre psychologique (8mbits). En cumulant, on arrive aux 16mbit/s IP, soit 20mbit ATM de FREE en ADSL.
 
@@ -102,4 +82,26 @@ Pour moi, le côté décodeur/lecteur télé est absolument inacceptable. Cette 
 En résumé, avec Orange, je trouve que j'ai "moins" (de fonctions geek, de fiabilité TV) pour "plus" (de perfs réseau). Peu importe la différence de 11 euros par mois, c'est amplement justifié par le débit. Bref je suis satisfait à 90%, car le geek en moi est dépité de ce que j'ai perdu en terme de fonctions et de gadgets.
 
 Reste qu'avoir la fibre dans mon appartement me permettra peut-être d'obtenir (soit plus vite, soit obtenir tout court) la fibre optique des autres opérateurs (SFR et surtout Free), car il n'y aurait plus de travaux physiques à réaliser pour changer d'opérateur. On verra dans quelques mois !
+
+**Update 2014-06-19** :
+
+Ce matin un commercial Orange m'appelle pour me proposer de passer d'un contrat Play à un contrat Jet. Si je dis "oui", je gagne  : Orange Cinema Series offert gratuitement à vie (au lieu de 12€/mois), 100Go d'Orange Cloud au lieu de 10go, dépannage en 24h, et surtout passage d'un débit down/up de max 200/50 à max 500/200. Tout ça pour +3€/mois.
+
+J'accepte verbalement l'offre à 10h31, je valide via le lien dans l'email de confirmation, le suivi de commande : "réalisation prévue lundi 23/6". A 12h14, email et sms "Prise en compte de ma commande". A 16h32, email et sms de confirmation que le changement est effectif.
+
+Les résultats sont sans appel :
+- débit ethernet : 475mbit (down) et 188mbit (up)
+- débit utile : **56Mo/s en download** et **22.5Mo/s en upload !**
+- soit un gain de +66% (down) et x4 (up) comparé à l'offre Play
+
+Pour faire un test de débit, depuis un pc linux debian :
+- installer les outils : `sudo aptitude install lftp nload`
+- dans une autre console : `sudo nload eth0`
+- dans une console : `lftp -c "pget -c -n 10 http://ipv4.rbx.proof.ovh.net/files/10Gio.dat -o /dev/null"`
+
+Pour faire un test de débit montant, depuis un pc linux debian :
+- installer les outils : `sudo aptitude install iperf`
+- dans une console : `iperf -c iperf.testdebit.info -i 1 -t 20`
+
+*Attention, les tests de débit en ligne ne sont pas capables (à part celui de testdebit.info) de remplir l'upload, et même celui-ci n'a pas réussi à dépasser les 280-300mbits de download. C'est pour ça que j'utilise des outils en ligne de commande, comme ça je m'affranchis du navigateur et du flash (qui montrent leurs limites)*
 

@@ -8,6 +8,8 @@ Tout d'abord, kezako la Forward Secrecy (PFS) ? Vincent Bernat [l'explique en d�
 1. sans précautions particulières, les communications chiffrées ayant été enregistrées par le passé peuvent être déchiffrées bien plus tard, si on obtient la clé privée du certificat serveur
 2. avec la Perfect Forward Secrecy, même si on obtient la clé privée du certificat serveur, les communications passées ne peuvent plus être déchiffrées
 
+<!--more-->
+
 Dans le cas 1, c'est possible car la clé privée est utilisée à la fois pour l'authentification et pour le chiffrement. Dans le cas 2, la clé privée n'est utilisée que pour l'authentification, et une autre clé temporaire (via Diffie-Hellman) est générée pour le chiffrement : De cette manière, même si on récupère la clé du certificat, on ne dispose pas de l'information nécessaire au (dé)chiffrement
 
 # Inventaire des ciphers souhaités

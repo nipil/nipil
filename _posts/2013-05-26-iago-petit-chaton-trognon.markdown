@@ -8,6 +8,8 @@ Ce matin, nous sommes allés à [Annet-sur-Marne](https://maps.google.com/maps?q
 
 <a href="/files/chats-iago-bebe.jpg"><img src="/files/chats-iago-bebe_small.jpg" /></a>
 
+<!--more-->
+
 Nous avions découvert [ce petit chaton](http://asso-sauvade.forumactif.org/t3493-iago-gentil-loulou) durant les vacances sur le site de l'association, et Cécile ayant contacté jeudi via le formulaire, on reçoit un coup de fil samedi soir. La personne au bout du fil est sympa et tout, et après une courte réflexion on prend rendez-vous pour ce dimanche à 11h.
 
 Iago, c'est donc un petit chaton mâle né le 18 février 2013 ... sur l'île de la Réunion ! Oui oui, on a ouvert de grands yeux quand on a découvert ça. En fait quand c'est l'hiver ici c'est l'été là bas, et ça permet à l'association d'avoir des chats à accueillir toute l'année.
