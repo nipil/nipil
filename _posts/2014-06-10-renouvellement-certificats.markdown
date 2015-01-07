@@ -1,0 +1,327 @@
+---
+layout: post
+title: Renouvellement certificats serveurs (Heartbleed & annuel)
+tags: serveur ssl
+---
+
+En avril dernier la librairie OpenSSL a subit la catastrophique faille [Heartbleed](http://heartbleed.com).
+
+Outre les "autres failles" ([historique](https://www.openssl.org/news/vulnerabilities.html)) qui ne nécessitent en général qu'une mise à jour de la librairie, celle là a demandé le renouvellement de la clé privée du certificat avant l'expiration annuelle habituelle, donc autant documenter ça pour les futurs renouvellements.
+
+La faille permet à un attaquant de récupérer la clé privée du certificat serveur.
+
+Qu'est ce que ça signifie ?
+- que notre serveur n'est plus le seul au monde à pouvoir se présenter sous le nom "nipil.org" et être reconnu de manière absolue comme "nous"
+- que n'importe qui (employeur, FAI, hébergeur, wifi ouvert, etc) ayant pu enregistrer tout ou partie du traffic peut déchiffrer tout le trafic passé (ie pas de Perfect Forward Secrecy par défaut)
+
+En résumé, le pire du pire est arrivé, et il faut faire du "damage control" additionnel après avoir mis à jour la librairie OpenSSL de nos machines/VM : renouveler nos clés privées et nos certificats.
+
+# Qu'est ce qu'on doit vérifier
+
+Commençons déjà par regarder dans quelle mesure on est concernés. Il s'agit d'une faille qui permet d'extraire des données d'un serveur. En conséquence, on va commencer regarder ce qui utilise la librairie OpenSSL sur chaque hôte :
+
+	apt-cache rdepends openssl | grep  '^ ' | xargs dpkg -l 2>/dev/null | grep '^ii'
+
+Dans la liste, on recherche les "serveurs", et on trouve en vrac :
+- exim4-base (envoi/réception email)
+- lighttpd (serveur web)
+- openvpn (tunnel crypto SSL)
+- dovecot (consultation email)
+- bind9-host (résolution de noms)
+- openssh-server (administration à distance)
+- transmission-daemon (partage peer-to-peer)
+- ntp (synchronisation d'horloge)
+- freeradius + racoon (tunnel crypto IPSEC)
+
+Tous ces serveurs utilisent donc la librairie OpenSSL. Trois d'entre eux ont été configurés pour utiliser un certificat "reconnu" sur nos machines (exim/dovecot/lighttpd). On doit donc renouveler le certificat de chaque machine
+
+A noter que je n'ai pas révoqué mes certificats car d'une part c'est payant, d'autre part les "clients" SSL ne vérifient souvent pas les listes de révocation de certificats (CRL) ce qui fait que l'utilité de la révocation est limitée.
+
+# Renouvellement des certificats auprès de StartSSL
+
+J'utilise les services gratuits de StartSSL, et comme beaucoup de services fournissant des certificats, il existe deux méthodes pour en créer un :
+1. générer la clé privée *sur notre propre serveur*, puis générer une requête de signature de certificat (CSR) puis faire signer cette CSR par le fournisseur, qui nous donne ensuite un certificat "nu" (ie sans clé privée)
+2. faire générer la clé privée *sur le site du fournisseur*, puis récupérer un certificat "complet" contenant aussi la clé privée.
+
+*La première méthode est la "meilleure" car la clé privée (l'information la plus importante) ne quitte jamais notre serveur*.
+
+La deuxième méthode est "moins bien" car c'est le fournisseur qui la génère, et donc s'il n'était pas digne de confiance (ou avait un problème de sécurité) il dispose de toutes les informations nécessaires pour se faire passer pour nous, et/ou déchiffrer tout le traffic de notre site.
+
+Je décrirai ci-après la méthode 1 (qui a aussi l'avantage de pas devoir s'embêter avec des mots de passe de certificats, et de conversion de fichiers `.p12` pour passer du format PKCS#12 au format PEM !)
+
+## Création d'une nouvelle clé privée
+
+On va commencer par se connecter sur le serveur, et générer une nouvelle clé privée (en tant que root). La sous-commande "date" permet de ne pas supprimer/écraser par erreur une clé déjà générée/utilisée... croyez moi, on se sent idiot quand ça arrive.
+
+	openssl genrsa 4096 > `hostname`-`date '+%FT%T'`.key
+
+De plus on met les droits d'accès à 400 (ie lecture seule, et uniquement pour le propriétaire) afin d'éviter que quiconque puisse récupérer la clé privée. C'est le seul et unique élément qui doit être protégé : la CSR et le certificat en lui-même n'ont pas besoin d'être protégés, seule la clé privée est importante.
+
+	chmod 400 *.key
+
+Le plus important est fait.
+
+## Saisie de la requête de signature de certificat (CSR)
+
+Ensuite, on génère une "Certificate Signing Request" (CSR). Ca n'est qu'une sorte de "formulaire" contenant les informations du serveur (nom, localisation, email de contact).
+
+*A noter que toutes les informations seront reprises telles quelles dans le certificat à l'exception du champs "Common Name" qui sera lui automatiquement saisi lors de la génération du certificat dans le portail StartSSL.*
+
+	openssl req -new -out fantasio.csr -key fantasio-2014-06-10T15:47:27.key
+
+	You are about to be asked to enter information that will be incorporated
+	into your certificate request.
+	What you are about to enter is what is called a Distinguished Name or a DN.
+	There are quite a few fields but you can leave some blank
+	For some fields there will be a default value,
+	If you enter '.', the field will be left blank.
+	-----
+	Country Name (2 letter code) [AU]:FR
+	State or Province Name (full name) [Some-State]:Ile-de-France
+	Locality Name (eg, city) []:Paris
+	Organization Name (eg, company) [Internet Widgits Pty Ltd]:nipil.org
+	Organizational Unit Name (eg, section) []:
+	Common Name (e.g. server FQDN or YOUR name) []:fantasio.nipil.org
+	Email Address []:postmaster@nipil.org
+
+	Please enter the following 'extra' attributes
+	to be sent with your certificate request
+	A challenge password []:
+
+Cette CSR a été signée par la clé privée qu'on vient de créer, ce qui permettra à StartSSL d'associer les deux informations (nom et empreinte de la clé privée), et on vérifie le tout, partiellement abrégé ci-dessous via (...) pour être plus lisible.
+
+	openssl req -in fantasio.csr -text
+
+	Certificate Request:
+	Data:
+	Version: 0 (0x0)
+	Subject: C=FR, ST=Ile-de-France, L=Paris, O=nipil.org, CN=fantasio.nipil.org/emailAddress=postmaster@nipil.org
+	Subject Public Key Info:
+	Public Key Algorithm: rsaEncryption
+	Public-Key: (4096 bit)
+	Modulus:
+	00:cb:e3:c8:57:86:ba:bf:77:eb:c7:7f:d1:73:3b:
+	...
+	a1:37:e7
+	Exponent: 65537 (0x10001)
+	Attributes:
+	a0:00
+	Signature Algorithm: sha1WithRSAEncryption
+	1e:f8:58:d0:25:e3:a5:b3:0e:c3:fd:60:5d:18:aa:a6:c5:70:
+	...
+	d6:08:f0:d0:b2:be:f7:4e
+	-----BEGIN CERTIFICATE REQUEST-----
+	MIIEzTCCArUCAQAwgYcxCzAJBgNVBAYTAkZSMRYwFAYDVQQIDA1JbGUtZGUtRnJh
+	...
+	ZmzbCS52UTh955rrazQFm9Jo/2cGd+j6GtYI8NCyvvdO
+	-----END CERTIFICATE REQUEST-----
+
+On va maintenant envoyer ces informations au fournisseur de certificats
+
+## Génération du certificat
+
+Se connecter au panneau de contrôle StartSSL, et d'abord valider le domaine si ça n'a pas encore été fait. Ensuite :
+- Cliquer dans "Certificates Wizard"
+- Sélectionner "Web Server SSL/TLS Certificate"
+- Cliquer "Skip" comme on a généré une clé et une CSR
+- copier-coller le bloc de texte de la CSR (de *begin certificate request* à *end certificate request* inclus)
+- si pas de message d'erreur, alors on continue
+- sélectionner le domaine du certificat (pour moi, nipil.org) puis "continue"
+- entrer le nom de l'hôte du serveur (par exemple fantasio.nipil.org)
+- vérifier les information, et confirmer
+- copier-coller le bloc de texte (de *begin certificate* à *end certificate* inclus) dans un fichier `fantasio.crt` sur notre serveur
+
+Consulter les informations du certificat généré par StartSSL
+
+	openssl x509 -in fantasio.crt -text
+
+Les informations *vitales pour nous* qu'il faut vérifier sont les éléments **Subject: ... CN=** (et au besoin aussi "*X509v3 Subject Alternative Name*") qui indiquent pour quel noms de domaine ce certificat est valide, et **Validity Not After** qui indique l'échéance pour le prochain renouvellement.
+
+Ci après un exemple du résultat de la commande
+
+	Certificate:
+	Data:
+	Version: 3 (0x2)
+	Serial Number: 1113232 (0x10fc90)
+	Signature Algorithm: sha1WithRSAEncryption
+	Issuer: C=IL, O=StartCom Ltd., OU=Secure Digital Certificate Signing, CN=StartCom Class 1 Primary Intermediate Server CA
+	Validity
+	Not Before: Jun 10 07:03:57 2014 GMT
+	Not After : Jun 10 15:28:40 2015 GMT
+	Subject: description=9E4u3BO3el0ze7H0, C=FR, CN=fantasio.nipil.org/emailAddress=postmaster@nipil.org
+	Subject Public Key Info:
+	Public Key Algorithm: rsaEncryption
+	Public-Key: (4096 bit)
+	Modulus:
+	00:c8:44:71:4c:1c:d4:a3:c1:81:ba:38:dc:a1:17:
+	...
+	34:97:7b
+	Exponent: 65537 (0x10001)
+	X509v3 extensions:
+	X509v3 Basic Constraints: 
+	CA:FALSE
+	X509v3 Key Usage: 
+	Digital Signature, Key Encipherment, Key Agreement
+	X509v3 Extended Key Usage: 
+	TLS Web Server Authentication
+	X509v3 Subject Key Identifier: 
+	E7:D3:28:C7:84:E8:37:5A:7D:14:D1:4B:71:1F:CA:D9:7E:F8:D7:6D
+	X509v3 Authority Key Identifier: 
+	keyid:EB:42:34:D0:98:B0:AB:9F:F4:1B:6B:08:F7:CC:64:2E:EF:0E:2C:45
+
+	X509v3 Subject Alternative Name: 
+	DNS:fantasio.nipil.org, DNS:nipil.org
+	X509v3 Certificate Policies: 
+	Policy: 2.23.140.1.2.1
+	Policy: 1.3.6.1.4.1.23223.1.2.3
+	CPS: http://www.startssl.com/policy.pdf
+	User Notice:
+	Organization: StartCom Certification Authority
+	Number: 1
+	Explicit Text: This certificate was issued according to the Class 1 Validation requirements of the StartCom CA policy, reliance only for the intended purpose in compliance of the relying party obligations.
+
+	X509v3 CRL Distribution Points: 
+
+	Full Name:
+	URI:http://crl.startssl.com/crt1-crl.crl
+
+	Authority Information Access: 
+	OCSP - URI:http://ocsp.startssl.com/sub/class1/server/ca
+	CA Issuers - URI:http://aia.startssl.com/certs/sub.class1.server.ca.crt
+
+	X509v3 Issuer Alternative Name: 
+	URI:http://www.startssl.com/
+	Signature Algorithm: sha1WithRSAEncryption
+	55:48:c6:19:42:dc:fb:ef:a2:a4:e7:17:e5:ba:ba:4a:dc:86:
+	...
+	f8:79:51:4b
+	-----BEGIN CERTIFICATE-----
+	MIIHUDCCBjigAwIBAgIDEPyQMA0GCSqGSIb3DQEBBQUAMIGMMQswCQYDVQQGEwJJ
+	...
+	+HlRSw=
+	-----END CERTIFICATE-----
+
+A partir de maintenant, la CSR ne sert plus à rien, **mais** on l'archivera néamoins afin d'avoir sous la main les informations pour le prochain renouvellement au cas ou. Seul la clé `.key` et le certificat `.crt` seront utiles par la suite.
+
+A noter que j'ai utilisé diverses extensions : le fichier clé en `.key` et le fichier certificat en `.crt`, mais on voit souvent dans les fichiers de configuration l'extension `.pem` : ça n'a pas d'importance réelle, car le **contenu** des fichiers key/crt sont *au format PEM* et c'est tout ce qui importe. On pourrait tout aussi bien utiliser l'extension `.pem` pour les deux fichiers, et différentier le contenu grâce aux en-têtes/fin-de-bloc du contenu (soit "certificate" soit "private key"). Chacun son truc !
+
+J'ai pris l'habitude de stocker les certificats et les clés privées dans le répertoire `/root/certs`. Comme ça, même en cas de mauvaise manipulation dans le dossier de configuration du daemon, les informations sont toujours disponibles. Et logiquement, j'utilise des liens symboliques vers la clé privée afin qu'elle ne soit pas "disponible" en de multiples endroits pour limiter les éventuelles erreurs de droits d'accès. A nouveau, chacun sa méthode.
+
+On termine en récupérant les certificats intermédiaires et racines utilisés par la chaine de certification StartSSL, car il faut toujours fournir une chaine de validation complète au client qui se connecte à notre serveur :
+
+	cd /root/certs
+	wget https://www.startssl.com/certs/sub.class1.server.ca.pem
+	wget https://www.startssl.com/certs/ca.pem
+
+On est maintenant prêts à mettre en place les certificats.
+
+# Mise en place des certificats pour Dovecot
+
+Ensuite on configure place les informations au bon endroit pour Dovecot, selon la config Debian par défaut (cf `/etc/dovecot/conf.d/10-ssl.conf`) 
+
+On place les 3 certificats (serveur + AC intermédiaire + AC racine) dans un seul fichier `/etc/dovecot/dovecot.pem`
+
+	cat /root/certs/{fantasio.crt,sub.class1.server.ca.pem,ca.pem} > /etc/dovecot/dovecot.pem
+
+On place un lien vers la clé privée dans le sous répertoire private de dovecot
+
+	mkdir -p /etc/dovecot/private
+	chmod 500 /etc/dovecot/private
+	ln -s /root/certs/fantasio-2014-06-10T15\:47\:27.key /etc/dovecot/private/dovecot.pem
+
+On recharge la configuration de dovecot (regarder `/var/log/mail.err` en cas de besoin)
+
+	service dovecot restart
+
+On teste que la connexion SSL est fonctionnelle et que le certificat **et** la chaine complète est bien envoyé :
+
+	openssl s_client -connect localhost:993
+
+Quand il affiche `* OK ... Dovecot ready.` taper `. logout` (l'espace est important) puis entrée pour quitter proprement la connexion
+
+Relativement au début de l'échange on devrait voir les informations suivantes :
+
+	Certificate chain
+	0 s:/description=9E4u3BO3el0ze7H0/C=FR/CN=fantasio.nipil.org/emailAddress=postmaster@nipil.org
+	  i:/C=IL/O=StartCom Ltd./OU=Secure Digital Certificate Signing/CN=StartCom Class 1 Primary Intermediate Server CA
+	1 s:/C=IL/O=StartCom Ltd./OU=Secure Digital Certificate Signing/CN=StartCom Class 1 Primary Intermediate Server CA
+	  i:/C=IL/O=StartCom Ltd./OU=Secure Digital Certificate Signing/CN=StartCom Certification Authority
+	2 s:/C=IL/O=StartCom Ltd./OU=Secure Digital Certificate Signing/CN=StartCom Certification Authority
+	  i:/C=IL/O=StartCom Ltd./OU=Secure Digital Certificate Signing/CN=StartCom Certification Authority
+
+Tout est OK, On peut continuer avec le serveur Web.
+
+# Mise en place des certificats pour Lighttpd
+
+On place cette fois ci seulement 2 certificats (AC intermétiaire + AC racine) dans un seul fichier `/etc/dovecot/dovecot.pem`
+
+	cat /root/certs/{fantasio.crt,sub.class1.server.ca.pem,ca.pem} > /etc/lighttpd/authority.pem
+
+On place un lien vers la clé privée dans le répertoire de lighttpd
+
+	ln -s /root/certs/fantasio-2014-06-10T15\:47\:27.key /etc/lighttpd/server.pem
+
+Si ça n'a pas déjà été fait par le passé, activer le SSL au niveau de lighttpd
+- éditer le fichier `/etc/lighttpd/conf-available/10-ssl.conf`
+- localiser la ligne `ssl.pemfile = "/etc/lighttpd/server.pem"`
+- ajouter en dessous la ligne `ssl.ca-file = "/etc/lighttpd/authority.pem"`
+- sauvegarder les modifications et quitter l'éditeur
+- activer la configuration via `lighty-enable-mod ssl`
+
+On recharge la configuration de lighttpd (`/var/log/lighttpd/error.log` en cas de besoin)
+
+	service lighttpd restart
+
+Pointer le navigateur vers votre site Web (en **https** bien sûr !) et vérifier qu'il n'affiche pas de d'avertissement de certificat.
+
+# Mise en place des certificats pour Exim4
+
+On place les 3 certificats (serveur + AC intermédiaire + AC racine) dans un seul fichier `/etc/exim4/exim.crt`
+
+	cat /root/certs/{fantasio.crt,sub.class1.server.ca.pem,ca.pem} > /etc/exim4/exim.crt
+
+Exceptionnelement, on va faire une copie de la clé, car Exim veut des droits d'accès spécifiques
+
+	cp /root/certs/fantasio-2014-06-10T15\:47\:27.key /etc/exim4/exim.key
+	chown root:Debian-exim /etc/exim4/exim.key
+	chmod 440 /etc/exim4/exim.key
+
+Activer le support SSL si ça n'était pas déjà fait
+
+	echo "MAIN_TLS_ENABLE = 1" > /etc/exim4/exim4.conf.localmacros
+
+On recharge la configuration d'Exim (`/var/log/exim4/error.log` en cas de besoin)
+
+	service exim4 restart
+
+Verifier qu'on accepte bien le chiffrement des emails reçus (il faut saisir les lignes ne commençant pas par un nombre)
+
+	telnet localhost 25
+
+	Trying ::1...
+	Connected to fantasio.
+	Escape character is '^]'.
+	220 fantasio ESMTP Exim 4.80 Tue, 10 Jun 2014 18:47:34 +0200
+	ehlo fantasio
+	250-fantasio Hello fantasio [::1]
+	250-SIZE 52428800
+	250-8BITMIME
+	250-PIPELINING
+	250-STARTTLS
+	250 HELP
+	starttls
+	220 TLS go ahead
+	quit
+	221 fantasio closing connection
+	Connection closed by foreign host.
+
+Comme on voit l'option `STARTTLS`, c'est que l'option SSL est bien activée. La réponse "220 TLS go ahead" veut dire que le daemon a bien réussi à lire la clé privée quand il en a eu besoin (sinon on reçoit "454 TLS currently unavailable" c'est souvent que les droits d'accès au fichier de la clé ne sont pas bons)
+
+Maintenant, tous les relais qui voudraient nous envoyer des emails choisiront l'option s'ils la supporte (par défaut, exim chiffre les envois si le serveur distant le supporte) mais *s'il ne supporte pas le chiffrement, les emails seront malgré tout envoyés en clair*.
+
+Il est possible de "refuser" catégoriquement la transmission en clair quand TLS n'est pas supporté, mais ça dépendra de votre contexte : refuser de recevoir des emails non chiffrés vous empêchera d'envoyer/recevoir des mails vers/depuis certaines destinations... Bref vous risquez de "perdre des mails" !
+
+A vous de voir si ça vous convient, il n'y a malheureusement pas de solution miracle pour le chiffrement des emails.
+
+
+

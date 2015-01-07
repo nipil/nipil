@@ -1,0 +1,105 @@
+---
+layout: post
+title:  Fibre optique & livebox play
+tags: server orange fibre
+---
+
+**Update 2014-06-19** :
+
+Ce matin un commercial Orange m'appelle pour me proposer de passer d'un contrat Play à un contrat Jet. Si je dis "oui", je gagne  : Orange Cinema Series offert gratuitement à vie (au lieu de 12€/mois), 100Go d'Orange Cloud au lieu de 10go, dépannage en 24h, et surtout passage d'un débit down/up de max 200/50 à max 500/200. Tout ça pour +3€/mois.
+
+J'accepte verbalement l'offre à 10h31, je valide via le lien dans l'email de confirmation, le suivi de commande : "réalisation prévue lundi 23/6". A 12h14, email et sms "Prise en compte de ma commande". A 16h32, email et sms de confirmation que le changement est effectif.
+
+Les résultats sont sans appel :
+- débit ethernet : 475mbit (down) et 188mbit (up)
+- débit utile : **56Mo/s en download** et **22.5Mo/s en upload !**
+- soit un gain de +66% (down) et x4 (up) comparé à l'offre Play
+
+Pour faire un test de débit, depuis un pc linux debian :
+- installer les outils : `sudo aptitude install lftp nload`
+- dans une autre console : `sudo nload eth0`
+- dans une console : `lftp -c "pget -c -n 10 http://ipv4.rbx.proof.ovh.net/files/10Gio.dat -o /dev/null"`
+
+Pour faire un test de débit montant, depuis un pc linux debian :
+- installer les outils : `sudo aptitude install iperf`
+- dans une console : `iperf -c iperf.testdebit.info -i 1 -t 20`
+
+*Attention, les tests de débit en ligne ne sont pas capables (à part celui de testdebit.info) de remplir l'upload, et même celui-ci n'a pas réussi à dépasser les 280-300mbits de download. C'est pour ça que j'utilise des outils en ligne de commande, comme ça je m'affranchis du navigateur et du flash (qui montrent leurs limites)*
+
+**Article original** (publié le 2014-01-31)
+
+Après 4 ans d'attente et de travail au corps, notre immeuble a finit par être raccordé à la fibre optique, et après le passage du technicien ce matin, je dispose d'une bande passante de 285/47 mbit/s. Soit la bagatelle de 30Mo reçu en une seconde, et 5.5Mo envoyés chaque seconde... !
+
+Pour info, l'upload est *la seule et unique raison* pour laquelle je voulais la fibre, car pour moi la vitesse de téléchargement n'a plus d'importance au delà d'un débit qui permette : de regarder une chaine de télé HD (4mbit/s), d'enregistrer une autre chaîne en HD (4mbit/s) et de télécharger à 1Mo/s, chiffre psychologique (8mbits). En cumulant, on arrive aux 16mbit/s IP, soit 20mbit ATM de FREE en ADSL.
+
+Par contre, la vitesse d'upload (1mbit/s chez Free) est cruciale dans *ce qu'on peut faire de notre accès internet* : le temps mis pour envoyer des fichiers dans le cloud, la qualité de flux visio temps réel, la capacité et la qualité du streaming (par exemple quand on joue) et le temps mis pour récupérer des fichiers persos quand on est en déplacement.
+
+Et pire que tout, comme il y a un lien entre ce qui rentre et ce qui sort, si on envoie au maximum des capacités de la ligne, on détruit la réactivité de tout le reste (y compris le surf), d'où l'existance de la QoS qui permet de trier, optimiser, et prioriser un peu tout ça, mais c'est hors de propos ici.
+
+A titre d'exemple, avec 1mbit/s : envoyer 10 go dans le cloud ou récupérer la même quantitié depuis ailleurs prends 24h ; et il est impossible de faire du streaming de jeu en full HD "propre" et lisible si ça bouge un peu à l'écran. Il est donc évident qu'avec plus de bande passante en upload, non seulement on peut faire tout ce qu'on veut, mais en plus on peut faire chacun "mieux" et tout faire en parallèle.
+
+Mais pour ce faire, j'ai dû vendre mon âme au diable, et aller chez Orange (j'étais freenaute extrêmement satisfait en depuis 10 ans) sachant qu'ils ont été les premiers à fibrer chez nous, et qu'on a strictement aucune certitude que les autres (Free/SFR) proposent la fibre un jour dans notre appartement. Je ne parles pas de Bouygues, pour cause, il est hors de question d'être sur un réseau Numéricâble.
+
+# Ce que j'ai GAGNE en passant de Free/ADSL à Orange/FO
+
+Internet
+- download upgradé de 16 mbits (en ip) à 285 mbits (**x17**)
+- upload uprgadé de 1 mbits à 47 mbits (**x47**)
+- ping qui passe de 20ms à 1ms pour un serveur "proche"
+- les 2+2 premiers mois d'abonnement sont offerts (soit 160 euros)
+- le remboursement des frais de résiliations Free sont remboursés par Orange (50 euros)
+- heureusement, pas de limitation de débit par connexion TCP/UDP qu'avait vu [philpep](http://philpep.org/blog/lets-gre)
+- une offre cloud de 100go
+
+Télévision
+- un pass TV Livebox Play inclus (c'est l'avantage que j'ai chois) avec des films et série à la demande, ok peu de choix et choix un peu moisi, mais c'est gratuit alors on a pas le droit de se plaindre !
+- la liste des codecs lus par la livebox est clairement [documentée](http://liveboxplay.orange.fr/fiche_tech_play_tv.html) contrairement à la freebox où c'est plutôt "teste et tu verras si ça marche"
+- on peut surfer via la télévision, avec la télécommande qui fonctionne comme un pointeur, c'est plutôt pas mal (même si ça me terrifie de voir que je suis automatiquement loggué sur mon compte Orange ... bonjour la sécurité)
+
+Support
+- nombreuses boutiques, facilite les démarches matérielles de remplacement de matériels
+- a priori le 39 00 serait moins cher depuis une ligne orange, j'en sais encore rien
+
+Pour les débits, j'ai testé et vérifié pour des serveurs dans plusieurs backbone (Orange, Bouygues, Free, OVH, etc) : il n'y a pas à dire, pour la capacité de transit pure, c'est fantastique. Reste à voir si ces capacités restent les mêmes avec plus de personnes raccordées dans l'immeuble (10 appartements seulement dans l'immeuble, ça va, mais je suis le seul raccordé pour l'instant)
+
+# Ce que j'ai PERDU en passant de Free/ADSL à Orange/FO
+
+Internet
+- encapsulation PPPoE en sortie de la livebox, qui mange 8 octets de la MTU "pour rien" (~0.5% de bande passante perdue)
+- pas d'adresse IP fixe (uniquement sur offre orange pro) mais livebox permet de mettre à jour un enregistrement gratuit chez [no-ip](http://www.noip.com/) qui peut être utilisé comme `CNAME` comme cible d'un enregistrmement de votre propre zone DNS
+- impossibilité de mettre la livebox en mode "bridge" et de "récupérer" l'adresse IP publique sur une seule machine du lan qui ferait routeur/firewall ; cependant la possibilité de [remplacer la livebox par un linux](http://www.forum-orange.com/forums/viewtopic.php?id=17933) existe, mais le téléphone ne fonctionne pas, car Orange ne donne pas les infos SIP. La livebox permet une IP DMZ, histoire d'avoir un pseudo-bridge et de recevoir tous les flux entrants sur une machine personnelle ([sauf](http://livebox.asso.fr/forum/index.php/topic,20928.msg177985.html#msg177985) le port tcp 50805 [dont l'utilisation est inconnue](http://www.forum-orange.com/forums/viewtopic.php?pid=182457#p182457) ...!)
+- pas d'ipv6 (uniquement sur offre orange pro), donc il faudra soit se rabattre sur un [tunnel en mode sit](http://www.tldp.org/HOWTO/Linux%2BIPv6-HOWTO/conf-ipv6-in-ipv4-point-to-point-tunnels.html) entre un serveur linux à la maison qui fait routeur et un serveur loué sur internet (ce que je fais) ou bien utiliser les services d'un [tunnel broker](https://www.sixxs.net/faq/sixxs/?faq=enduser) ce que je n'ai pas encore essayé mais qui est dans ma todo-list.
+- un boitier Alcatel en plus à caser, cabler et alimenter, qui sert de convertisseur FO/Cuivre et de terminaison GPON
+
+Téléphonie
+- plus de compte SIP utilisable hors du domicile ! (Heureusement qu'il existe des lignes [SIP chez OVH pour 1euros/mois](http://www.ovhtelecom.fr/telephonie/forfaits/ligne_sip_individuelle.xml))
+- si on a pas la version "Play", les appels vers les mobiles fraçais ne sont pas incluses !
+- le tarif des appels vers l'étranger sont peut-être plus chers (mais je n'ai pas regardé, je ne téléphone pas à l'étranger)
+
+Télévision
+- impossible d'acheter les chaines à l'unité, c'est toujours par pack (10+ euros chaque pack ...) et il n'y pas national geographic, et game one (+music hd) sont a priori payants : je liste juste celles là, ce sont les seules que j'ai remarqué, on verra le reste quand je n'aurais plus accès aux contenus "payants"
+- grosses disparité de volume sonore entre le contenu des chaines de télé et le contenu lu depuis le disque USB, chose que je ne constatais pas sur la freebox pour exactement les mêmes contenus
+- la programmation des enregistrements récurrents n'est possible que manuellement, et en passant par le guide tv on ne peut programmer que le premier épisode (à la rigueur le 2ème, avec un bonus de +60 minutes à la fin, mais on peut pas mettre plus !). De plus pas de programmation des enregistrements à distance possible (sauf erreur de ma part) 
+- impossible de récupérer ce qui a été enregistré sur le décodeur, par exemple pour le regarder dans les métro-boulot, pour des raisons de "protection des droits d'auteur"
+- la livebox a un disque dur de 320go, mais il est bridé à 80go au départ : si on a pas la version "Play" il faut payer pour débrider par pas de 80go
+- impossible de déposer les fichiers persos sur le disque interne décodeur pour les visionner, **il faut ajouter un disque usb externe**... ?! Ou avoir un serveur DLNA/UPNP-AV
+- la lecture des fichiers personnels ne lit pas les SRT, et pas toujours le multilangue (hello les MKV qui passent pas ?!)
+- la navigation est catastrophique : la reprise au point actuel aprs avoir stoppé n'est pas toujours fonctionnelle, il n'y a plus la navigation "absolue" (touche 1=10%, 5=50% etc) ni d'avance retour par pas fixe (1min sur la freebox, ce qui est très fiable) et l'avance retour rapide "lisse" est remplacée par une lecture "slideshow" x4/x16/x64 dont le choix des images est assez aléatoire
+
+Tarifs
+- 3euros/mois pour la location de la livebox
+- 4euros/mois en plus par rapport à un abonnement freebox
+- 4euros/mois en plus car perte de l'avantage free mobile
+
+La liste est plus longue que ce à quoi je m'attendais...
+
+# Mon impression ?
+
+Le débit internet et le peering avec les différents opérateurs de transit est génial, il n'y a rien à dire là dessus ; reste à voir si ça restera valable quand plus de clients seront raccordés dans l'immeuble.
+
+Pour moi, le côté décodeur/lecteur télé est absolument inacceptable. Cette livebox play qui est toute récente est moins fiable et agréable à utiliser que la freebox v5 que j'ai depuis 2007. Faut pas déconner, la navigation vidéo et la reprise au précedent point de lecture, ce sont des fonctions de débutant, et il reste à espérer qu'Orange patch tout ça, même si je ne m'attends pas à des miracles.
+
+En résumé, avec Orange, je trouve que j'ai "moins" (de fonctions geek, de fiabilité TV) pour "plus" (de perfs réseau). Peu importe la différence de 11 euros par mois, c'est amplement justifié par le débit. Bref je suis satisfait à 90%, car le geek en moi est dépité de ce que j'ai perdu en terme de fonctions et de gadgets.
+
+Reste qu'avoir la fibre dans mon appartement me permettra peut-être d'obtenir (soit plus vite, soit obtenir tout court) la fibre optique des autres opérateurs (SFR et surtout Free), car il n'y aurait plus de travaux physiques à réaliser pour changer d'opérateur. On verra dans quelques mois !
+

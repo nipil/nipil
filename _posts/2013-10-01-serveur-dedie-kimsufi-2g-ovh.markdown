@@ -1,0 +1,325 @@
+---
+layout: post
+title:  Serveur dédié Kimsufi OVH (KS2G)
+tags: server linux debian ovh
+---
+
+Aujourd'hui, j'ai reçu les identifiants pour mon serveur dédié chez OVH. Il s'agit d'un serveur perso à faible puissance et à coût ultra-réduit (2.99 euros HT / mois).
+
+L'intérêt pour moi d'un tel serveur ce n'est pas sa puissance, c'est le fait qu'il ait une connectivité complete (y compris IPv6) avec une bande passante en upload qui, quelle qu'en soit la valeur, sera forcément supérieure à celle de mon ADSL à la maison (1mbit/s).
+
+Le but de ce post, c'est de faire le tour du propriétaire, à la fois du serveur lui-même et des service OVH qui y sont liés, et vu que je vais choisir une distribution Debian comme sur toutes mes machines, de regarder les différences entre ce serveur Debian-OVH, et l'ISO habituelle.
+
+Dans leur mail, OVH communique trois informations :
+- le nom de domaine du serveur
+- le mot de passe root (12 charactères alphanumériques)
+- le rapport de test de conformité
+
+Le rapport des tests de conformité est produit par OVH à l'issu des tests de torture (cpu, mem, disque, réseau) qui sont réalisés automatiquement avant la livraison au client.
+
+Mon serveur est hébergé dans un datacenter d'OVH situé à Roubaix, dont la supervision du backbone est consultable sur le [weathermap](http://weathermap.ovh.net/roubaix-2). Mais OVH dispose de plusieurs DC et les serveurs peuvent être n'importe où, même si principalement les serveurs KS2G sont sensés être à Gravelines (GRA)
+
+J'ai anonymisé les informations réseau données ci-dessous, même si dans l'absolu un certain nombre sont de toute façon publiques, mais ça fait partie des "best practices" en plus de faire une sécurisation réseau correcte sur le serveur.
+
+# Matériel
+
+Côté hardware, le rapport me donne l'information du type de carte mère (intel [D201GLY](http://www.intel.com/p/fr_FR/support/highlights/dsktpboards/d201gly)) et la version du bios détectée (LY66210M.86A.0137.2008.0104.1540) c'est du matos qui a environ 4 ans je dirais.
+
+Le disque dur est un TOSHIBA DT01ACA050 de 500Go comme prévu, et d'après la S.M.A.R.T il a déjà tourné mais assez peu (3617h soit 150j soit 5mois) il a subit 15 powerdown, tourne à 30°C : il est donc pas "neuf" mais la réutilisation des disques est bien entendu une pratique courante chez les hébergeurs.
+
+	# smartctl -a /dev/sda
+	ID  ATTRIBUTE_NAME          FLAG     VALUE WORST THRESH TYPE      UPDATED  WHEN_FAILED RAW_VALUE
+	9   Power_On_Hours          0x0012   100   100   000    Old_age   Always       -       3617
+	12  Power_Cycle_Count       0x0032   100   100   000    Old_age   Always       -       15
+	194 Temperature_Celsius     0x0002   200   200   000    Old_age   Always       -       30 (Min/Max 22/43)
+
+Côté CPU, il s'agit d'un Céléron 220 à 1.2Ghz au lieu d'un Atom à 1.6, mais il se trouve que dans les faits c'est mieux que l'atom en question. Dans l'absolu ça n'a pas d'importance pour moi, c'est forcément mieux que mon AMD Geode LX800 à 500 Mhz donc je suis content.
+
+Donc l'essentiel à retenir c'est qu'il n'y ait pas d'extension de virtualisation hardware (VMX pour intel / SVM pour amd), ce qui sauf erreu veut dire pas de virtualisation directe, mais que la paravirtualisation reste possible.
+
+	# cat /proc/cpuinfo && lscpu
+	model name      : Intel(R) Celeron(R) CPU 220  @ 1.20GHz
+	cpu MHz         : 1199.999
+	flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr
+	                  pge mca cmov pat pse36 clflush dts acpi mmx fxsr
+	                  sse sse2 ss tm pbe syscall nx lm constant_tsc
+	                  arch_perfmon pebs bts rep_good nopl aperfmperf
+	                  pni dtes64 monitor ds_cpl tm2 ssse3 cx16 xtpr
+	                  pdcm lahf_lm dtherm
+	L1d cache       : 32K
+	L1i cache       : 32K
+	L2 cache        : 512K
+
+Concernant la RAM, on a 2Go de DDR2-533Mhz, mais sur une seule barette donc pas de dual-channel.
+
+	# dmidecode --type 17
+	Size: 2048 MB
+	Locator: DIMM0
+	Bank Locator: BANK0
+	Type: DDR2
+	Type Detail: Synchronous
+	Speed: 533 MHz
+
+Pour le reste du hardware on a un chipset graphique intégré, ce qui permettra de faire tourner un serveur X, et pas de disque externe connecté en USB (une option OVH payante pour ceux qui en auraient besoin).
+
+	# lspci 
+	00:00.0 Host bridge: Silicon Integrated Systems [SiS] 662 Host (rev 01)
+	00:01.0 PCI bridge: Silicon Integrated Systems [SiS] AGP Port (virtual PCI-to-PCI bridge)
+	00:02.0 ISA bridge: Silicon Integrated Systems [SiS] SiS964 [MuTIOL Media IO] LPC Controller (rev 36)
+	00:02.5 IDE interface: Silicon Integrated Systems [SiS] 5513 IDE Controller (rev 01)
+	00:03.0 USB controller: Silicon Integrated Systems [SiS] USB 1.1 Controller (rev 0f)
+	00:03.1 USB controller: Silicon Integrated Systems [SiS] USB 1.1 Controller (rev 0f)
+	00:03.2 USB controller: Silicon Integrated Systems [SiS] USB 1.1 Controller (rev 0f)
+	00:03.3 USB controller: Silicon Integrated Systems [SiS] USB 2.0 Controller
+	00:04.0 Ethernet controller: Silicon Integrated Systems [SiS] SiS900 PCI Fast Ethernet (rev 91)
+	00:05.0 IDE interface: Silicon Integrated Systems [SiS] SATA (rev 01)
+	00:1f.0 PCI bridge: Silicon Integrated Systems [SiS] PCI-to-PCI bridge
+	01:00.0 VGA compatible controller: Silicon Integrated Systems [SiS] 661/741/760 PCI/AGP or 662/761Gx PCIE VGA Display Adapter (rev 04)
+
+	# lsusb 
+	Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+	Bus 002 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
+	Bus 003 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
+	Bus 004 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
+
+Seul truc surprenant, `lsmod` ne retourne rien et remonte une erreur, mais bon on verra plus tard si c'est réellement un problème.
+
+	# lsmod   
+	libkmod: ERROR ../libkmod/libkmod-module.c:1567 kmod_module_new_from_loaded: could not open /proc/modules: No such file or directory
+	Error: could not get list of modules: No such file or directory
+
+En résumé, on a un serveur dédié limitée en puissance, qui peut faire plein de choses à condition de pas trop lui en demander.
+
+# Réseau
+
+Après connexion, on a la bannière suivante qui rappelle les informations relatives au serveur
+
+	Linux ksAAAAAA.kimsufi.com 3.10.9-xxxx-grs-ipv6-64 #1 SMP Wed Aug 21 11:51:59 CEST 2013 x86_64 GNU/Linux
+	server    : BBBBB
+	hostname  : ksAAAAAA.kimsufi.com
+	eth0 IPv4 : 91.121.CCC.DDD
+	eth0 IPv6 : 2001:abcd:1:abcd::1/64
+
+La configuration DNS est la suivante :
+
+	nameserver 127.0.0.1
+	nameserver 213.186.33.99
+	search ovh.net
+
+On a une connectivité IPv4 et IPv6 native, une MTU de 1500. On remarquera que la passerelle IPv6 est située hors du réseau déclaré sur l'interface (préfixe /64) et qu'une route additionnelle pour celle ci via l'interface physique a été déclarée. Il faudra donc en tenir compte en cas de changement de configuration du routage (VPN IPSEC, etc).
+
+	# ip addr show dev eth0
+	4: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UNKNOWN qlen 1000
+	link/ether 00:1c:c0:ab:cd:ef brd ff:ff:ff:ff:ff:ff
+	inet 91.121.CCC.DDD/24 brd 91.121.CCC.255 scope global eth0
+	valid_lft forever preferred_lft forever
+	inet6 2001:abcd:1:abcd::1/64 scope global 
+	valid_lft forever preferred_lft forever
+	inet6 fe80::21c:c0ff:feab:cdef/64 scope link 
+	valid_lft forever preferred_lft forever
+
+	# ip route              
+	default via 91.121.CCC.254 dev eth0 
+	91.121.CCC.0/24 dev eth0  proto kernel  scope link  src 91.121.CCC.DDD 
+
+	# ip -6 route
+	2001:abcd:1:abcd::/64 dev eth0  proto kernel  metric 256 
+	2001:abcd:1:abff:ff:ff:ff:ff dev eth0  metric 1024 
+	fe80::/64 dev eth0  proto kernel  metric 256 
+	default via 2001:abcd:1:abff:ff:ff:ff:ff dev eth0  metric 1024 
+
+On va regarder comment on communique avec le reste du monde. Ci-dessous la partie intéressante des traceroute IPv4 et IPv6 :
+
+	IPv4 vers le serveur
+	7  gsw-g1-a9.fr.eu (91.121.128.164)
+	8  rbx-g2-a9.fr.eu (91.121.215.151)
+	9  rbx-1-6k.fr.eu (91.121.131.13)
+	10  rbx-51-m1.fr.eu (91.121.130.25)
+	11  ksAAAAAA.kimsufi.com (91.121.CCC.DDD)
+
+	IPv4 depuis le serveur
+	1  rbx-51-m2.fr.eu (91.121.CCC.252)
+	2  rbx-1-6k.fr.eu (91.121.130.1)
+	3  rbx-g2-a9.fr.eu (91.121.131.14)
+	4  gsw-g1-a9.fr.eu (91.121.215.150)
+	5  gsw-2-6k.fr.eu (91.121.128.161)
+
+	IPv6 vers le serveur
+	6  th2-g1-a9.fr.eu (2001:41d0::162)
+	7  rbx-g1-a9.fr.eu (2001:41d0::b71)
+	8  rbx-2-6k.fr.eu (2001:41d0::aa2)
+	9  2001:abcd:1:abcd::1 (2001:abcd:1:abcd::1)
+
+	IPv6 depuis le serveur
+	1  rbx-2-6k.fr.eu (2001:41d0:1:abff:ff:ff:ff:fd)
+	2  rbx-g2-a9.fr.eu (2001:41d0::6b1)
+	3  gsw-g1-a9.fr.eu (2001:41d0::b82)
+
+Côté services lancés par défaut, on trouve SSH sur toutes les addresses disponibles et BIND (dns) uniquement pour le localhost.
+
+	# netstat -lp
+	Connexions Internet actives (seulement serveurs)
+	Proto Recv-Q Send-Q Adresse locale          Adresse distante        Etat        PID/Program name
+	tcp        0      0 localhost.locald:domain *:*                     LISTEN      3849/named      
+	tcp        0      0 *:ssh                   *:*                     LISTEN      3992/sshd       
+	tcp        0      0 localhost.localdoma:953 *:*                     LISTEN      3849/named      
+	tcp6       0      0 ip6-localhost:domain    [::]:*                  LISTEN      3849/named      
+	tcp6       0      0 [::]:ssh                [::]:*                  LISTEN      3992/sshd       
+	tcp6       0      0 ip6-localhost:953       [::]:*                  LISTEN      3849/named      
+	udp        0      0 localhost.locald:domain *:*                                 3849/named      
+	udp6       0      0 ip6-localhost:domain    [::]:*                              3849/named      
+
+Concernant la sécurisation réseau, la configuration initiale du firewall est vide (aucun filtrage entrant ou sortant) ce qui est logique, car après tout seul le serice SSH est actuellement disponible, et pour que le client puisse s'y connecter depuis n'importe où, aucune sécurisation additionnelle n'était possible.
+
+	# iptables -L
+	Chain INPUT (policy ACCEPT)
+	target     prot opt source               destination         
+
+	Chain FORWARD (policy ACCEPT)
+	target     prot opt source               destination         
+
+	Chain OUTPUT (policy ACCEPT)
+	target     prot opt source               destination  
+
+Pour ce qui est de la bande passante allouée au serveur, on est connecté au LAN OVH en 100 méga full duplex, et la bande passante effective est **SLA best effort** (Service Level Agreement) c'est à dire qu'elle n'est pas garantie.
+
+En clair, si toute la capacité est disponible en amont, on peut atteindre les 100mbit/s, mais si tous les autres serveurs du rack consomment beaucoup, on peut tomber à 1ko/sec et il n'y a aucune raison valable de râler, ce qui est parfaitement normal au vu de l'offre.
+
+	# iperf -c iperf.ovh.net -m -i 3 -t 9 -r
+	------------------------------------------------------------
+	Server => iperf.ovh.net (tcp, ipv4)
+	------------------------------------------------------------
+	[  3] local 91.121.CCC.DDD port 39491 connected with 188.165.12.136 port 5001
+	[  3]  0.0- 3.0 sec  33.9 MBytes  94.7 Mbits/sec
+	[  3]  3.0- 6.0 sec  33.6 MBytes  94.0 Mbits/sec
+	[  3]  6.0- 9.0 sec  33.8 MBytes  94.4 Mbits/sec
+	------------------------------------------------------------
+	iperf.ovh.net => Server (tcp, ipv4)
+	------------------------------------------------------------
+	[  5] local 91.121.CCC.DDD port 5001 connected with 188.165.12.136 port 36459
+	[  5]  0.0- 3.0 sec  33.7 MBytes  94.2 Mbits/sec
+	[  5]  3.0- 6.0 sec  33.7 MBytes  94.2 Mbits/sec
+	[  5]  6.0- 9.0 sec  33.7 MBytes  94.2 Mbits/sec
+
+Bref, on a ce qu'il faut question tuyau.
+
+# Système de fichiers
+
+Lors de la commande, on a pas demandé de partitionnement spécifique, ni de LVM ni d'encryption ni rien de spécial, et qu'il n'y a qu'un disque donc pas de RAID.
+
+Ce qu'il faut retenir, c'est qu'avec le partitionnement par défaut les data volumineuses **doivent** être stockées dans la partition `home` (de 460go) car la partition racine ne fait "que" 20Go. Par défaut, les deux partitions sont en EXT4 (système de fichier journalisé donc plus résilient aux pannes).
+
+	# lsblk 
+	NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+	sda      8:0    0 465,8G  0 disk 
+	|-sda1   8:1    0    20G  0 part /
+	|-sda2   8:2    0 445,3G  0 part /home
+	`-sda3   8:3    0   513M  0 part [SWAP]
+
+	# mount
+	/dev/root on / type ext4 (rw,relatime,errors=remount-ro,data=ordered)
+	devtmpfs on /dev type devtmpfs (rw,relatime,size=999968k,nr_inodes=249992,mode=755)
+	tmpfs on /run type tmpfs (rw,nosuid,noexec,relatime,size=200100k,mode=755)
+	tmpfs on /run/lock type tmpfs (rw,nosuid,nodev,noexec,relatime,size=5120k)
+	proc on /proc type proc (rw,nosuid,nodev,noexec,relatime)
+	sysfs on /sys type sysfs (rw,nosuid,nodev,noexec,relatime)
+	tmpfs on /dev/shm type tmpfs (rw,nosuid,nodev,noexec,relatime,size=505240k)
+	devpts on /dev/pts type devpts (rw,nosuid,noexec,relatime,gid=5,mode=620)
+	/dev/sda2 on /home type ext4 (rw,relatime,data=ordered)
+
+On a donc largement assez de place pour stocker les fichiers d'un site web, d'un échange de photos, les fichiers d'une base de données, ou les systèmes de téléchargements.
+
+A noter qu'il s'agit ici de la primo installation par défaut, et qu'il suffit de réinstaller le serveur pour repartitionner comme on le souhaite (primaire, secondaire, LVM, ext3, ext4, etc)
+
+# Spécificités OVH
+
+Bonne nouvelle, côté gestion des packages et des sources d'installation Debian, OVH dispose d'un mirroir local. Ca permet d'avoir des mises à jour extrêmement rapides et efficaces, et d'avoir un système initialement installé qui est déjà à jour (aptitude full-upgrade m'informe que tout est à jour).
+
+Les sources n'incluent que la branche "main", donc il faudra rajouter manuellement "contrib" et éventuellement "non-free" si besoin d'un logiciel qui s'y trouve.
+
+	# cat /etc/apt/sources.list
+	deb http://debian.mirrors.ovh.net/debian/ wheezy main
+	deb-src http://debian.mirrors.ovh.net/debian/ wheezy main
+	deb http://security.debian.org/ wheezy/updates main
+	deb-src http://security.debian.org/ wheezy/updates main
+
+Dans le répertoire home du root, je vois 3 fichiers que je ne connais pas :
+- `.email` : l'email du compte client
+- `.mdg` : le numéro du serveur affiché dans la bannière
+- `.ovhrc` : des infos OVH sous forme de variable du shell
+
+Le fichier `.ovhrc` contient les infos suivantes
+
+	# cat .ovhrc
+	DATACENTER="RBX2"
+	COUNTRY="France"
+	TIMEZONE="Europe/Paris"
+	DISTRIB=debian7_64
+	IPV6ADDR=2001:abcd:1:abcd::1
+	IPV6GW=2001:abcd:1:abff:ff:ff:ff:ff
+	DNS_IPV6=2001:abcd:3:abc::1
+	DNS_IP=213.186.33.199
+	DNS_HOSTNAME=ns.kimsufi.com
+
+Dans les tâches cron on retrouve l'appel à l'outil OVH de supervision, RTM. Il s'agit d'un ensemble de scripts perl/bash, séparé du reste du système de base, et rangé proprement dans /usr/local/rtm
+
+	# cat /etc/crontab 
+	*/1 * * * * root /usr/local/rtm/bin/rtm 9 > /dev/null 2> /dev/null
+
+Cette Debian "OVH" est donc une Debian standard, si ce n'est:
+- le kernel 3.10.9 maison avec les patchs [grsec](http://grsecurity.net/) au lieu du kernel wheezy (3.2.46-1+deb7u1)
+- le daemon de monitoring RTM, lancé toutes les minutes
+- le daemon Bind9 (en loopback uniquement) pour la résolution des noms
+- GnuPG déjà installé (mais rien dans le keyring, même pas de clé publique)
+- et un daemon `mdadm` (gestion du RAID soft sous Linux) ce que je trouve curieux vu qu'on a qu'un seul disque dans les KS2G. En fait c'est logique, le process d'install OVH doit fonctionner pour tous les serveurs. On pourra arrêter ce daemon dans notre cas.
+
+Bref, pas de surcouche à la noix, c'est parfait.
+
+# Services OVH
+
+Pour la gamme Kimsufi, tout le support est effectué via le forum [kimsufi](http://forum.kimsufi.com)
+
+A priori le système d'incident disponible dans le manager OVH n'est là que pour les problèmes réellement hardware, mais je n'en suis même pas certain.
+
+Dans tous les cas, les [guides](http://guides.ovh.net) sont là pour mieux comprendre la manière de faire OVH et les services associés à la location du serveur.
+
+## Manager v3
+
+Dans le [manager v3](https://www.ovh.com/managerv3/) on retrouvera les informations "externes"
+- un résumé des infos du serveur (DC, baie, numéro du serveur)
+- la fonction de monitoring "à la sauce OVH" via un soft maison appelé RTM
+- le formulaire pour configurer les reverse DNS de nos adresse IPv4/IPv6
+
+Pour la gestion du serveur lui même on retiendra surtout
+- une fonction reboot hard (donc "pas propre" et à utiliser le moins posible)
+- choix de la méthode de boot (disque, netboot, ou recovery qui permet d'avoir un accès pour corriger les problèmes de password ou de partition ou pour faire des backups, etc etc)
+- réinstaller/changer d'OS, tout en partitionnant comme on le souhaite
+
+Il y a tout ce qu'il faut pour faire ce dont j'aurai besoin. Tout au plus l'encryption du disque manque à l'appel, si on ne peut pas la créer/gérer manuellement dans le LVM post-installation, mais c'est juste pour le principe.
+
+## Manager v6
+
+Le [manager v6](https://www.ovh.com/manager) est le futur de l'interface OVH, mais il est en développement, et très peu de fonctions sont disponibles au moment où j'écris ce post. Cependant, on y retrouve déjà la gestion du netboot, du reboot hard, et du système [anti-ddos VAC](http://www.ovh.com/fr/anti-ddos/)
+
+L'anti-ddos est vu dans le manager comme un firewall réseau et la mitigation (IDS/IPS) tous deux se situant en amont de notre serveur serveur. Ca permet de bloquer tout ou partie des attaques avant que celles-ci n'aient atteint la carte réseau de notre serveur, et donc sans gacher de bande passante ni de CPU/MEM/IO.
+
+Dans ce manager, on peut configurer les règles du firewall, activer ou désactiver le firewall réseau, activer/désactiver la mitigation permanente, et consulter les stats entrantes quand la mitigation est active (qu'elle soit permanente ou détectée à la volée)
+
+## API
+
+L'[API OVH](http://api.ovh.com) est l'épine dorsale sur laquelle vont au final se greffer toutes les fonctions des managers.
+
+Elle permet
+- d'accéder de manière programmée simple aux fonctions OVH, pour automatiser des tâches par exemple
+- d'utiliser les fonctions en cours de bêta et pour lesquelles le(s) managers ne seraient pas encore à jour
+- de mieux comprendre et tracer l'état et le fonctionnement des services OVH
+
+Actuellement l'API permet de gérer : le CDN, le PCA/PCS, les NAS, les serveurs dédiés, les VPS, le VRACK, les noms de domaine, les emails, les IP failover, les blocs RIPE, l'anti-ddos, les comptes SMS, les infos de contact, de facturation, les commandes, et les liaisons DSL. Et elle s'étoffe au fur et à mesure.
+
+# Conclusion
+
+Je suis très content de ce petit serveur, qui me permettra de faire tout ce que je faisais déjà sur mon serveur à la maison, avec du CPU en plus, de la mémoire en plus, et surtout plus de bande passante.
+
+Merci OVH pour cette superbe offre.
+
+

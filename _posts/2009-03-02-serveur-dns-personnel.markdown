@@ -1,0 +1,437 @@
+---
+layout: post
+title:  Serveur-dns-personnel
+tags: serveur dns
+---
+
+J'avais depuis longtemps envie de gérer mes propres enregistrements DNS, au lieu de confier les informations à mon registrar [online.net](http://www.online.net) qui fait le travail réel pour moi.
+
+En les gérant le nom de domaine soi-même :
+- on perd en fiabilité (on a pas les mêmes capacités réseau et la même redondance que le registrar), on ne dispose plus du support technique du service pour lequel on paye (*ie* faut se débrouiller pour la compréhension, la config, et les problèmes)
+- mais on gagne en contrôle car si le registrar ne fait pas de DNSSEC, on pourra essayer d'en faire, et s'il autorise l'AXFR alors qu'on voudrait pas, nous on peut l'interdire ; et on pourra peut-être même générer des entrées dynamiques.
+
+Allez, en avant pour l'aventure.
+
+# Fournisseur de service .. qui gère la zone DNS ?
+
+J'ai acheté auprès de lui un nom de domaine `nipil.org.` et maintenant quoi ? Plus précisément, je *loue* la zone `nipil` de la zone `org` de la zone racine `.`, c'est pour ça qu'on voit un `.` à la fin du nom de domaine ci-dessus.
+
+Bref, en offre Basique, j'ai les services DNS suivants :
+- la zone `nipil` modifiable à volonté
+- nombre de sous domaines illimités
+- tous les types de champs disponibles
+
+Tout d'abord, il faut décider qui aura authorité sur cette zone `nipil`. Dans la console online.net, ce choix se manifeste dans l'onglet *"Manage DNS Servers"*, où il faut entrer les adresses des serveurs qui seront contactés en tant que connaisseurs fiable des informations de la zone. On a alors deux possibilités :
+1. soit je délègue aux serveurs DNS de mon registrar l'authorité sur ma zone `nipil`
+2. soit je délègue à un serveur personnel l'authorité sur ma zone `nipil`
+
+Euh ... ouais. Mais qu'est ce que ça veut dire ? Grosso modo, c'est pareil. Je m'explique :
+- Imaginons la famille Dalton et les 4 frères, chacun habitant à un endroit différent, et on les nommera logiquement Joe, Jack, William, et Avrael.
+- La méthode 1 consiste à dire que Lucky Luke sait toujours où se trouvent chacun des 4 Dalton : il fait autorité, et garde toujours à l'oeil les 4 Dalton, ce qui fait qu'il les retrouve toujours.
+- La méthode 2 consiste à dire que Ma Dalton, leur mère sait toujours où se trouvent chacun des 4 Dalton : elle fait autorité, et sait toujours où se trouvent ses 4 fils.
+
+A priori c'est strictement identique, car qu'on demande à Ma Dalton ou à Lucky Luke, on retrouvera toujours les frères Dalton. En fait, la seule différence est la suivante :
+- demander à Lucky Luke, c'est s'adresser à quelqu'un de fiable, d'efficace, mais qui n'a pas de lien affectif fort avec les frères Dalton. C'est son boulot de les retrouver, il est toujours disponible et il est sérieux.
+- demander à Ma Dalton, c'est s'adresser à un personnage qui n'est pas toujours disponible, mais qui a un lien affectif fort avec les frères Dalton, et qui saura toujours où se trouvent ses fils. Et elle acceptera sûrement de faire des choses pour ses fils que Lucky Luke refuserait de faire.
+
+En résumé, qu'on choisisse l'une ou l'autre méthode, le resultat sera donc le même, mais les acteurs concernés seront différents. Donc par soucis de fiabilité, et surtout de simplicité, la majorité du temps on utilise la méthode 1.
+
+# Méthode 1 : Déléguer sa zone DNS à son registrar
+
+C'est le comportement par défaut dans la majorité des cas :
+- je laisse les valeurs par défaut `ns0.online.net` et `ns1.online.net` dans le formulaire "Manage DNS Servers" de la console de gestion du registrar
+- le registrar indiquera au gestionnaire de la zone `org` que le serveur qui fera authorité pour la sous-zone `nipil` seront les serveurs DNS du registrar.
+- ses serveurs DNS utiliseront les informations configurées dans le formulaire "Edit DNZ zone" pour répondre aux requêtes qui lui parviennent.
+
+On a alors la chaine suivante : `.` sait où trouver ORG `org` qui sait où trouver `nipil.org` (*ie* sur les serveurs DNS du registrar) qui eux saura répondre aux requêtes du type `xyz.nipil.org`
+
+## Verification de la chaine de résolution
+
+On peut vérifier et visualiser ça facilement, par étape, comme indiqué ci-dessous
+
+On interroge d'abord un serveurs faisant autorité sur la zone racine `.` pour savoir s'il connaît qui gère notre zone `nipil.org.` : il nous répond qu'il ne sait pas (`ANSWER: 0`) mais qu'il connaît quelques personnes qui font autorités sur la zone `org.` qui sauront nous répondre.
+
+	$ dig @a.root-servers.net nipil.org any
+	...
+	;; flags: qr rd; QUERY: 1, ANSWER: 0, AUTHORITY: 6, ADDITIONAL: 12
+	...
+	;; AUTHORITY SECTION:
+	org.                    172800  IN      NS      b0.org.afilias-nst.org.
+	org.                    172800  IN      NS      a0.org.afilias-nst.info.
+	org.                    172800  IN      NS      d0.org.afilias-nst.org.
+	org.                    172800  IN      NS      b2.org.afilias-nst.org.
+	org.                    172800  IN      NS      a2.org.afilias-nst.info.
+	org.                    172800  IN      NS      c0.org.afilias-nst.info.
+	...`
+
+On interroge ensuite un serveurs faisant autorité sur la zone `org.` pour savoir s'il connaît qui gère notre zone `nipil.org.` : il nous répond qu'il ne sait pas (`ANSWER: 0`) mais qu'il connaît quelques personnes qui font autorités sur la zone `nipil.org.` qui sauront nous répondre.
+
+	$ dig @b0.org.afilias-nst.org nipil.org any
+	...
+	;; flags: qr rd; QUERY: 1, ANSWER: 0, AUTHORITY: 2, ADDITIONAL: 0
+	...
+	;; AUTHORITY SECTION:
+	nipil.org.              86400   IN      NS      ns0.online.net.
+	nipil.org.              86400   IN      NS      ns1.online.net.
+	...
+
+On interroge pour finir un des serveurs faisant autorité sur la zone `nipil.org.` pour savoir ce qu'il connait de notre zone : il nous répond qu'il sait plein de choses (`ANSWER: 6`) et nous donne tous les enregistrements de la zone (mais pas les sous-enregistrements)
+
+	$ dig @ns0.online.net nipil.org any
+	...
+	;; ANSWER SECTION:
+	nipil.org.              14400   IN      SOA     ns0.online.net. hostmaster.proxad.net. 1326533522 3600 1800 1209600 5400
+	nipil.org.              14400   IN      NS      ns0.online.net.
+	nipil.org.              14400   IN      NS      ns1.online.net.
+	nipil.org.              14400   IN      A       88.190.253.247
+	nipil.org.              14400   IN      MX      10 mx.online.net.
+	nipil.org.              14400   IN      MX      20 mx-cache.online.net.
+	...
+
+A noter qu'on obtiendrait ces trois résultats en une seule requête `dig nipil.org +trace +nodnssec any`, sachant que le paramètre `+nodnssec` est juste là pour éviter d'avoir des lignes supplémentaires liées à la vérification cryptographique d'authenticité, qui sont a priori incompréhensibles.
+
+Et par "chance", comme les DNS d'Online ne l'interdisent pas, il est aussi possible de demander un "Transfert de zone" (appelé aussi AFXR) afin de connaître l'intégralité du contenu déclaré dans cette zone :
+
+	$ dig @ns0.online.net nipil.org axfr
+	...
+	nipil.org.              14400   IN      SOA     ns0.online.net. hostmaster.proxad.net. 1326533522 3600 1800 1209600 5400
+	nipil.org.              14400   IN      NS      ns0.online.net.
+	nipil.org.              14400   IN      NS      ns1.online.net.
+	nipil.org.              14400   IN      A       88.190.253.247
+	nipil.org.              14400   IN      MX      20 mx-cache.online.net.
+	nipil.org.              14400   IN      MX      10 mx.online.net.
+	*.nipil.org.            14400   IN      CNAME   pf7-web.online.net.
+	autoconfig.nipil.org.   14400   IN      CNAME   mail-autoconfig.online.net.
+	nipildb.nipil.org.      14400   IN      CNAME   pf9-mysql.online.net.
+	nipil.org.              14400   IN      SOA     ns0.online.net. hostmaster.proxad.net. 1326533522 3600 1800 1209600 5400
+	...
+	;; XFR size: 12 records (messages 12, bytes 728)
+
+Ca nous permet de connaitre le contenu exaustif de ce qui est configuré, que ça soit au niveau de la zone elle-même, *mais aussi ses sous-éléments*, alors que ces sous éléments n'apparaissaient pas dans la requête précédente.
+
+En général, c'est une fonctionnalité désactivée, car ça aide l'attaquant à connaître la topologie DNS de l'entité cible, et donc de trouver plus facilement des ressources à attaquer. Mais rappelons que dans l'absolu, ce n'est pas parce que qu'une entité est cachée qu'elle est moins vulnérable : la sécurité par l'obscurité n'est jamais une bonne solution.
+
+## Chaîne de résolution inverse
+
+Pour terminer, on peut regarder la résolution inverse (ce qui fait correspondre un nom de domaine à une adresse ip) et ce pour une adresse IPv4 et IPv6. A noter que ces informations ne sont **pas** liées à votre nom de domaine, mais gérée *par votre FAI* ! C'est effectivement votre opérateur d'accès à internet qui fera (s'il l'autorise et que vous l'avez configuré) ce travail de référencement.
+
+Par exemple, mon FAI [Free](http://www.free.fr) (fournisseur d'accès à internet) ne me permet que de référencer la résolution inverse de mon adresse IPv4. Je lui avais demandé via la console de gestion, de faire correspondre `home.nipil.org` à mon adresse internet.
+
+	$ dig -x 88.189.158.57 +trace
+
+	; <<>> DiG 9.8.4-rpz2+rl005.12-P1 <<>> -x 88.189.158.57 +trace
+	;; global options: +cmd
+	...
+	in-addr.arpa.           172800  IN      NS      a.in-addr-servers.arpa.
+	in-addr.arpa.           172800  IN      NS      f.in-addr-servers.arpa.
+	in-addr.arpa.           172800  IN      NS      e.in-addr-servers.arpa.
+	in-addr.arpa.           172800  IN      NS      d.in-addr-servers.arpa.
+	in-addr.arpa.           172800  IN      NS      b.in-addr-servers.arpa.
+	in-addr.arpa.           172800  IN      NS      c.in-addr-servers.arpa.
+	;; Received 420 bytes from 2001:dc3::35#53(2001:dc3::35) in 212 ms
+
+	88.in-addr.arpa.        86400   IN      NS      ns3.nic.fr.
+	88.in-addr.arpa.        86400   IN      NS      pri.authdns.ripe.net.
+	88.in-addr.arpa.        86400   IN      NS      sec1.apnic.net.
+	88.in-addr.arpa.        86400   IN      NS      sec3.apnic.net.
+	88.in-addr.arpa.        86400   IN      NS      sns-pb.isc.org.
+	88.in-addr.arpa.        86400   IN      NS      tinnie.arin.net.
+	;; Received 200 bytes from 2001:500:87::87#53(2001:500:87::87) in 195 ms
+
+	189.88.in-addr.arpa.    172800  IN      NS      ns0.proxad.net.
+	189.88.in-addr.arpa.    172800  IN      NS      ns.ripe.net.
+	189.88.in-addr.arpa.    172800  IN      NS      ns1.proxad.net.
+	;; Received 156 bytes from 2001:dc0:1:0:4777::140#53(2001:dc0:1:0:4777::140) in 306 ms
+
+	158.189.88.in-addr.arpa. 86400  IN      NS      ns3-rev.proxad.net.
+	158.189.88.in-addr.arpa. 86400  IN      NS      ns2-rev.proxad.net.
+	;; Received 130 bytes from 212.27.32.2#53(212.27.32.2) in 34 ms
+
+	57.158.189.88.in-addr.arpa. 86400 IN    PTR     home.nipil.org.
+	;; Received 72 bytes from 213.228.57.42#53(213.228.57.42) in 38 ms
+
+Ce que montre ce listing :
+- que les informations inverses sont connues entre autres par `a.in-addr-servers.arpa`
+- qui lui dit que `88.*.*.*` est connu entre autres par `ns3.nic.fr`
+- qui lui dit que `88.189.*.*` est connu entre autre par `ns0.proxad.net`
+- qui lui sait que `88.189.158.*` est connu entre autre par `ns3-rev.proxad.net`
+- qui lui sait (la ligne `PTR`) que 88.189.158.57 correspond à `home.nipil.org`
+
+En conclusion, mon opérateur a bien fait son travail avec mon adresse IPv4.
+
+Regardons maintenant pour l'IPv6 :
+
+	$ dig -x 2a01:e35:8bd9:e390::2 +trace
+
+	; <<>> DiG 9.8.4-rpz2+rl005.12-P1 <<>> -x 2a01:e35:8bd9:e390::2 +trace
+	;; global options: +cmd
+	...
+	ip6.arpa.               172800  IN      NS      a.ip6-servers.arpa.
+	ip6.arpa.               172800  IN      NS      d.ip6-servers.arpa.
+	ip6.arpa.               172800  IN      NS      b.ip6-servers.arpa.
+	ip6.arpa.               172800  IN      NS      f.ip6-servers.arpa.
+	ip6.arpa.               172800  IN      NS      c.ip6-servers.arpa.
+	ip6.arpa.               172800  IN      NS      e.ip6-servers.arpa.
+	;; Received 462 bytes from 2001:dc3::35#53(2001:dc3::35) in 215 ms
+
+	3.e.0.1.0.a.2.ip6.arpa. 172800  IN      NS      ns3.proxad.net.
+	3.e.0.1.0.a.2.ip6.arpa. 172800  IN      NS      ns2.proxad.net.
+	;; Received 136 bytes from 2001:dc0:2001:a:4608::59#53(2001:dc0:2001:a:4608::59) in 326 ms
+
+	;; Received 90 bytes from 213.228.57.41#53(213.228.57.41) in 39 ms
+
+Ce que montre ce listing :
+- que les informations inverses sont connues entre autres par `a.ip6-servers.arpa`
+- qui lui dit que `3.e.0.1.0.a.2.ip6.arpa` est connu entre autres par `ns3.proxad.net`
+- il n'y a pas de ligne `PTR`, et donc aucun nom référencé pour cette adresse IPv6
+
+Et c'est logique, car en IPv4 mon FAI ne me donne une seule adresse, donc si je lui dit quelle nom mettre pour mon adresse il sait directement à laquelle associer ce nom. Alors que pour l'IPv6, il me donne un sous-réseau IPv6 (pleins d'adresses), donc pour configurer des résolutions inverses il faudrait que je lui donne à la fois les noms, mais aussi les adresses qui iraient avec. Mon FAI ne propose pas de formulaire pour l'IPv6, mais ça viendra peut-être un jour.
+
+On remarque aussi via les commentaires `; Received` que l'on interroge les serveurs DNS à la fois en IPv4 et IPv6, indépendamment du fait qu'on demande des informations relatives à des adresses IPv4 ou IPv6 : quand on parle DNS, le contenu *n'est pas lié* au moyen de transport.
+
+# Méthode 2 : Déléguer sa zone DNS à un serveur personnel
+
+Un des principales contraintes n'est pas technique mais organisationnelle : les standards internet (appelées RFC) préconisent d'avoir deux serveurs dns distincts pour chaque zone. En conséquence, notre registrar me demande 2 serveurs minimum pour que je puisse gérer moi-même mon domaine, et bien évidemment refusera que je mette deux fois la même ... Ce qui va nous embêter vu qu'on a une seule adresse sur votre box !
+
+Il serait techniquement possible de mettre 1x fois notre adresse personnelle, et 1x celui d'un dns secondaire quelconque d'internet, mais ça ne foncitonnerait pas car le registrar vérifie que chacun des dns rentré est `SOA` sur la zone demandée avant d'accepter la modification, ce qui n'est pas le cas pour le dns choisi au pif.
+
+Resterait la solution de mettre 1x notre adresse, et 1x l'adresse d'un des serveurs DNS du registrar. Résultat ? le registrar accepte la modification. Cool ? Non. Car on aurait alors un problème de cohérence. En effet, pour résoudre les informations de notre zone `nipil.org`, les résolveurs commencent par demander à `org` qui gère `nipil`, et en faisant ça ils obtiendrait à chaque fois l'une ou l'autre des réponses suivantes : 
+
+	;; AUTHORITY SECTION:
+	nipil.org.		86400	IN	NS	ns0.nipil.org.
+	nipil.org.		86400	IN	NS	ns0.online.net.
+
+	;; AUTHORITY SECTION:
+	nipil.org.		86400	IN	NS	ns0.online.net.
+	nipil.org.		86400	IN	NS	ns0.nipil.org.
+
+En quoi c'est un problème ? Et bien chaque serveur DNS, quand il a plusieurs enregistrements qui correspondent, les donnes à ceux qu'il interrogent dans un ordre indéfini, afin de répartir la charge sur chacun d'entre eux, et ces informations seront essayées dans l'ordre où elles ont été données.
+
+Ce qui fait que les résolveurs vont parfois s'adresser à `ns0.nipil.org` et parfois à `ns0.online.net`. Et qu'ils recevront soit les données configurées dans notre serveur à domicile, soit les données configurées dans le formulaire "Edit DNS zone" de notre registrar.
+
+Si ça n'est pas un problème insoluble, ça n'est clairement pas souhaitable, car il faudra au minimum faire l'effort de conserver la cohérence entre ces deux sources de données (tout ce que vous configurerez dans l'un devra aussi l'être dans l'autre). De plus si vous voulez configurer des trucs comme du round robin dns ou déléguer des sous-zones, le formulaire du registrar ne le permettant pas, on ne pourra conserver la cohérence. Et accessoirement, on ne recevra sur notre serveur en moyenne qu'une requête sur deux, alors qu'on veut "tout gérer soi-même".
+
+La solution est toute simple : il suffit, au moment où on demande la gestion de notre zone sur notre serveur, d'avoir à disposition un *deuxième* daemon DNS qu'on aura configuré à l'identique du premier, et qui peut recevoir des connexions, et qui aura une adresse ip différente de notre serveur principal (c'est indispensable).
+
+Pour ce faire, plusieurs possibilités :
+- utiliser une connexion modem RTC temporaire
+- utilisiez la connexion FreeWifi
+- réutilisiez la connexion internet d'un ami, voisin, famille
+- utiliser un serveur cloud temporairement (Amazon EC2 par exemple)
+
+Une fois le changement effectué auprès du registrar, ce deuxième serveur peut être arrêté, rendu, libéré, bref, ne sert plus. **A VERIFIER** Cependant, cette adresse IP restera dans les DNS de la zone `org` jusqu'à expiration, soit quelques jours **A VERIFIER**.  Pendant ce temps, toute machine ayant ou récupérant cette adresse recevra des requêtes DNS pour notre zone, ce qui n'est pas gênant au point de vue technique.
+
+Du coup, sachez bien que si la machine qui a encore, ou récupérera cette adresse par le futur, décide de faire tourner un daemon DNS et configure une zone `nipil`, alors il pourra se faire passer pour nous. Il pourra rediriger tous les flux de manière transparente (sauf les https, ssl, tls, ssh, vpn, etc) vers n'importe quel serveur de son choix. Pourquoi cette "faille" ? Parce qu'en configurant ces deux adresses auprès de notre registrar, on a délégué la confiance de notre zone à ces deux serveurs, peu importe qui c'est effectivement, avec tout que ça implique en cas de réutilisation de cette seconde adresse par d'autres personnes.
+
+Les étapes à réaliser seront les suivantes :
+- monter un daemon DNS sur votre serveur et sur une autre connexion réseau
+- configurer votre zone correspondante dans les daemon DNS des deux machines
+- configurer deux entrées dns chez votre registrar actuel pour ces machines
+- configurer les pare-feux des deux machines pour laisser passer les requêtes
+- entrer noms et ip dans le formulaire "Manage DNS Servers"
+- vérifier les résultats après quelques minutes
+
+Le registrar indiquera alors au gestionnaire de la zone `org` que les serveurs qui feront authorité pour la sous-zone `nipil` sera les deux serveurs que vous avez indiqué, dont un seul au final travaillera. Dorénavant, c'est votre serveur qui fera le travail de résolution de nom lors des demandes, pour tous les relais internet, et non plus ceux du registrar.
+
+## Etape 1 : préparation et installation des daemon DNS
+
+J'utilise actuellement le paquet `dnsmasq` comme serveur DHCP (pour fournir des adresses IPv4 aux machines du LAN) et il fait aussi office de **relais** DNS pour les machines du LAN. Celui-ci écoute donc déjà sur les ports `domain`. Et ça posera problème si on veut installer un autre serveur DNS qui va vouloir utiliser ces mêmes ports.
+
+Plus précisément, ce qui serait indésirable pas réellement d'avoir deux daemons qui écouteraient sur les ports `domain` en UDP, mais de n'avoir qu'un seul daemon qui écouterait sur le port `domain` en TCP ... et en plus, ça serait le premier des deux à démarrer qui prendrait la place, donc pas très fiable.
+
+En fait, ca donnerait ça :
+
+	# netstat -lp | grep domain
+	tcp        0      0 *:domain                *:*      LISTEN 21419/dnsmasq
+	tcp6       0      0 [::]:domain             [::]:*   LISTEN 21419/dnsmasq
+	udp        0      0 10.120.0.100:domain     *:*             21435/named
+	udp        0      0 192.168.9.1:domain      *:*             21435/named
+	udp        0      0 192.168.8.1:domain      *:*             21435/named
+	udp        0      0 192.168.7.1:domain      *:*             21435/named
+	udp        0      0 192.168.6.1:domain      *:*             21435/named
+	udp        0      0 192.168.5.1:domain      *:*             21435/named
+	udp        0      0 192.168.4.1:domain      *:*             21435/named
+	udp        0      0 192.168.0.1:domain      *:*             21435/named
+	udp        0      0 home.nipil.org:domain   *:*             21435/named
+	udp        0      0 home.nipil.org:domain   *:*             21435/named
+	udp        0      0 *:domain                *:*             21419/dnsmasq
+	udp6       0      0 [::]:domain             [::]:*          21435/named
+	udp6       0      0 [::]:domain             [::]:*          21419/dnsmasq
+
+On va donc désactiver la fonction DNS de dnsmasq pour qu'il ne fasse plus que serveur DHCP. Pour ce faire, éditer le fichier `/etc/dnsmasq.conf`, décommenter et modifier la ligne `#port=5353` pour avoir `port=0`. Après un `/etc/init.d/dnsmasq restart` et le port `domain` sera disponible.
+
+Maintenant, on peut installer le logiciel Bind9 via `aptitude install bind9 bind9-doc`, qui sera automatiquement lancé avec les paramètres par défaut. On va modifier le fichier `/etc/resolv.conf` pour que le serveur utilise le daemon local pour les résolutions qu'il doit faire :
+
+	search nipil.org
+
+S'il n'y a aucune ligne indiquant un `nameserver`, c'est `localhost` qui sera utilisé par défaut, donc notre daemon qu'on va installer maintenant.
+
+## Etape 2 : configuration d'un daemon DNS Bind
+
+Tout d'abord, il faut protéger son serveur DNS vis à vis des attaques et des abus. Une règles les plus importantes est de ne pas permettre à quelqu'un venant d'internet d'interroger notre serveur en lui demandant de résoudre des adresses qui ne font pas partie de notre zone (qu'il ne soit pas un "open resolver"). 
+
+De plus, pour éviter que notre serveur contacte systématiquement les racines d'internet (qui ne sont pas faits pour ça !), il faut que l'on configure quelques forwarders, à qui on relaiera toutes nos requêtes DNS en provenance de nos machines LAN. J'utiliserai les deux DNS de mon FAI (Free), mais on peut utiliser d'autres serveurs.
+
+Pour ce faire, ajouter les lignes suivantes dans la structure `options { ... };` du fichier `/etc/bind/named.conf.options` :
+
+	allow-transfer { 192.168.0.0/16; 127.0.0.0/8; };
+	allow-recursion { 192.168.0.0/16; 127.0.0.0/8; };
+	allow-query-cache { 192.168.0.0/16; 127.0.0.0/8; };
+
+	forwarders { 212.27.40.240; 212.27.40.241; };
+
+On configure ensuite le domaine `nipil.org`, en insérant les informations suivantes dans le fichier `/etc/bind/named.conf.local`. Ce texte dit qu'on créé une zone, que le daemon est maître (SOA = Start of Autority) sur cette zone  et qu'en conséquence on a pas besoin de se référer à qui que ce soit pour y répondre (et donc il n'y a pas de forwarders).
+
+	zone "nipil.org." {
+		type master;
+		file "/etc/bind/db.nipil.org";
+		forwarders {};
+	};
+
+	include "/etc/bind/zones.rfc1918";
+
+La zone RFC1918 est incluse afin d'éviter de polluer internet ou les serveurs racine avec des résolutions inverses d'adresses locales.
+
+Pour finir, on a indique que les informations relatives à cette zone `nipil.org` sont stockées dans le fichier `/etc/bind/db.nipil.org`, qu'on va compléter de manière "minimale" comme suit :
+
+	$TTL       3600
+	@          IN      SOA     ns0.nipil.org. hostmaster.nipil.org. (
+	2013060300 ; serial
+	1H         ; refresh
+	15M        ; retry
+	4W         ; expire
+	10M        ; failed lookup cache
+	) 
+
+	; Nameserver stuff
+	@          IN      NS      ns0.nipil.org.
+	@          IN      NS      ns1.nipil.org.
+	ns0        IN      A       88.189.158.57
+	ns0        IN      AAAA    2a01:e35:8bd9:e390::2
+	ns1        IN      A       78.251.94.78
+
+Les informations importantes sont les suivantes :
+- le champs `hostmaster.nipil.org` est en fait l'email qui doit être contacté en cas de problème DNS, le `@` habituel est remplacé par un `.` pour avoir une syntaxe "à la DNS"
+- le nombre à gauche du `; SERIAL` doit *absolument être incrémenté* manuellement à chaque modification du fichier : il doit être au format `YYYYMMDDNN` où `NN` est un compteur quotidien s'il y a plus d'une modification par jour de ce fichier
+- le bloc en dessous indique les deux adresses que notre serveur est le serveur à contacter pour résoudre tout ce qui est relatif à notre domaine, et ici `ns0.nipil.org` est le serveur "qui restera" alors que `ns1.nipil.org` est le serveur temporaire monté sur la connexion FreeWifi
+
+Pour `ns0.nipil.org`, j'ai mis un enregistrement `A` et un `AAAA`, ce qui permettrait donc que notre serveur soit interrogé en IPv4 et en IPv6. Cependant, l'enregistrement IPv6 ne sert à rien dans la mesure où le formulaire de mon registrar ne permet que des "glue-record" en IPv4. Mais ça ne coûte rien de l'avoir, et ça sera déjà prêt pour le jour où le registrar prendra en compte l'IPv6.
+
+## Etape 3 : configuration du pare-feux et premier test
+
+Pour accepter les connexions entrantes en IPv4
+- ajouter la ligne `DNS(ACCEPT) net $FW` à `/etc/shorewall/rules`
+- recharger le pare feu IPv4 via `/etc/init.d/shorewall force-reload`
+
+Pour accepter les connexions entrantes en IPv6
+- ajouter la ligne `DNS(ACCEPT) net $FW` à `/etc/shorewall6/rules`
+- recharger le pare feu IPv6 via `/etc/init.d/shorewall6 force-reload`
+
+Pour vérifier ou suivre la propagation des requêtes, on peut ajouter le logging des connexions en utilisant `DNS(ACCEPT):info` à la place. On pourra enlever le logging après coup quand on sera satisfaits. Vérifier aussi que l'on accepte pas de spoofing avec des adresses sources locales sur l'interface côté internet, c'est à dire qu'il y a l'option `norfc1918` pour la ligne de l'interface de la zone `net` dans le fichier `/etc/shorewall/interface`.
+
+Tester via ce premier formulaire [Afnic Zonecheck](http://www.afnic.fr/fr/produits-et-services/services/zonecheck/formulaire-complet/), où il faut remplir la zone, et mettre dans la case "primaire" l'adresse de votre serveur, que votre zone est bien configurée (cocher la case "continue après fatal"). Puis tester via secondle formulaire [open resolver](http://dns.measurement-factory.com/cgi-bin/openresolvercheck.pl) en rentrant l'adresse IP de votre serveur, que votre daemon n'est pas un "open resolver" (ça doit marquer "closed").
+
+Une capture réseau `tcpdump -i interface_internet port domain` permet de voir les requêtes entrantes et sortantes, dans le tas on trouve celle du test de l'open resolver, qui est satisfaisant car la réponse fournie par Bind est "Refused".
+
+	16:13:39.774721 IP dns-surveys-2.caida.org.51496 > home.nipil.org.domain: 39788+ A? dee42d9795db60d7.4fa170190a05b227.test2.openresolvers.org. (75)
+	16:13:39.775438 IP home.nipil.org.domain > dns-surveys-2.caida.org.51496: 39788 Refused- 0/0/0 (75)
+
+On verra aussi, si le logging a été activé, les requêtes entrantes dans les logs du firewall, mais on verra aussi quelques infos de logs du daemon dans le fichier `/var/log/daemon.log` (y compris les requêtes 'denied') en cas de problèmes, ou pour voir qui tente d'utiliser notre serveur comme "open resolver".
+
+## Etape 4 : mise en place de la délégation de zone
+
+On se rend dans la console de notre registrar, et on configure dans "Edit DNS Zone" les deux enregistrements `ns0` et `ns1` qui pointent sur nos serveurs. Ca permet à l'outil de configuration du registrar de vérifier, lors de l'étape suivante, de retrouver et de vérifier les données de l'étape suivante.
+
+On va ensuite dans l'onglet "Manage DNS servers", et on remplace les valeurs par défaut (qu'on archivera dans un coin s'il n'y a pas un bouton "restore default") par les adresses IPv4 et IPv6 de notre serveur personnel, et de la machine temporaire.
+
+Ca donnera quelque chose comme ça,pour mon registrar Online.net :
+
+	DNS Server       |     IPv4 (optional)
+	-----------------+--------------------	
+	ns0.nipil.org    |     88.189.158.57
+	ns1.nipil.org    |     78.251.94.78
+
+Pourquoi mettre l'adresse IP en plus du nom de domaine qu'on vient de configurer ? C'est ce qu'on appelle un "[glue record](http://fr.wikipedia.org/wiki/Domain_Name_System#Glue_records)". C'est pour résoudre le problème de l'oeuf et de la poule.
+
+En effet, si les serveurs permettant de résoudre les noms de la zone `nipil.org` font partie de la zone `nipil.org` (c'est le cas ci-dessus), alors ils est impossible de les interroger, car pour leur faire correspondre une adresse IP, il faudrait les interroger, mais pour ça faudrait leur faire correspondre une adresse IP !
+
+Les "glue records", ici présentés par mon registrar sous la forme de champs IP facultatifs, servent donc à donner la réponse à cette question implicite. C'est une entorse au principe "ne stocker qu'une fois l'information", mais c'est nécessaire. C'est entre autres pour ça qu'il y a une section "additionnal records" dans le listing qu'on voit juste un peu plus bas, qui donne les serveurs gérant la zone, mais aussi les IP qui vont avec.
+
+Exemple : si on avait une configuration "mixte" (non souhaitable) où on aurait mis notre serveur et un de ceux de notre registrar, alors on aurait la réponse ci-dessous quand on interroge `org` : on voit qu'on a un seul "glue record", car `ns0.online.net` est serveur de nom pour la zone `nipil.org` mais ne fait pas partie de cette zone, donc il n'a pas besoin de glue record pour fonctionner. Cependant, `ns0.nipil.org` lui fait partie de cette zone, donc il lui faut un "glue record".
+
+	;; AUTHORITY SECTION:
+	nipil.org.		86400	IN	NS	ns0.online.net.
+	nipil.org.		86400	IN	NS	ns0.nipil.org.
+
+	;; ADDITIONAL SECTION:
+	ns0.nipil.org.		86400	IN	A	88.189.158.57
+
+Après avoir patienté un peu (ça peut être instantané, ça peut prendre plus d'une journée pour certains registrar, et pour d'autres faut carrément faire une demande à la main, d'après ce que j'ai lu) on peut vérifier le résultat.
+
+On devrait avoir la la chaine suivante : `.` sait où trouver ORG `org.` qui sait où trouver `nipil.org.` (*ie* sur votre serveur et votre machine temporaire) qui lui saura répondre aux requêtes `xyz.nipil.org.`.
+
+En interrogeant `.` puis `org`, on voit qu'il a bien pris en compte nos informations :
+
+	$ dig nipil.org ns @a0.org.afilias-nst.info
+
+	; <<>> DiG 9.8.4-rpz2+rl005.12-P1 <<>> nipil.org ns @a0.org.afilias-nst.info
+	;; global options: +cmd
+	;; Got answer:
+	;; HEADER opcode: QUERY, status: NOERROR, id: 61767
+	;; flags: qr rd; QUERY: 1, ANSWER: 0, AUTHORITY: 2, ADDITIONAL: 2
+	;; WARNING: recursion requested but not available
+
+	;; QUESTION SECTION:
+	;nipil.org.                     IN      NS
+
+	;; AUTHORITY SECTION:
+	nipil.org.              86400   IN      NS      ns0.nipil.org.
+	nipil.org.              86400   IN      NS      ns1.nipil.org.
+
+	;; ADDITIONAL SECTION:
+	ns0.nipil.org.          86400   IN      A       88.189.158.57
+	ns1.nipil.org.          86400   IN      A       78.251.94.78
+
+	;; Query time: 296 msec
+	;; SERVER: 2001:500:e::1#53(2001:500:e::1)
+	;; WHEN: Mon Jun  3 18:49:46 2013
+	;; MSG SIZE  rcvd: 95
+
+Nos deux serveurs sont là, nos deux "glue record" aussi. Dans les heures et les jours à venir, l'intégralité des relais internet devraient venir progressivement sur notre serveur pour rafraîchir les caches correspondant à notre zone.
+
+Pour finir, profitez de votre passage sur une autre connexion que la vôtre pour vérifier *a la mano* que ça marche, que vous n'êtes pas un open-relay, et que le transfert de zone ne fonctionne pas depuis internet :
+- `dig @ns0.nipil.org nipil.org any` doit donner quelque chose
+- `dig @ns0.nipil.org www.perdu.com` doit être refusé
+- `dig @ns0.nipil.org nipil.org axfr` doit être refusé
+
+Tout est alors bon, on gère bien notre domaine.
+
+# Modification de la zone et propagation des enregistrements
+
+Maintenant qu'on a un serveur dns qui tourne et qui gère notre zone, il est possible d'ajouter des enregistrements de tous type, par exemple `xyz.nipil.org` pour permettre à une connaissance de ne plus devoir retenir son adresse ip pour quand il veut se connecter à la maison, ou pour son serveur web, serveur vocal, etc etc.
+
+Cependant, quand vous changez l'adresse IP d'un enregistrement sans anticiper, ça peut mettre plusieurs jours à se propager à tous les relais internet. Pendant ce temps, certains clients se retrouveront sur le nouveau service, d'autres sur l'ancien.
+
+Une astuce vise donc à anticiper le changement, et modifier les informations de la zone 72H à l'avance, en baissant les champs `$TTL` et du nombre `; failed lookup cache` à une valeur faible et identique, par exemple `300` (soit 5 minutes).
+
+Ainsi, ça garanti que tout changement du fichier de zone sera propagé rapidement car les informations antérieures expirent beaucoup plus vite dans les relais.
+
+*Cependant, après la modification, il est important de remettre les deux valeurs à leur configuration initiale, car sinon le nombre de requêtes durant ces 72H et si on ne remet pas les valeurs initiales, le nombre de requêtes pourra reçues être extrêmement élevées, et la charge générée sur le serveur (et la connexion internet) plus forte que prévue !*
+
+Dans tous les cas, lors d'une modification du fichier de zone, il faut **absolument** mettre à jour le serial. Ensuite il faut vérifier que la configuration est valide via la commande
+
+	named-checkzone nipil.org /etc/bind/db.nipil.org
+
+Puis recharger la configuration du daemon via `/etc/init.d/bind9 reload` (ou restart)
+
+Pour toute configuration additionnelle, le mieux est de se référer au [wiki](http://wiki.debian.org/fr/Bind9) Debian, mais surtout sur le [site](http://www.bind9.net/) officiel de Bind, et le `man named.conf` est bien sûr le meilleur ami pendant la configuration.
+
+# Et notre registrar, alors ?
+
+Notre registrar ne sert plus à rien maintenant. Il fallait que ça soit dit clairment, car à part si vous déménagez votre serveur et que vous devez mettre à jour le formulaire "Manage DNS servers", votre registrar est totalement inutile (sauf pour le renouvellement annuel).
+
+Et par conséquence, le formulaire "Edit DNZ zone" de votre registrar n'auront plus aucun effet : ça ne sert donc à rien de le regarder ni de le modifier en espérant que ça corrige un problème.
+
+D'ailleurs, mon registrar Online.net est suffisemment intelligent pour ne même plus permettre de consulter ce formulaire, ni de le modifier, car ça serait inutile. Peut-être que le votre continue de donner ce formulaire.
+
+Ah, et pour revenir en arrière (et réutiliser les informations de la zone) il suffit de remettre les deux serveurs DNS de votre regisrtar dans le formulaire "Manage DNS servers".

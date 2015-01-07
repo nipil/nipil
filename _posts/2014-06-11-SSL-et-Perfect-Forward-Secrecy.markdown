@@ -1,0 +1,122 @@
+---
+layout: post
+title: SSL et (Perfect) Forward Secrecy
+tags: serveur ssl
+---
+
+Tout d'abord, kezako la Forward Secrecy (PFS) ? Vincent Bernat [l'explique en détails](http://vincent.bernat.im/fr/blog/2011-ssl-perfect-forward-secrecy.html#sans-forward-secrecy) mais je vais résumer simplement :
+1. sans précautions particulières, les communications chiffrées ayant été enregistrées par le passé peuvent être déchiffrées bien plus tard, si on obtient la clé privée du certificat serveur
+2. avec la Perfect Forward Secrecy, même si on obtient la clé privée du certificat serveur, les communications passées ne peuvent plus être déchiffrées
+
+Dans le cas 1, c'est possible car la clé privée est utilisée à la fois pour l'authentification et pour le chiffrement. Dans le cas 2, la clé privée n'est utilisée que pour l'authentification, et une autre clé temporaire (via Diffie-Hellman) est générée pour le chiffrement : De cette manière, même si on récupère la clé du certificat, on ne dispose pas de l'information nécessaire au (dé)chiffrement
+
+# Inventaire des ciphers souhaités
+
+Un "cipher" est une combinaison de 4 séries de paramètres : 
+- Kx = échange de clés (pour échanger les informations nécessaires aux méthodes suivantes)
+- Au = authentification (pour vérifier à qui on cause et prouver qui on est)
+- Enc = chiffrement (pour rendre les données confidentielles)
+- Mac = vérification d'intégrité (pour vérifier que rien n'a été modifié en chemin)
+
+Pour connaître la liste de toutes les combinaisons disponibles sur le système permettant le chiffrement, utiliser la commande suivante `openssl ciphers -v | column -t`. Sur une Debian Wheezy, l'obtient 82 lignes. La première colonne est le nom OpenSSL du cipher, la deuxième colonne la "cipher suite" dont il dépend, et ensuite on retrouve les paramètres évoqués plus haut.
+
+Pour forcer l'usage d'algorithmes permettant la PFS, il faut n'autoriser que les algorithmes basés sur Diffie-Hellman (DH) avec clés *éphémères*. On prendra soin de retirer les algorithmes DES (cassé) et RC4 (qui n'est [pas loin d'être cassé](https://community.qualys.com/blogs/securitylabs/2013/03/19/rc4-in-tls-is-broken-now-what)) et bien sûr retirer eNULL (sans chiffrement). On les triera finalement par "robustesse".
+
+On aboutit à la liste suivante (34 lignes)
+
+	openssl ciphers -v 'EECDH:EDH:!eNULL:!RC4:!DES:@STRENGTH'
+
+	ECDHE-RSA-AES256-GCM-SHA384    TLSv1.2  Kx=ECDH  Au=RSA    Enc=AESGCM(256)    Mac=AEAD
+	ECDHE-ECDSA-AES256-GCM-SHA384  TLSv1.2  Kx=ECDH  Au=ECDSA  Enc=AESGCM(256)    Mac=AEAD
+	ECDHE-RSA-AES256-SHA384        TLSv1.2  Kx=ECDH  Au=RSA    Enc=AES(256)       Mac=SHA384
+	ECDHE-ECDSA-AES256-SHA384      TLSv1.2  Kx=ECDH  Au=ECDSA  Enc=AES(256)       Mac=SHA384
+	ECDHE-RSA-AES256-SHA           SSLv3    Kx=ECDH  Au=RSA    Enc=AES(256)       Mac=SHA1
+	ECDHE-ECDSA-AES256-SHA         SSLv3    Kx=ECDH  Au=ECDSA  Enc=AES(256)       Mac=SHA1
+	DHE-DSS-AES256-GCM-SHA384      TLSv1.2  Kx=DH    Au=DSS    Enc=AESGCM(256)    Mac=AEAD
+	DHE-RSA-AES256-GCM-SHA384      TLSv1.2  Kx=DH    Au=RSA    Enc=AESGCM(256)    Mac=AEAD
+	DHE-RSA-AES256-SHA256          TLSv1.2  Kx=DH    Au=RSA    Enc=AES(256)       Mac=SHA256
+	DHE-DSS-AES256-SHA256          TLSv1.2  Kx=DH    Au=DSS    Enc=AES(256)       Mac=SHA256
+	DHE-RSA-AES256-SHA             SSLv3    Kx=DH    Au=RSA    Enc=AES(256)       Mac=SHA1
+	DHE-DSS-AES256-SHA             SSLv3    Kx=DH    Au=DSS    Enc=AES(256)       Mac=SHA1
+	DHE-RSA-CAMELLIA256-SHA        SSLv3    Kx=DH    Au=RSA    Enc=Camellia(256)  Mac=SHA1
+	DHE-DSS-CAMELLIA256-SHA        SSLv3    Kx=DH    Au=DSS    Enc=Camellia(256)  Mac=SHA1
+	ECDHE-RSA-DES-CBC3-SHA         SSLv3    Kx=ECDH  Au=RSA    Enc=3DES(168)      Mac=SHA1
+	ECDHE-ECDSA-DES-CBC3-SHA       SSLv3    Kx=ECDH  Au=ECDSA  Enc=3DES(168)      Mac=SHA1
+	EDH-RSA-DES-CBC3-SHA           SSLv3    Kx=DH    Au=RSA    Enc=3DES(168)      Mac=SHA1
+	EDH-DSS-DES-CBC3-SHA           SSLv3    Kx=DH    Au=DSS    Enc=3DES(168)      Mac=SHA1
+	ECDHE-RSA-AES128-GCM-SHA256    TLSv1.2  Kx=ECDH  Au=RSA    Enc=AESGCM(128)    Mac=AEAD
+	ECDHE-ECDSA-AES128-GCM-SHA256  TLSv1.2  Kx=ECDH  Au=ECDSA  Enc=AESGCM(128)    Mac=AEAD
+	ECDHE-RSA-AES128-SHA256        TLSv1.2  Kx=ECDH  Au=RSA    Enc=AES(128)       Mac=SHA256
+	ECDHE-ECDSA-AES128-SHA256      TLSv1.2  Kx=ECDH  Au=ECDSA  Enc=AES(128)       Mac=SHA256
+	ECDHE-RSA-AES128-SHA           SSLv3    Kx=ECDH  Au=RSA    Enc=AES(128)       Mac=SHA1
+	ECDHE-ECDSA-AES128-SHA         SSLv3    Kx=ECDH  Au=ECDSA  Enc=AES(128)       Mac=SHA1
+	DHE-DSS-AES128-GCM-SHA256      TLSv1.2  Kx=DH    Au=DSS    Enc=AESGCM(128)    Mac=AEAD
+	DHE-RSA-AES128-GCM-SHA256      TLSv1.2  Kx=DH    Au=RSA    Enc=AESGCM(128)    Mac=AEAD
+	DHE-RSA-AES128-SHA256          TLSv1.2  Kx=DH    Au=RSA    Enc=AES(128)       Mac=SHA256
+	DHE-DSS-AES128-SHA256          TLSv1.2  Kx=DH    Au=DSS    Enc=AES(128)       Mac=SHA256
+	DHE-RSA-AES128-SHA             SSLv3    Kx=DH    Au=RSA    Enc=AES(128)       Mac=SHA1
+	DHE-DSS-AES128-SHA             SSLv3    Kx=DH    Au=DSS    Enc=AES(128)       Mac=SHA1
+	DHE-RSA-SEED-SHA               SSLv3    Kx=DH    Au=RSA    Enc=SEED(128)      Mac=SHA1
+	DHE-DSS-SEED-SHA               SSLv3    Kx=DH    Au=DSS    Enc=SEED(128)      Mac=SHA1
+	DHE-RSA-CAMELLIA128-SHA        SSLv3    Kx=DH    Au=RSA    Enc=Camellia(128)  Mac=SHA1
+	DHE-DSS-CAMELLIA128-SHA        SSLv3    Kx=DH    Au=DSS    Enc=Camellia(128)  Mac=SHA1
+
+La "cipher spec" peut être définie de deux manières dans les divers serveurs :
+- soit par le critère de tri de la commande `EECDH:EDH:!eNULL:!RC4:!DES:@STRENGTH`
+- soit par le résultat complet et non formaté de la commande openssl, ci-dessous
+
+ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-DSS-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA256:DHE-RSA-AES256-SHA:DHE-DSS-AES256-SHA:DHE-RSA-CAMELLIA256-SHA:DHE-DSS-CAMELLIA256-SHA:ECDHE-RSA-DES-CBC3-SHA:ECDHE-ECDSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:EDH-DSS-DES-CBC3-SHA:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:DHE-DSS-AES128-GCM-SHA256:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES128-SHA256:DHE-DSS-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA:DHE-RSA-SEED-SHA:DHE-DSS-SEED-SHA:DHE-RSA-CAMELLIA128-SHA:DHE-DSS-CAMELLIA128-SHA
+
+On va maintenant appliquer tout ça !
+
+# Configuration du serveur Web (Lighttpd)
+
+Avec le paramètre `ssl.cipher-list` à sa valeur par défaut `ECDHE-RSA-AES256-SHA384:AES256-SHA256:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM`, le site d'analyse SSL [Qualis SSL Labs](https://www.ssllabs.com) nous donne le résultat suivant :
+
+<img src="/files/ssl-pfs-default.png" />
+
+On constate alors que :
+- 3 clients sur 30 testés ne supportent pas la PFS d'après le "No FS" en jaune à droite du nom (WinXP, et le crawler du plus gros moteur de recherche russe)
+- 10 clients sur 30 ne bénéficient pas de la PFS alors qu'ils en seraient capables (Android Gingerbread et KitKat, IE sous Win7/8, Java6)
+- 23 clients sur 30 chiffrent en utilisant RC4...
+
+Remédions à tout ça.
+
+Editer le fichier `/etc/lighttpd/conf-available/10-ssl.conf`
+- ajouter le paramètre `ssl.honor-cipher-order = "enable"` s'il n'est pas présent
+- mettre `ssl.cipher-list` à la valeur `"EECDH:EDH:!eNULL:!RC4:!DES:@STRENGTH"`
+
+Recharger la configuration du serveur (`service lighttpd restart`), et retester la configuration SSL en cliquant sur "Clear cache" en haut de la page de résultat de [Qualis SSL Labs](https://www.ssllabs.com). On obtient le résultat suivant :
+
+<img src="/files/ssl-pfs-strict.png" />
+
+On constate alors que :
+- tous les autres clients bénéficient de la PFS
+- tous les autres clients bénéficient de clés conséquentes
+- aucun client ne chiffrera avec l'algorithme RC4
+- *IE6/8 sous Windows XP ne peut plus accéder au site en HTTPS !*
+
+Afin de permettre quand même aux utilisateurs de Windows XP d'accéder à notre site (*soit 18.91% du parc informatique en mai 2014 selon [statcounter](http://gs.statcounter.com/#os-ww-monthly-201305-201405-bar)*) on va ajouter un cipher "pas trop pourri" pour permettre à tous ces clients de se connecter à notre site, qui je vous le rapelle, a été configuré pour être uniquement accessible en HTTPS.
+
+Vous pouvez aussi décider que les utilisateurs d'XP vont disparaître, et que le moteur de recherche Russe Yondex ne vous intéresse pas, et ne pas ajouter ce cipher à votre liste, à vous de voir... Mais personnellement je préfère que tout le monde puisse y accéder (d'autant que le message d'erreur sous IE/XP est peu clair !)
+
+En regardant le détail de ce qui est disponible chez le "moins compétent" des trois ([Yandex](https://www.ssllabs.com/ssltest/viewClient.html?name=YandexBot&version=3.0)) on voit deux lignes de RC4 et une ligne de 3DES. Ca tombe bien [IE6/XP](https://www.ssllabs.com/ssltest/viewClient.html?name=IE&version=6&platform=XP) et [IE8/XP](https://www.ssllabs.com/ssltest/viewClient.html?name=IE&version=8&platform=XP) supportent aussi cette même ligne 3DES : `TLS_RSA_WITH_3DES_EDE_CBC_SHA`. Une recherche de ce nom dans `man cipher` nous indique que le nom équivalent côté OpenSSL pour ce cipher est `DES-CBC3-SHA`.
+
+On va donc ajouter ce dernier tout à la fin de notre paramètre `ssl.ssl.cipher-list`
+
+	ssl.cipher-list = "EECDH:EDH:!eNULL:!RC4:!DES:@STRENGTH:DES-CBC3-SHA"
+
+De cette manière, étant en tout dernier on aura le comportement suivant :
+- les clients "capables" continueront d'utiliser les meilleures versions "compatibles PFS"
+- les clients incompatibles choisiront ce dernier, et sauront toujours se connecter (sans PFS)
+
+On recharge à nouveau la configuration du serveur (`service lighttpd restart`), et on reteste la configuration SSL en cliquant sur "Clear cache" en haut de la page de résultat de [Qualis SSL Labs](https://www.ssllabs.com).
+
+On obtient le résultat suivant :
+
+<img src="/files/ssl-pfs-withxp.png" />
+
+Tout le monde accède correctement à notre site, tous ceux qui sont capables de bénéficier de la PFS en disposent, bingo c'est gagné !
+
+*Addendum : les clients non compatibles PFS ainsi que toutes les versions Java, sont passés d'un chiffrement RC4/128 bits à un chiffrement 3DES/112 bits. La clé est certes plus petite, mais sur la base de l'état des algorithmes il est (sauf erreur de ma part) préférable d'avoir du 3DES que du RC4*
+

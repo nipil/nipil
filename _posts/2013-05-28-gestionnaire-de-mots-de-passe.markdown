@@ -1,0 +1,203 @@
+---
+layout: post
+title:  Gestionnaire de mots de passe
+tags: sécurité internet mot-de-passe
+---
+
+Pourquoi faire ce billet ?
+
+Je suis conscient depuis des années que je me met en danger en ré-utilisant des mots de passe faibles. Je le sais et je n'ai jamais rien changé, parce qu'on espère que les problèmes n'arrivent qu'aux autres.
+
+Mais je constate aussi que les personnes de mon entourage se mettent en danger elles aussi. Souvent c'est par méconnaissance de la réalité des choses. Mais avouons le, c'est aussi par flemme.
+
+Et il faut que ça change.
+
+La sécurité absolue n'existe pas. Il faut faire "au mieux". Et sur internet, il s'agit en fait plutôt de faire "mieux" que les autres cibles potentielles, afin que l'attaqueur ait d'autres proies plus facile à abuser et ne s'intéresse pas à vous, car ça lui demanderait plus d'efforts que nécessaire.
+
+C'est comme l'histoire des deux gars poursuivis par un lion dans la savane, peu importe que vous courriez plus vite que le lion, l'essentiel est de courrir plus vite que l'autre gars pour pas être bouffé. Si le lion le voulait vraiment, il pourrait vous avoir, mais vu comme ce qu'il veut c'est avoir quelque chose à manger, il se contentera du plus facile à attraper.
+
+Bref. Pour vos comptes sur internet, il existe une solution extrêmement efficace pour sécuriser votre vie en ligne mieux que le commun des mortels qui prennent des risques sans le savoir. Rien de magique, aucune astuce : il suffit d'utiliser le bon outil et d'avoir de la méthode.
+
+# Version courte
+
+Si vous ne deviez retenir que ça, ce sont ces trois points :
+
+- utilisez un [gestionnaire de mots de passe](http://keepass.info)
+- utilisez le pour avoir des mot de passe différent pour chaque site
+- utilisez le pour générer des password sécurisés (aléatoires, complexes et longs)
+
+*Franchement, faites le vraiment, là tout de suite, c'est pour votre bien*.
+
+Sinon, le jour où vous vous ferez avoir, la déception sera [amère](http://www.wired.com/gadgetlab/2012/08/apple-amazon-mat-honan-hacking/all/). Et ça pourrait être encore pire que ce qui est arrivé à ce gars là, car il n'y a pas de limites à la loi de l'emmerdement maximum...
+
+# Un point sur la réalité des choses
+
+Chaque internaute [possède](https://research.microsoft.com/pubs/74164/www2007.pdf) en moyenne *25 comptes en ligne*, mais on utilise en moyenne que *6.5 mots de passe* pour ces 25 comptes. Pourquoi ? Parce qu'on a tendance à choisir des mots de passe mémorisables et qu'on réutilise souvent tout ou partie des password utilisés ailleurs.
+
+D'autre part, la réalité du terrain montre que les sites web se font régulièrement hacker et des millions de mots de passe sont publiés à chaque fois : 
+- [Sony PSN](http://en.wikipedia.org/wiki/PlayStation_Network_outage) : 77 millions de comptes
+- [LivingSocial](http://arstechnica.com/security/2013/04/why-livingsocials-50-million-password-breach-is-graver-than-you-may-think/) : 50 millions de comptes
+- [Evernote](http://arstechnica.com/security/2013/03/evernote-resets-all-user-passwords-after-coordinated-breach-attempt/) : 50 millions de comptes
+- [RockYou](http://arstechnica.com/security/2010/01/32-million-passwords-show-most-users-careless-about-security/) : 32 millions de comptes
+- [Zoosk](http://arstechnica.com/security/2013/03/dating-site-zoosk-resets-some-user-accounts-following-password-dump/) : 29 millions de comptes
+- [LinkedIn](http://arstechnica.com/security/2012/06/8-million-leaked-passwords-connected-to-linkedin/) : 6.5 millions de comptes
+- [Gawker](http://www.theregister.co.uk/2010/12/13/gawker_hacked/) : 1.3 millions de comptes
+- [Yahoo](http://news.cnet.com/8301-1009_3-57471178-83/yahoos-password-leak-what-you-need-to-know-faq/) : 450 000 comptes
+- [Twitter](http://arstechnica.com/security/2013/02/twitter-detects-and-shuts-down-password-data-hack-in-progress/) : 250 000 comptes
+- [Amazon](http://www.ehackingnews.com/2012/11/security-breach-hits-amazoncouk-628.html) : 628 comptes
+- [Skype](http://www.inquisitr.com/398517/skype-security-breach-forces-microsoft-to-suspend-password-resets/) : récupération de compte à volonté
+- [Google](http://www.cryptzone.com/news/article.aspx?category=Email-security&title=Google-reveals-data-security-breach-on-Gmail&id=800565910) : écoute des correspondances
+
+D'après vous, est ce que les mots de passe `momof3g8kids`, `qeadzcwrsfxv1331`, `k1araj0hns0n`, `Apr!l221973`, `Qbesancon321`, et `tmdmmj17` sont des mots de passe sécurisés ?
+
+La réponse est non, ils ont tous été publiés récemment, après avoir été [crackés](http://arstechnica.com/security/2013/05/how-crackers-make-minced-meat-out-of-your-passwords/) facilement, en moins de 6 heures par une seule personne avec un ordinateur à 500 euros.
+
+Pourtant, ils rassemblent tous les critères d'un "bon" mot de passe : il sont long et utilisent majuscules, minuscules, chiffres et ponctuation. La majorité des "password meter" diront que c'est un bon mot de passe, mais malheurseusement ça n'est pas le cas, car ils sont partiellement composés de mots présents dans des dictionnaires qui ont été construits à partir des attaques listées plus haut.
+
+A contrario, le site [My1login](https://www.my1login.com) tient compte, contrairement à la majorité des évaluateurs de mots de passe, de ces dictionnaires. Il indique à titre informatif qu'il faut 0.69 secondes pour cracker `k1araj0hns0n`, et tout juste 21 minutes pour `Apr!l221973`. Ce qui est une bonne chose.
+
+Mais malheureusement il indique aussi que les autres mots de passe sont "forts" et prennent plus d'un mois à être cracké, alors qu'en réalité il a fallu moins de 6 heures, notemment grâce aux précédentes attaques qui ont permis à la fois de construire des dictionnaires, et des trouver les habitudes des gens quand il s'agit de choisir un mot de passe.
+
+C'est ce qu'ils utilisent pour arriver à cracker 70-90% des mots de passe récupérés, après ils arrêtent car ça n'est plus "rentable".
+
+La morale ? Un bon mot de passe doit être *aléatoire* (et long et complexe), c'est la seule chose qui permet de garantir de faire partie des ~10-30% qui n'ont pas été crackés rapidement.
+
+# Pourquoi je suis vraiment concerné
+
+Imaginons que vous ayez été utilisateur d'un site `http://site.com`, que ce site ait été attaqué avec succès, et que l'attaqueur ait récupéré les informations suivantes :
+
+`toto@email.com:5d7f770a272b5c129e91ae5b8d5b6a5c`
+
+[Sans](http://arstechnica.com/security/2013/03/how-i-became-a-password-cracker/) véritables connaissances préalables, il faudra moins de 24 heures à un amateur armé des bons [outils](http://hashcat.net) pour récupérer le mot de passe correspondant : `EcranMichael2012*`.
+
+Maintenant, il peut déjà continuer d'utiliser ces informations pour consulter, modifier, et agir en votre nom sur `http://site.com` si ses créateurs n'ont pas communiqué sur le fait qu'il s'est fait attaquer (c'est plus fréquent qu'on ne le pense)
+
+Mais il peut aussi et surtout tenter d'utiliser ces informations sur d'autres sites. Il pourrait utiliser ces informations pour essayer de se connecter à votre adresse `toto@email.com`, par exemple.
+
+Si jamais vous n'aviez pas utilisé exactement ce mot de passe, il peut essayer quelques variations comme `ecranmichael2012*`, `EcranMichael2013!` ou `3cranMicha3l2012*`, et il y a de très fortes chances que ça fonctionne. Rappelez vous, on utilise tous des mots de passe qu'on puisse mémoriser facilement, et plus on a de comptes différents, plus on a tendance à réutiliser tout ou parties du mot de passe, ou même se conformer à un "style" de mot de passe.
+
+En tout cas, dès qu'il a l'accès à votre messagerie, la partie est finie.
+
+Votre messagerie est la clé de voute de votre vie en ligne : vous utilisez cette adresse pour vous inscrire partout ou presque, et il lui suffit d'aller sur divers sites et de faire une demande de "mot de passe perdu" et il récupérera les informations ou un lien de réinitialisation de mots de passe dans la boîte mail à laquelle il a accès !
+
+Il fera ça pour chaque site, et comme des dominos, tous vos comptes en ligne seront conquis les uns après les autres... Il pourra prendre l'argent disponible (via paypal, achats amazon, virements bancaires, paris en ligne, jeux d'argent). Il pourra supprimer toutes vos données personnelles, vos photos de familles, vos documents stockés dans le cloud. Il pourra publier des informations discriminatoires en votre nom (que ça soit des emails pornos à votre chef pour le fun, ou des injures pénalement sanctionnables sur votre compte twitter).
+
+Il sera vous, mais il fera ce qu'il veut.
+
+# Réagissons !
+
+Sécuriser sa vie numérique tient en 5 points :
+1. utiliser un gestionnaire de mot de passe sécurisés 
+2. protéger sa messagerie, car c'est la clé de voute de votre vie numérique
+3. faire l'inventaire de tous vos comptes en ligne
+4. modifer le mots de passe sur chaque site pour qu'ils soient tous différents
+5. utiliser le gestionnaire pour chaque nouvelle inscription ultérieure
+
+Il y a deux semaines, j'ai sauté le pas et décidé d'appliquer ces principes.
+
+## Le bon outil
+
+Pourquoi ne pas simplement utiliser le gestionnaire de mots de passe de votre navigateur ? D'une part parce que vous pouvez changer de navigateur, ou en utiliser plusieurs, mais aussi parce que tous vos comptes ne sont pas forcément accessibles par navigateur. Ou bien parce que vous n'êtes pas chez vous.
+
+J'ai commencé par le choix d'un outil de gestion de mots de passe : [KeePass](http://keepass.info). Il est multi-plateforme vu qu'il est écrit en [C#](http://en.wikipedia.org/wiki/C_Sharp_(programming_language) et il existe une version portable, ce qui permet de l'avoir toujours avec soi sur une clé USB. Et il est disponible en français.
+
+Primo-configuration :
+- lancer le logiciel
+- créer une nouvelle base de donnée
+- choisir et confirmer un mot de passe maître
+- aller dans l'onglet "Securité" et cliquer le lien bleu "Délai 1 seconde"
+- terminer en cliquant ok.
+
+*Ne chochez pas "utilisez le compte windows", car sinon vous serez emmerdés quand vous serez en déplacement sur un autre windows, ou si vous vous retrouvez temporairement sur un macintosh ou un linux.*
+
+La base de donnée est protégée contre les attaques par force brute, car en cliquant sur le lien bleu lors de la création, on demande à ce que les étapes de vérification du mot de passe soient suffisement nombreuses pour que ça prenne environ une seconde : comme ça toute tentative du type "force brute" devient irréaliste.
+
+C'est le seul et unique mot de passe que vous devrez retenir pour le restant de votre vie numérique. Vous pouvez donc vous permettre d'avoir un mot de passe "un peu compliqué", mais pas besoin d'un truc monstreux car *vous ne devez jamais l'oublier*, sinon vous perdez absolument tout, sans aucun recours possible.
+
+Donc, hors de question de prendre `toto`, mais un truc du style `dMi*43U` fera largement l'affaire. Le fait qu'il soit très simple (46 bits d'entropie seulement) est compensé par l'histoire des 1 secondes expliqué auparavant : ce mot de passe n'est pas "devinable" par quelqu'un qui vous connaîtrait, et donc il faudra tester au pif, avec 1 seconde d'attente à chaque fois. Irréalisable.
+
+Ne reste plus qu'à le stocker sur le disque dur de chaque PC, sur une clé USB, dans le cloud, bref avoir plusieurs copies à divers endroits pour être sûr de ne pas perdre le fichier. L'outil KeePass2 permet la synchronisation de fichiers à différents emplacements, j'expliquerai ça dans un prochain billet.
+
+## Inventaire
+
+J'ai fais l'inventaire de mes comptes en ligne, et ça a été plus facile que je n'aurais cru. Depuis mes premiers pas sur internet, même si j'ai utilisé au total 7 adresses email (personnelles) différentes, seulement 2 sont encore fonctionnelles, et ce sont celles que j'utilise depuis 2004, les autres n'existent plus car liées à des opérateurs antérieurs.
+
+Cet inventaire a été facilité par le fait que je ne jete jamais rien, sauf si c'est inévitable, merci aux 1 puis maintenant 10 gigas de stockage de GMail. J'ai donc encore tous les mails *"confirmer votre inscription"* ou *"bienvenue sur le site"* que j'ai reçu ces 9 dernières années, ainsi que les newsletters, etc.
+
+J'ai commencé par créer dans Keepass un répertoire "todo". Puis pour chacun des mails trouvés, j'ai créé dans ce répertoire une entrée que je me suis contenté de nommer (monsieurpix, slashdot, guild wars, allocine...) et on remplira le reste plus tard.
+
+Remarquez bien que pour chaque entrée créée, l'outil génère directement un mot de passe, ça évitera de se tromper plus tard, ou de se demander quel mot de passe aléatoire on aura choisi. Durant cette collecte, pensez à enregistrer régulièrement : tant qu'il y a une étoile dans la barre de titre de l'outil, c'est qu'il y a des modifications non sauvegardées.
+
+Pour compléter la collecte, jetez aussi un oeil aux "mots de passe sauvegardés" de votre navigateur web, ça m'a permis de retrouver encore une trentaine de sites auxquels je m'étais inscrits mais sans avoir récupéré de mail correspondant.
+
+Au final, j'ai comptabilisé **165** comptes en ligne ... !!!
+
+A cet inventaire initial, j'ai prévu d'ajouter toutes les autres infos à ma portée : les identifiants wifi, mes carte bancaires par exemple, les combos clés publiques/privées... En fait keepass peut stocker à peu près tout et n'importe quoi, alors autant en profiter.
+
+## Mise à jour de vos mots de passe
+
+Pour chacun des sites de votre inventaire dans le répertoire "todo" :
+- aller sur le site
+- copier-coller l'adresse du site dans le champs URL de keepass
+- tenter de se connecter avec vos identifiants connus
+- si vous ne les connaissez plus, faite une "récupération de mot de passe"
+- copier-coller l'identifiant dans le champs idoine de keepass
+- connectez vous au site, cherchez la fonction "changer de mot de passe"
+- utilisez le mot de passe donné par keepass comme nouveau password
+- enregistrer les modifications dans Keepass après chaque site concerné
+
+Si le site *ne permet pas du tout* de changer son mot de passe (j'en ai eu 11 sur 165)  il faut remplacer dans l'outil le mot de passe généré, par celui que vous utilisez réellement. Et pour identifier aisément ces sites "mauvais élèves", changez l'icone pour un truc style "panneau avertissement".
+
+Si un site *refuse le mot de passe qui a été généré*, vous pouvez ouvrir le générateur de mot de passe de Keeypass pour cette entrée, et l'utiliser pour générer un mot de passe qui convienne aux règles de sécurité du site.
+
+Pour info, cette tâche de mise à jour peut prendre entre quelques minutes et quelques heures. En moyenne à la fin de la procédure, avec l'habitude je mettais environ 2 minutes pour changer le mot de passe sur un site. *Et si jamais vous ne comptez pas faire tous vos comptes, concentrez vous d'abord sur les sites comptes importants* (messagerie, achats, argent, jeux) et laissez les autres tels (forum, news, etc).
+
+Ce travail fastidieux n'est à faire qu'une fois. Après c'est que du bonheur.
+
+## Conclusions
+
+Maintenant que je l'ai fait, quelques statistiques :
+- 42 comptes utilisaient exactement le même mot de passe
+- 97 comptes avaient une variations minime de ce même mot de passe
+- 25 avaient conservé le mot de passe par défaut fourni lors de l'inscription
+- 1 seul mot de passe était "robuste" (mais mémorisable donc "pas parfait")
+
+Et de tous ceux-ci, le seul mot de passe solide était `zjelp3agy9`, ce qui n'est pas un "bon" mot de passe, mais qui reste mémorisable ... et devinez à quoi il servait ? A ma messagerie Google.
+
+Oui, ça veut dire que le mot de passe de mon compte Paypal n'était pas "bon". Et que mon compte Amazon avec option achat-en-1-click ne l'était pas non plus. Idem pour mon compte de poker en ligne, et aussi mon compte Warcraft... Tous ces mots de passe n'étaient pas très solides, mais surtout, très similaires les uns aux autres.
+
+Pourtant, je connais les implications de ces mauvais choix de mots de passe, puisque je tente de vous les expliquer ici. Mais pendant des années, je n'ai pas fait l'effort de passer par dessus ma flemme. J'ai eu de la chance de ne pas avoir eu de problèmes entre temps ... Ou alors j'ai eu des problèmes mais je ne m'en suis jamais rendu compte !
+
+Mais tout ça c'est du passé, car maintenant :
+- je sais exactement où j'ai des comptes en ligne
+- j'ai un mot de passe différent pour chaque compte
+- j'ai un mot de passe solide pour chaque compte
+
+Pour les choses vraiment importantes (mes comptes de messagerie) ou pour tout ce qui donne accès à mon argent (Paypal, Amazon 1-click, Battle.net, etc) j'ai augmenté la qualité du mot de passe pour atteindre 300+ bits d'entropie. Pourquoi ? Parce que ça coûte rien, et que ces sites le permettent, contrairement à la majorité des autres standards.
+
+Ca m'aura coûté 10 heures pour appliquer cette méthode et réaliser le travail de modification initial, mais dorénavant je peux être serein. En effet :
+- si un site web sur lequel je suis enregistré se fait attaquer, le fait d'avoir un mot de passe complexe me permet de ne pas faire partie des comptes les plus rapidement crackés quand un site est corrompu
+- si un site web sur lequel je suis enregistré se fait attaquer, et que mon mot de passe est effectivement cracké, il ne sera d'aucune utilité à l'attaquant pour tenter de prendre le contrôle d'un autre compte qui m'appartient
+- je n'ai plus besoin de me rappeler tous mes mots de passe, ni de se souvenir si c'était `Sardines`, `$4rd1n35` ou `sardine0123*`. Je ne dois mémoriser qu'un seul et unique mot de passe.
+
+*Bref, je sais maintenant que dans la savane numérique, je cours plus vite que les autres, et que le lion attrapera quelqu'un d'autre avant moi...*
+
+# Update 2013-06-14: Debian Wheezy et auto-type non foncitonnel
+
+Debian "stable" (wheezy) inclus `xdotool` en version `1:2.20100701.2961-3+deb7u3`. Cependant, pour que la fonctionn marche correctement, il faut une version plus récente, par exemple la version `1:3.20130111.1-3` présente dans "testing" (jessie).
+
+On va donc configurer notre distribution pour être "hybride" : par défaut tous les paquets seront ceux de stable et seront gérés comme tel pour les upgrades, mais on permet aussi l'installation ou l'upgrade de paquets issus de testing, qui seront mis à jour comme tels.
+
+Pour ce faire :
+- éditer le fichier `/etc/apt/apt.conf`
+- ajouter la ligne `APT::Default-Release "wheezy";`
+- éditer le fichier `/etc/apt/sources.list`
+- dupliquer toutes les lignes présentes
+- remplacer `wheezy` par `jessie` dans ces nouvelles lignes
+- effacer les lignes qui contiendraient éventuellement `jessie-updates`
+- sauvegarder et lancer un `sudo aptitude update`
+
+Finalement mettre à jour `xdotool` via `sudo aptitude upgrade -t jessie xdotool`.
+
+One fois l'opération réalisée, l'intégralité de notre distribution est restée en version "stable" mais ce paquet uniquement, et ses librairies est en version "testing". A noter que si vous faites un "sudo aptitude full-upgrade", par défaut ça conservera tous les paquets en version stable à cause du paramètre `APT:Default-Release`, ce qui est le but de la manoeuvre (conserver un système "wheezy" avec quelques exeptions "jessie").
+

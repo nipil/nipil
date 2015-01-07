@@ -1,0 +1,352 @@
+---
+layout: post
+title: Tunnel IPSec pour Android et ordinateurs
+tags: debian ipsec serveur android
+---
+
+Aujourd'hui, on va voir comment configurer une gateway IPSEC/L2TP pour
+sécuriser les communications de nos smartphones, laptops, tablettes en
+mobilité, et aussi de nos ordinateurs à domicile.
+
+L'objectif est de chiffrer toutes les communications entre nos machines
+et un serveur qu'on contrôle, ce qui donne aussi plus de confidentialité
+pour notre surf vis à vis des réseaux qu'on utilise (opérateur mobile,
+opérateur fixe, réseau employeur, hotspot gratuits de restaurants ou
+boutiques ou hotels, réseau informatique de notre employeur, chez la
+famille et les amis, etc)
+
+Pour ce faire, on va utiliser :
+
+- un serveur sous Debian Wheezy pour la gateway (dédié ou VPS loué)
+- Shorewall pour le pare-feux du serveur
+- Racoon + ipsec-tools pour l'ISAKMP/IPSec de la gateway
+- xl2tpd + pppd pour le tunnel L2TP/ppp
+
+A noter qu'il existe 3 solutions pour faire de l'IPSec sous Debian (racoon + 
+ipsec-tools, OpenSwan, StrongSwan). On pourrait utiliser l'une ou l'autre,
+les trois ont vocation à être reconduites dans Jessie.
+
+Pourquoi utiliser de l'IPSec plutôt que d'utiliser OpenVPN ?
+
+- OpenVPN n'est pas disponible **en natif** sur les smartphone et les windows,
+alors qu'IPSec/L2TP est configurable de base sur absolument tous les
+smartphones, et les systèmes d'exploitations pour ordinateurs personnel
+- OpenVPN ne peut pas toujours utiliser l'accélération matérielle AES qui peut
+être présente sur vos smartphone, ordinateurs, ou serveur. En IPsec, on est
+sûr que cette accélération pourra être utilisée.
+
+En conséquence, si vous ne voulez/pouvez rien installer sur vos
+terminaux, IPSec/L2TP est "la" solution.
+Idem, si votre liaison internet dépote (fibre optique) **mais** que votre
+routeur/passerelle locale a peu de puissance CPU (routeur OpenWRT,
+Raspberry Pi, Alix, vieux pentium 100 ou aute tromblon à faible consommation)
+mais que ce même équipement dispose d'une accélération matérielle (Alix,
+Soekris) alors vous avez tout intérêt à le faire en IPSec plutôt qu'en OpenVPN.
+
+Cela dit, si votre serveur/gateway/pc/smartphone a un gros processeur, 
+préférez OpenVPN, c'est plus simple.
+Et idem, si vous êtes limités par votre débit internet (connexion 3G, ADSL)
+alors ça ne sert à rien de vous compliquer la vie avec de l'IPSec, préférez
+OpenVPN
+
+Bref, hormis pour les performances brutes, OpenVPN est plus simple à configurer
+pour la même fonctionnalité. On pourra pas dire que je ne l'ai pas dit.
+Mais là, aujourd'hui on va faire de l'IPSec !
+
+Voici un schémas d'ensemble de la "réalité" sans sécurisation
+
+<img src="/files/ipsec-l2tp-schemas-00.png" />
+
+Et voici ce qu'on va chercher à construire
+
+<img src="/files/ipsec-l2tp-schemas-01.png" />
+
+Au final, une fois que tous nos périphériques seront configurés, le seul
+lien où ça passera en clair sera la sortie de notre serveur vers internet.
+
+En conséquence, nos communications seront sécurisées sur tous les réseaux
+où on se déplacera, seul l'hébergeur de notre serveur voit notre trafic.
+
+Quelques détails supplémentaires
+
+- les nomades auront des addresses : 192.168.34.100-199
+- les clients seront autentifiés par login/passord
+- la connection IPsec sera sécurisée par clé partagée (PSK)
+
+On va commencer par configurer le serveur
+
+# Configuration du serveur
+
+Installer les paquets nécessaires
+
+	apt-get install racoon ipsec-tools xl2tpd ppp shorewall
+
+*Attention* : ne pas choisir racoon-tool, choisir modification directe
+
+On arrête tout ce qui tournerait déjà avec les valeur par défaut
+
+	service shorewall stop
+	service xl2tpd stop
+	service racoon stop
+	service setkey stop
+
+Maintenant on peut reconfigurer les différents fichiers
+
+/etc/ipsec-tools.conf
+
+	#!/usr/sbin/setkey -f
+
+	flush;
+	spdflush;
+
+	spdadd 0.0.0.0/0[0] 0.0.0.0/0[1701] udp -P in  ipsec
+		esp/transport//require;
+
+	spdadd 0.0.0.0/0[1701] 0.0.0.0/0[0] udp -P out ipsec
+		esp/transport//require;
+
+/etc/racoon/racoon.conf 
+
+	log notify;
+	path pre_shared_key "/etc/racoon/psk.txt";
+	path certificate "/etc/racoon/certs";
+
+	remote anonymous {
+		exchange_mode main;
+		generate_policy on;
+		nat_traversal on;
+		dpd_delay 20;
+		proposal {
+			encryption_algorithm aes;
+			hash_algorithm md5;
+			authentication_method pre_shared_key;
+			dh_group modp1024;
+		}
+	}
+
+	sainfo anonymous {
+		encryption_algorithm aes, 3des;
+		authentication_algorithm hmac_sha1, hmac_md5;
+		compression_algorithm deflate;
+	}
+
+/etc/racoon/psk.txt 
+
+	* mypresharedkey
+
+/etc/ppp/chap-secrets 
+
+	myusername l2tpd mypassword *
+
+/etc/ppp/xl2tpd-options 
+
+	mtu 1372
+	mru 1372
+	auth
+	nodefaultroute
+	lock
+	proxyarp
+	require-chap
+	ms-dns 8.8.8.8
+	ms-dns 8.8.4.4
+
+/etc/xl2tpd/xl2tpd.conf
+
+	[global]
+	access control = no
+
+	[lns default]
+	ip range = 192.168.34.100-192.168.34.199
+	local ip = 192.168.34.1
+	require authentication = yes
+	require chap = yes
+	refuse pap = yes
+	length bit = yes
+	name = l2tpd
+
+/etc/shorewall/interfaces
+
+	net eth0 tcpflags,logmartians,nosmurfs,sourceroute=0,routefilter
+	mobil ppp+ tcpflags,nosmurfs
+
+/etc/shorewall/zones 
+
+	fw firewall
+	net ipv4
+	l2tp ipv4
+	mobil ipv4
+
+/etc/shorewall/tunnels 
+
+	ipsecnat net 0.0.0.0/0
+
+/etc/shorewall/hosts 
+
+	l2tp eth0:0.0.0.0/0 ipsec
+
+/etc/shorewall/masq 
+
+	eth0 192.168.0.0/16
+
+/etc/shorewall/policy 
+
+	net all DROP info
+	$FW net ACCEPT
+	mobil net ACCEPT
+	all all REJECT info
+
+/etc/shorewall/rules 
+
+	SECTION NEW
+
+	COMMENT server admin
+	SSH(ACCEPT) net $FW
+
+	COMMENT l2tp tunnels
+	L2TP(ACCEPT) l2tp $FW
+
+On relance les services
+
+	service shorewall restart
+	service xl2tpd restart
+	service racoon restart
+	service setkey restart
+
+On surveille le syslog (arrêt par Ctrl-C)
+
+	tail -f /var/log/syslog
+
+Le serveur est prêt, on peut passer au smartphone
+
+# Configuration android
+
+Sur mon téléphone android kitkat (4.4.4) on configure le vpn via ces écrans
+
+<img src="/files/ipsec-l2tp-android.png" />
+
+Normalement, en allant sur [monip.org](http://monip.org) on devrait avoir
+affiché l'adresse IP de notre serveur plutôt que celui de l'accès qu'on
+utilise.
+
+# Configuration laptop Debian
+
+Sur les client linux, les fichiers suivants sont identiques à ceux du serveur :
+
+- /etc/ipsec-tools.conf
+- /etc/racoon/racoon.conf 
+- /etc/racoon/psk.txt 
+- /etc/ppp/chap-secrets 
+- /etc/shorewall/zones
+- /etc/shorewall/tunnels 
+- /etc/shorewall/masq 
+- /etc/shorewall/interfaces
+- /etc/shorewall/hosts 
+
+Par contre les fichiers suivants diffèrent pour le client :
+
+/etc/ppp/xl2tpd-options-isis
+
+	auth
+	defaultroute
+	lock
+
+/etc/xl2tpd/xl2tpd.conf
+
+	[global]
+	;debug avp = yes
+	;debug network = yes
+	;debug state = yes
+	;debug tunnel = yes
+
+	[lac isis]
+	lns = 123.123.123.123
+	require chap = yes
+	refuse pap = yes
+	require authentication = yes
+	name = myusername
+	pppoptfile = /etc/ppp/xl2tpd-options-isis
+	length bit = yes
+	;ppp debug = yes
+
+/etc/shorewall/policy 
+
+	net all DROP info
+	$FW net ACCEPT
+	$FW mobil ACCEPT
+	all all REJECT info
+
+/etc/shorewall/rules 
+
+	SECTION NEW
+
+	COMMENT allow l2tp tunneling
+	L2TP(ACCEPT) l2tp $FW
+
+On relance les services
+
+	service shorewall restart
+	service xl2tpd restart
+	service racoon restart
+	service setkey restart
+
+On regarde la table de routage actuelle
+
+	ip route
+
+	192.168.111.0/24 dev eth0  proto kernel  scope link  src 192.168.111.3
+	default via 192.168.111.1 dev eth0
+
+Le log du lancement/arrêt est visible dans le syslog
+
+	tail -f /var/log/syslog &
+
+Lancement du tunnel (en tant que root)
+
+	echo "c isis" > /var/run/xl2tpd/l2tp-control
+
+Quand le tunnel est monté correctement, une interface **pppX** est créée
+
+	ip addr
+
+	...
+	128: ppp0: <POINTOPOINT,MULTICAST,NOARP,UP,LOWER_UP> mtu 1372
+		       qdisc pfifo_fast state UNKNOWN qlen 3
+	link/ppp 
+	inet 192.168.34.100 peer 192.168.34.1/32 scope global ppp0
+	...
+
+On a vu passer dans le syslog un message 
+
+	pppd: not replacing existing default route via 192.168.111.1
+
+C'est la raison pour laquelle on rajoute deux routes manuellement :
+
+	ip route add 0.0.0.0/1 dev ppp0
+	ip route add 128.0.0.0/1 dev ppp0
+
+Et la table de routage est mise à jour
+
+	ip route
+
+	0.0.0.0/1 dev ppp0  scope link 
+	default via 192.168.111.1 dev eth0 
+	128.0.0.0/1 dev ppp0  scope link 
+	192.168.34.1 dev ppp0  proto kernel  scope link  src 192.168.34.100 
+	192.168.111.0/24 dev eth0  proto kernel  scope link  src 192.168.111.3
+
+Normalement, en allant sur [monip.org](http://monip.org) on devrait avoir
+affiché l'adresse IP de notre serveur plutôt que celui de l'accès qu'on
+utilise.
+
+Arrêt du tunnel (en tant que root)
+
+	echo "d isis" > /var/run/xl2tpd/l2tp-control
+
+On arrête l'affichage du syslog
+
+	jobs
+	fg
+	Ctrl-C
+
+Et on retourne à une vie normale :-)
+

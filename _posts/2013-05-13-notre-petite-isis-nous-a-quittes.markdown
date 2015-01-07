@@ -1,0 +1,113 @@
+---
+layout: post
+title:  "Notre petite Isis nous a quittés"
+tags: chats
+---
+
+On est bien triste d'annoncer une aussi mauvaise nouvelle, mais notre petite Isis (ex-Leïa) nous a quittés hier soir suite à un problème rénal aigu, après 4 années d'un intense bonheur passé avec nous et sa soeur Vala (ex-Chipie) ...
+
+<a href="/files/tribute_isis_J5jIQv6.jpg"><img src="/files/tribute_isis_J5jIQv6l.jpg" /></a>
+
+Nos vétos et nous mêmes ne le saurons jamais vraiment ce qui a causé cette intoxication/infection des reins. Elle ne sortait que rarement, et toujours avec nous, et couchée confortablement sur les épaules de nico, avec sa ptite tête qui faisait la girouette pour tout observer. Dans les différentes maisons où nous avons séjournés durant ces 4 années, on s'assurait toujours qu'aucun produit dangereux n'était à portée, et on est aujourd'hui aussi surpris que dévastés. On pense qu'elle a grignoté un morceau de "pot pourri" (les paniers senteur de trucs séchés et parfumés/décorés) chez les parents, car on a retrouvé quelques feuilles et brindilles juste à côté, mais on en fait on en sait rien du tout
+
+En tout cas, elle a été héroïque, elle s'est bien battue pendant ses 4 jours de soins, et la perfusion faite au plus vite a "délesté" les reins pour qu'ils aient une chance de se reposer et de remprendre leur travail. A l'échographie, aucun kyste ni tumeur ni malformation ni calcul, rien du tout, c'était a priori une bonne nouvelle, et les deux vétérinaires nous ont dit qu'elle était énergique et qu'elle leur avait donné bien du fil à retordre, qu'elle faisait ses besoins grace à la perf, et qu'elle picorait un tout petit peu dans la pâtée spéciale, et on avait de l'espoir
+
+Malgré tout, lundi matin elle ne mange toujours pas, et la prise de sang est sans appel : avec toujours +3g d'urémie et +100mg de créatinine, la bataille est perdue. On est allés la voir hier soir, pour lui faire nos adieux, et surtout pleins de calins!! Et même là elle a essayé de nous réconforter de ses ptites léchouilles sur le nez, comme pour nous dire "c'est pas grave, j'ai été vraiment heureuse avec vous" ... on avait jamais rien vécu d'aussi déchirant ... et de voir sa soeur Vala la chercher et l'appeler dans l'appartement depuis jeudi, c'est vraiment pas facile, elles n'avaient jamais été séparées plus de 2h d'affilée
+
+Isis était une petite chatte en pleine santé, ultra-attentionnée et extrêmement vive. Avec son poids mouche de 2kg550, c'était une vrai terreur, et elle avait une fois éjecté sans ménagement deux matous adulte de 8kg qui étaient rentrés dans la maison des parents alors qu'on y séjournait pour seulement deux jours ! Elle était curieuse de tout, n'avait jamais peur des visiteurs ni des livreurs, c'était une véritable pile électrique qui a vécu intensément sa vie, en brûlant la chandelle par les deux bouts, comme on dit
+
+Tous les matins, elle se levait avec Cécile et l'accompagnait dans la salle de bain, ce qui rendait le réveil moins difficile. Elle passait ses soirées allongée de tout son long sur ses avant bras quand elle essayait d'utiliser le pc portable, ou à jouer au monstre dans son tunnel pour surgir, attraper, et emporter dans son antre tout ce qui passait à portée, orteils comme jouets, sans relâche jusqu’au moment du dodo où elle venait se poser au creux de ses genoux pour dormir avec nous
+
+Elle a pu voir la mer et le sable durant nos vacances en bretagne, elle a tremblé face aux vagues, elle a poursuivi oiseaux et écureuils d'un regard de chasseresse pendant des heures sur la terrasse, et elle à chaque fois elle était partagée entre curiosité, joie et frayeur, surtout quand elle pouvait gambader dans le jardin du grand père
+
+C'était une chatte merveilleuse, et on voulait aussi remercier l'association [Le Chat Kremlinois](http://www.lechatkrem.com/) pour lui avoir permis (et à nous aussi) de vivre ces belles années ensemble, grâce à son sauvetage in extrémis d'un conduit d'aération, sa prise en charge par l'association et les soins attentionnés de sa famille d'accueil, la wonderful-Gaëlle. Sans vous et sans ces petites biches, notre vie n'aurait pas été la même
+
+Voilà quelques photos d'Isis (la grise) avec sa soeur Vala (la brune)...
+
+<a href="/files/tribute_isis_TOsjTmM.jpg"><img src="/files/tribute_isis_TOsjTmMl.jpg" /></a>
+Isis - C'est boooon la bouteille toute chaude !
+
+<a href="/files/tribute_isis_bQdPl5E.jpg"><img src="/files/tribute_isis_bQdPl5El.jpg" /></a>
+Isis - oh oh comment ça faut pas manger la terre ?
+
+<a href="/files/tribute_isis_MwMMHlc.jpg"><img src="/files/tribute_isis_MwMMHlcl.jpg" /></a>
+Isis et Vala
+
+<a href="/files/tribute_isis_sFDfXBh.jpg"><img src="/files/tribute_isis_sFDfXBhl.jpg" /></a>
+Vala - Tu crois qu'il y a quoi là dessous ?<br />
+Isis - Je sais pas et je m'en fiche, je suis plus haut que toi !
+
+<a href="/files/tribute_isis_JfkFZoI.jpg"><img src="/files/tribute_isis_JfkFZoIl.jpg" /></a>
+Vala - Je vais te sauter dessus, tu vas rien voir venir ....
+
+<a href="/files/tribute_isis_NBWTIEQ.jpg"><img src="/files/tribute_isis_NBWTIEQl.jpg" /></a>
+Isis
+
+<a href="/files/tribute_isis_k871Tpi.jpg"><img src="/files/tribute_isis_k871Tpil.jpg" /></a>
+Vala et Isis- C'est bien d'avoir un repose-tête
+
+<a href="/files/tribute_isis_LBdtDNx.jpg"><img src="/files/tribute_isis_LBdtDNxl.jpg" /></a>
+Vala et Isis - Les acrobates... on se croirait au cirque !
+
+<a href="/files/tribute_isis_4SLa6VT.jpg"><img src="/files/tribute_isis_4SLa6VTl.jpg" /></a>
+Isis - C'est MON hamac. A moi. Le mien.
+
+<a href="/files/tribute_isis_DBlIyuj.jpg"><img src="/files/tribute_isis_DBlIyujl.jpg" /></a>
+Vala - Tant pis pour toi, mon pimboli est plus douillet
+
+<a href="/files/tribute_isis_TFm7jEH.jpg"><img src="/files/tribute_isis_TFm7jEHl.jpg" /></a>
+Vala - Toc toc, le facteur a livré un petit paquet !
+
+<a href="/files/tribute_isis_L8nHH1q.jpg"><img src="/files/tribute_isis_L8nHH1ql.jpg" /></a>
+Isis et Vala - "envies d'évasion"
+
+<a href="/files/tribute_isis_6yk976C.jpg"><img src="/files/tribute_isis_6yk976Cl.jpg" /></a>
+Isis et Vala - Comment ça t'avais rangé le linge ?
+
+<a href="/files/tribute_isis_CHx8qCw.jpg"><img src="/files/tribute_isis_CHx8qCwl.jpg" /></a>
+Isis - Marre de me lécher, ouvre l'eau , je te dis
+
+<a href="/files/tribute_isis_rPo8L71.jpg"><img src="/files/tribute_isis_rPo8L71l.jpg" /></a>
+Isis - Ben quoi .... j'avais froid !
+
+<a href="/files/tribute_isis_SQ84UO4.jpg"><img src="/files/tribute_isis_SQ84UO4l.jpg" /></a>
+Isis et Vala - Au sommet du tancarville !
+
+<a href="/files/tribute_isis_WUXcdua.jpg"><img src="/files/tribute_isis_WUXcdual.jpg" /></a>
+Isis - Oh, tu m'as trouvée ? A ton tour de te cacher alors !
+
+<a href="/files/tribute_isis_rP82zgq.jpg"><img src="/files/tribute_isis_rP82zgql.jpg" /></a>
+Isis - Et encore un sommet de vaincu
+
+<a href="/files/tribute_isis_IWDlDmL.jpg"><img src="/files/tribute_isis_IWDlDmLl.jpg" /></a>
+Isis - Dans mon tunnel de la terreur, je veille et j'attends les orteils imprudents
+
+<a href="/files/tribute_isis_ISVZug9.jpg"><img src="/files/tribute_isis_ISVZug9l.jpg" /></a>
+Vala et Isis - Dis, t'aurais pas grossi, toi ?
+
+<a href="/files/tribute_isis_G4Liob8.jpg"><img src="/files/tribute_isis_G4Liob8l.jpg" /></a>
+Isis - Pour aller plus haaaaaaaaut !
+
+<a href="/files/tribute_isis_eEogpp9.jpg"><img src="/files/tribute_isis_eEogpp9l.jpg" /></a>
+Isis - Plus qu'un petit effort et j'atteins le plafond
+
+<a href="/files/tribute_isis_QwqahlJ.jpg"><img src="/files/tribute_isis_QwqahlJl.jpg" /></a>
+Isis - Il faut chaud, mais y a pas d'eau dans ma piscine personnelle
+
+<a href="/files/tribute_isis_QBVZevA.jpg"><img src="/files/tribute_isis_QBVZevAl.jpg" /></a>
+Isis - Comment ça tu veux travailler ?
+
+<a href="/files/tribute_isis_Dhu5F3V.jpg"><img src="/files/tribute_isis_Dhu5F3Vl.jpg" /></a>
+Isis - Ca se voit tant que ça que j'ai envie de câlins ?
+
+<a href="/files/tribute_isis_MgM9uvN.jpg"><img src="/files/tribute_isis_MgM9uvNl.jpg" /></a>
+Isis et Vala - Oiseaux et rongeurs, chacun sa spécialité, en tout cas on vous guette !
+
+<a href="/files/tribute_isis_w4SqDD9.jpg"><img src="/files/tribute_isis_w4SqDD9l.jpg" /></a>
+Isis - Oooh la belle planche qu'on nous a installé, on va pouvoir voir dehors !
+
+<a href="/files/tribute_isis_TVwbTO3.jpg"><img src="/files/tribute_isis_TVwbTO3l.jpg" /></a>
+Isis et Vala - Tu le trouve comment le nouveau tapis ? Pas mal, mais je préfère le fauteuil
+
+<a href="/files/tribute_isis_SxZjb7p.jpg"><img src="/files/tribute_isis_SxZjb7pl.jpg" /></a>
+Isis et Nico - Balade en famille sur la digue en Bretagne, du bon air ! Pleins de choses à voir et à sentir, et que de bons souvenirs pour elle et pour nous !

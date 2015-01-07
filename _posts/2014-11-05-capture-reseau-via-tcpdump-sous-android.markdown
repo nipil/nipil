@@ -1,0 +1,233 @@
+---
+layout: post
+title: Capture réseau via tcpdump ... sous android !
+tags: android reseau
+---
+
+On peut faire des captures réseau sur son téléphone... Ok, mais pourquoi faire ?
+
+Et bien que ça soit parce qu'on développe une application mobile, ou parce qu'on a l'impression que la connexion data du téléphone rame, ou par curiosité pour voir "ce qui passe", ça peut être intéressant de faire une capture réseau directement sur son téléphone android.
+
+Premier point, il faut que le téléphone soit rooté (ie "su" est disponible).
+
+Deuxième point, on va compiler nous même un tcpdump, car je préfère pas faire tourner en root un binaire téléchargé directement sur internet :-)
+
+# Installer une chaîne de compilation ARM
+
+Déjà, les binaires compilés sur PC (386/x64) ne sont pas exécutables sur un téléphone ARM. Il faut donc installer une chaîne de compilation ("toolchain") pour produire des exécutables pour les plateformes arm.
+
+C'est quelque chose de très facile sous Debian Squeeze (6.0), alors on y va :
+
+	wget http://cdimage.debian.org/mirror/cdimage/archive/6.0.10/i386/iso-cd/debian-6.0.10-i386-netinst.iso
+	wget http://cdimage.debian.org/mirror/cdimage/archive/6.0.10/i386/iso-cd/SHA256SUMS
+
+On vérifie que l'intégrité de l'image téléchargée
+
+	sha256sum debian-6.0.10-i386-netinst.iso
+	grep debian-6.0.10-i386-netinst.iso SHA256SUMS
+
+Les deux empreintes sont identiques, on peut continuer.
+
+On configure une machine dans [VirtualBox](https://www.virtualbox.org/), on la boot, on installe tout par défaut, en choisissant n'importe quel mirroir réseau comme source d'installation. Je passe les détails, il y a trois tonnes de tutoriaux sur internet, google est notre ami.
+
+Ensuite on installe le keyring des gestionnaires de la toolchain
+
+	sudo apt-get install emdebian-archive-keyring
+
+On update la liste des paquets pour connaître les nouveaux paquets
+
+	sudo apt-get update
+
+On installe ensuite la toolchain et toutes ses dépendances
+
+	sudo apt-get install g++-4.4-arm-linux-gnueabi
+
+On vérifie que ça fonctionne correctement
+
+	arm-linux-gnueabi-gcc -v
+
+	Using built-in specs.
+	Target: arm-linux-gnueabi
+	Configured with: ../src/configure -v --with-pkgversion='Debian 4.4.5-8'
+	--with-bugurl=file:///usr/share/doc/gcc-4.4/README.Bugs
+	--enable-languages=c,c++,fortran,objc,obj-c++ --prefix=/usr
+	--program-suffix=-4.4 --enable-shared --enable-multiarch
+	--enable-linker-build-id --with-system-zlib --libexecdir=/usr/lib
+	--without-included-gettext --enable-threads=posix
+	--with-gxx-include-dir=/usr/arm-linux-gnueabi/include/c++/4.4.5
+	--libdir=/usr/lib --enable-nls --enable-clocale=gnu
+	--enable-libstdcxx-debug --enable-objc-gc --disable-sjlj-exceptions
+	--enable-checking=release --program-prefix=arm-linux-gnueabi-
+	--includedir=/usr/arm-linux-gnueabi/include --build=i486-linux-gnu
+	--host=i486-linux-gnu --target=arm-linux-gnueabi
+	--with-headers=/usr/arm-linux-gnueabi/include
+	--with-libs=/usr/arm-linux-gnueabi/lib
+
+	Thread model: posix
+	gcc version 4.4.5 (Debian 4.4.5-8)
+
+On installe deux packages nécessaires (pour info, [qui est qui](https://fr.wikipedia.org/wiki/Yacc_%28logiciel%29))
+
+	sudo apt-get install flex bison
+
+Yabon, let's go.
+
+# Récupérer et vérifier les sources de LIBPCAP et TCPDUMP
+
+On télécharge les tarballs les plus récents à ce jour
+
+	wget http://www.tcpdump.org/release/tcpdump-4.6.2.tar.gz
+	wget http://www.tcpdump.org/release/tcpdump-4.6.2.tar.gz.sig
+	wget http://www.tcpdump.org/release/libpcap-1.6.2.tar.gz
+	wget http://www.tcpdump.org/release/libpcap-1.6.2.tar.gz.sig
+
+On vérifie que les signatures
+
+	gpg --verify tcpdump-4.6.2.tar.gz.sig
+	
+	gpg: Signature made Wed 03 Sep 2014 03:27:15 CEST using RSA key ID D9C15D0D
+	gpg: Can't check signature: public key not found
+
+Ah... on a pas encore la clé publique dans le keyring, on la récupère :
+
+	gpg --recv-key D9C15D0D
+
+	gpg: requesting key D9C15D0D from hkp server keys.gnupg.net
+	gpg: key D9C15D0D: public key "The Tcpdump Group (Package signing key)
+	     <release@tcpdump.org>" imported
+	gpg: no ultimately trusted keys found
+	gpg: Total number processed: 1
+	gpg:               imported: 1  (RSA: 1)
+
+On relance la vérification des signatures de la librairie PCAP
+
+	gpg --verify libpcap-1.6.2.tar.gz.sig 
+
+	gpg: Signature made Wed 03 Sep 2014 02:06:25 CEST using RSA key ID D9C15D0D
+	gpg: Good signature from "The Tcpdump Group (Package signing key) <release@tcpdump.org>"
+	gpg: WARNING: This key is not certified with a trusted signature!
+	gpg:          There is no indication that the signature belongs to the owner.
+	Primary key fingerprint: 1F16 6A57 42AB B9E0 249A  8D30 E089 DEF1 D9C1 5D0D
+
+Et la vérification de la signature du programme TCPDUMP
+
+	gpg --verify tcpdump-4.6.2.tar.gz.sig
+
+	gpg: Signature made 2014-09-03T03:27:15 CEST using RSA key ID D9C15D0D
+	gpg: Good signature from "The Tcpdump Group (Package signing key) <release@tcpdump.org>"
+	gpg: WARNING: This key is not certified with a trusted signature!
+	gpg:          There is no indication that the signature belongs to the owner.
+	Primary key fingerprint: 1F16 6A57 42AB B9E0 249A  8D30 E089 DEF1 D9C1 5D0D
+
+Les signatures sont bonnes ("Good signature"), on peut continuer
+
+# Compiler les sources
+
+On compile la librairie, ça générera une librairie dynamique `libpcap.so.1.6.2`, et une librairie statique `libpcap.a`. L'une ou l'autre sera utilisé, en fonction des paramètres de compilation *des programmes qui l'utiliseront*.
+
+	tar xf libpcap-1.6.2.tar.gz
+	cd libpcap-1.6.2/
+	./configure --host=arm-linux --with-pcap=linux
+	make
+	cd ..
+
+Petite explication pour ce qui suit car même si on compile avec le bon jeu d'instruction ça n'est pas "suffisant"
+
+Normalement les programmes sont compilés de manière dynamique, c'est à dire avec des liens vers les librairies qu'ils utilisent qui devront être "reconstruits" au moment où on veut exécuter le programme sur la machine cible. Ca permet de gagner de la place en ne conservant qu'un exemplaire de chaque librairie sur chaque système
+
+Du coup, si on compilait "normalement" tcpdump, on aurait le résultat suivant :
+
+
+Le problème qui arriverait c'est qu'au moment où on lancerait tcpdump sur le téléphone, le système rechercherait la librairie pcap dans les librairies systèmes, et ne la trouvant pas, le programme ne pourrait s'exécuter.
+
+Du coup, l'astuce c'est de compiler TCPDUMP en statique, afin que les librairies nécessaires à son bon fonctionnement soient toutes directement inclues dans l'exécutable. Ce qui fait qu'il trouvera tous ses petits quand on voudra le lancer :-)
+
+On configure les flags pour que tout soit compilé/linké en static :
+
+	export CFLAGS=-static
+	export CPPFLAGS=-static
+	export LDFLAGS=-static
+
+Et on compile TCPDUMP
+
+	tar xf tcpdump-4.6.2.tar.gz 
+	cd tcpdump-4.6.2/
+	./configure --host=arm-linux --disable-ipv6
+	make
+
+On termine en virant les informations de debug, et en calculant son checksum
+
+	arm-linux-gnueabi-strip tcpdump
+	md5sum tcpdump > tcpdump.md5sum
+
+On obtient alors le précieux exécutable, à la fois compatible ARM **et** standalone.
+
+	c18b779ebbbce63a6304a22863c66fa8  tcpdump
+
+Vous pouvez le télécharger [ici](/files/tcpdump)
+
+Après l'avoir téléchargé, Pour vérifier l'empreinte MD5 donnée ci-dessus, il suffit de 
+
+	md5sum tcpdump
+
+Déposez le par exemple à la racine de la carte SD de votre téléphone et c'est fini !
+
+Certains préconisent de l'installer dans la partition system, mais perso je trouve ça débile : il faudra le réinstaller à chaque fois qu'on met à jour la rom... bref, je préfère aller le chercher sur la carte SD quand j'en ai besoin.
+
+# Vérifier que ça marche
+
+J'insiste, il faut que votre téléphone soit rooté. De plus, il faut que l'accès "root" soit autorisé pour les applications dans les options développeur du téléphone. Sinon tout ça c'était pour rien :-)
+
+Ouvrez l'application "Terminal Emulator", et déplacez vous dans le répertoire de votre carte SD
+
+	su
+
+Acceptez la confirmation de sécurité
+
+	cd /storage/primary/legacy
+
+Tentez de l'exécuter pour voir que tout va bien
+
+	./tcpdump --version
+
+	tcpdump version 4.6.2
+	libpcap version 1.6.2
+
+Yabon.
+
+# Choisir son interface
+
+Pour trouver les interfaces où il y a du trafic réseau, le plus simple est de lancer la commande, et de rechercher dans le listing les interfaces qui ont des adresses IP présentes : 
+
+	ip addr
+
+Par exemple chez moi j'ai 3 interfaces qui ont une adresse ip :
+
+	lo
+	wlan0
+	rmnet0
+
+Ici, on peut comprendre que :
+
+- `lo` est l'interface de *loopback*, qui sert à la communication interne au téléphone
+- `wlan0` est l'interface Wi-Fi (quand on est associé à une box par exemple)
+- `rmnet0` est l'interface liée à la connexion mobile
+
+Ca c'est sur mon téléphone, les noms seront peut-être (sûrement ?) différent chez d'autres.
+
+# Lancer une capture réseau
+
+Pour capturer le traffic qui passe par la connexion mobile :
+
+	./tcpdump -i rmnet0 -w mobile.pcap
+
+Pour capturer le traffic qui passe par le wifi :
+
+	./tcpdump -i wlan0 -w wifi.pcap
+
+Pour arrêter la capture, faire un Control-C (maintenir le bouton "volume bas", et appuyer sur la touche C), ou voir le menu "Paramètres" de l'application "Terminal Emulator" pour voir la combinaison de touche chez vous.
+
+Tout ce qui est capturé est stocké dans un fichier avec extension `.pcap`. Il vous suffit de copier les fichiers `.pcap` sur votre PC depuis la carte SD, et de l'ouvrir avec l'analyseur réseau [Wireshark](https://www.wireshark.org/)
+
+Maintenant, c'est à vous de jouer :-)
+

@@ -1,0 +1,672 @@
+---
+layout: post
+title: OpenBSD 5.6 sur Kimsufi 2G
+tags: server linux openbsd ovh
+---
+
+La dernière version OpenBSD 5.6 a été [publiée](http://www.openbsd.org/56.html) le 1er novembre 2014, mais OVH ne permet pas l'installation directe d'OpenBSD.
+
+Cependant, ça ne va pas nous empêcher d'installer OpenBSD sur notre serveur ... Parce que oui, c'est possible !
+
+La démarche générale sera la suivante :
+
+1. installer une FreeBSD sur le KS-2G via la manager OVH
+1. récupérer les infos/noms "BSD" de notre matos en bootant FreeBSD sur le KS-2G
+1. redémarrer sur une rescue FreeBSD
+1. télécharger et vérifier l'iso d'installation OpenBSD 5.6
+1. créer un espace en ram pour QEmu
+1. installer QEmu "dans" la rescue FreeBSD
+1. utiliser QEmu de FreeBSD pour installer OpenBSD sur le disk du KS-2G
+1. finaliser l'installation 
+
+Si vous connaissez déjà vos infos techniques (surtout le nom "BSD" de la carte réseau !) vous pouvez aller directement à l'étape 3.
+
+Je précise aussi que ce billet détaillé se base sur [ce post](http://forum.kimsufi.com/showthread.php?11363-Installation-d-OpenBSD-5-3-sur-kimsufi-mKS-2g) des forums Kimsufi où la méthode est décrite.
+
+# Etape 1 - installer une FreeBSD via le manager OVH
+
+Euh, pourquoi ça ? On veut plutôt une OpenBSD !
+
+En fait, le nommage des partitions, cartes réseaux etc est différent entre Linux et BSD, et du coup une FreeBSD permettra de connaître le nom du matos à la sauce BSD
+
+Et en plus, comme il est logiquement préférable d'utiliser un rescue Linux pour installer/réparer un Linux, il est souhaitable d'utiliser un rescue \*BSD pour installer/réparer un \*BSD.
+
+Et surtout, tant qu'on a pas installé une \*BSD sur notre serveur OVH, le manager ne proposera pas de rescue "BSD", uniquement le rescue "Linux"...
+
+<img src="/files/openbsd-install-freebsd-00.png" />
+<img src="/files/openbsd-install-freebsd-01.png" />
+<img src="/files/openbsd-install-freebsd-02.png" />
+<img src="/files/openbsd-install-freebsd-03.png" />
+<img src="/files/openbsd-install-freebsd-04.png" />
+
+Après environ 12 minutes, l'installation est terminée
+
+<img src="/files/openbsd-install-freebsd-12.png" />
+
+On a aussi reçu un email de confirmation de la part d'OVH, avec un mot de passe "root" initial.
+
+# Etape 2 - récupérer via FreeBSD les infos/noms "BSD" de notre matos
+
+On tente de se connecter au serveur nouvellement installé :
+
+	ssh root@91.121.167.150
+
+Or, comme le serveur a été réinstallé, son fingerprint SSH a changé (forcément), et le client SSH nous prévient
+
+	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+	@    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @
+	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+	IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!
+	Someone could be eavesdropping on you right now (man-in-the-middle attack)!
+	It is also possible that a host key has just been changed.
+	The fingerprint for the ECDSA key sent by the remote host is
+	3e:70:c2:f6:17:39:4c:f0:e6:87:db:27:4d:6e:b0:98.
+	Please contact your system administrator.
+	Add correct host key in /home/npillot/.ssh/known_hosts to get rid of this message.
+	Offending ECDSA key in /home/npillot/.ssh/known_hosts:36
+		remove with: ssh-keygen -f "/home/npillot/.ssh/known_hosts" -R 91.121.167.150
+	ECDSA host key for 91.121.167.150 has changed and you have requested strict checking.
+	Host key verification failed.
+
+Pas de soucis, il nous dit même quoi faire pour "oublier" l'ancien fingerprint :
+
+	ssh-keygen -f "/home/npillot/.ssh/known_hosts" -R 91.121.167.150
+
+On essaie à nouveau de se connecter et cette fois ci, tout va bien :
+
+	ssh root@91.121.167.150 -L 5900:localhost:5900
+
+	The authenticity of host '91.121.167.150 (91.121.167.150)' can't be established.
+	ECDSA key fingerprint is 3e:70:c2:f6:17:39:4c:f0:e6:87:db:27:4d:6e:b0:98.
+	Are you sure you want to continue connecting (yes/no)? yes
+	Warning: Permanently added '91.121.167.150' (ECDSA) to the list of known hosts.
+	root@91.121.167.150's password: 
+	Last login: Mon Nov 10 12:16:07 2014 from cache.ovh.net
+	FreeBSD 9.3-RELEASE-p2
+
+	server    : XXXXX
+	ip        : 91.121.167.150
+	hostname  : ks361272.kimsufi.com
+
+	root@ks361272:~ # 
+
+C'est parti !
+
+## Identification du CPU pour le choix du kernel
+
+OpenBSD propose deux kernel génériques :
+
+- le kernel "Single Processor" (SP)
+- le kernel "Scalable Multiple Processor" (MP)
+
+Selon qu'on ait un/plusieurs CPU/coeurs on utilisera l'un ou l'autre.
+
+	dmesg|grep -i cpu
+
+	CPU: Intel(R) Celeron(R) CPU 220  @ 1.20GHz (1200.07-MHz K8-class CPU)
+	cpu0: <ACPI CPU> on acpi0
+	p4tcc0: <CPU Frequency Thermal Control> on cpu0
+	
+Ici on voit que notre KS-2G n'a qu'un coeur (on a que `cpu0`, pas de `cpu1` ni de `cpu2` etc...), en conséquence on pourra conserver le kernel SP.
+
+Si vous avez plus d'un processeur/coeur, il faudra s'assurer que c'est bien le kernel MP qui est actif ; mais on verra tout ça à l'étape 8 "finalisation de l'installation".
+
+## Identification du nom "FreeBSD" du disque dur
+
+Le nom est différent de sous Linux
+
+	mount
+
+	/dev/ada0s1a on / (ufs, local, journaled soft-updates)
+	devfs on /dev (devfs, local, multilabel)
+	/dev/ada0s1b on /home (ufs, local, journaled soft-updates)
+	procfs on /proc (procfs, local)
+	devfs on /var/named/dev (devfs, local, multilabel)
+
+Sous linux, deux niveaux de découpage :
+- les disques : sda sdb sdc (SATA) et hda hdb (IDE) ...
+- les partitions : sdc4 hdb2 sda1 ...
+
+Sous \*BSD, trois niveaux de découpage :
+- les disques : ada0 ada1 ada2 (que ça soit SATA ou IDE)
+- les "slice" : ada0s1 asa0s2 sont les découpes des disques (ie partitions Linux)
+- les partitions : ada0s1a ada0s1b ada0s1k ...
+
+Dans tous les deux cas, ce sont les partitions qui stockent les filesystems.
+
+Et pour mon serveur, **ada0s1a** désigne :
+
+- un disque utilisant le driver **ada** (IDE/SATA)
+- le premier des disques dur **0** utilisant ce driver
+- le premier "slice" **s1** de ce disque dur
+- la première partition **a** de ce slice
+
+Bref, dans la rescue FreeBSD, on référencera le disque physique par **ada0**.
+
+## Identification du nom "FreeBSD" de la carte réseau"
+
+On affiche ensuite la configuration réseau :
+
+	ifconfig
+
+	sis0: flags=8843<UP,BROADCAST,RUNNING,SIMPLEX,MULTICAST> metric 0 mtu 1500
+		options=82008<VLAN_MTU,WOL_MAGIC,LINKSTATE>
+		ether 00:1c:c0:65:21:6e
+		inet 91.121.167.150 netmask 0xffffff00 broadcast 91.121.167.255
+		inet6 fe80::21c:c0ff:fe65:216e%sis0 prefixlen 64 scopeid 0x5 
+		inet6 2001:41d0:1:e896::1 prefixlen 128 
+		nd6 options=23<PERFORMNUD,ACCEPT_RTADV,AUTO_LINKLOCAL>
+		media: Ethernet autoselect (100baseTX <full-duplex>)
+		status: active
+	lo0: flags=8049<UP,LOOPBACK,RUNNING,MULTICAST> metric 0 mtu 16384
+		options=600003<RXCSUM,TXCSUM,RXCSUM_IPV6,TXCSUM_IPV6>
+		inet6 ::1 prefixlen 128 
+		inet6 fe80::1%lo0 prefixlen 64 scopeid 0x6 
+		inet 127.0.0.1 netmask 0xff000000 
+		nd6 options=23<PERFORMNUD,ACCEPT_RTADV,AUTO_LINKLOCAL>
+
+Le plus important, c'est le nom de l'interface réseau :
+
+- sous linux, les interfaces réseau s'appellent habituellement **ethX**
+- sous \*BSD les interfaces s'appellent **drvX**, où *drv* est le nom du driver qui pilote la carte réseau en question
+- dans les deux cas, X s'incrémente selon le nombre de cartes réseau de chaque type
+
+Dans mon cas l'interface réseau de notre KS-2G est **sis0** (driver [sis](https://www.freebsd.org/cgi/man.cgi?query=sis&sektion=4)) et en résumé, partout où on voudrait mettre eth0 sous linux, on mettre sis0 sous BSD.
+
+Pour voir la table de routage, sous BSD :
+
+	netstat -rn
+
+Le reste des informations de topologie réseau sont les mêmes que sous Linux :-)
+
+- serveur de nom (DNS) : 213.186.33.99
+- adresse IPv4 : 91.121.167.150
+- masque de réseau IPv4 : 255.255.255.0 (/24)
+- passerelle IPv4 : 91.121.167.254
+- adresse IPv6 : 2001:41D0:1:E896::1
+- masque de réseau IPv6 : /128
+- passerelle IPv6 : 2001:41D0:1:E8ff:ff:ff:ff:ff
+- et une route statique vers la passerelle IPv6 via l'interface réseau sis0
+
+Pour finir, au cas où on en aurait besoin plus tard, on peut regagarder/archiver le `dmesg`, ça peut toujours servir.
+
+# Etape 3 - redémarrer sur une rescue FreeBSD
+
+Dans le manager OVH, on change le mode de boot de notre serveur
+
+<img src="/files/openbsd-install-freebsd-12.png" />
+<img src="/files/openbsd-rescue-freebsd-00.png" />
+<img src="/files/openbsd-rescue-freebsd-01.png" />
+<img src="/files/openbsd-rescue-freebsd-02.png" />
+
+Et puis toujours dans notre connexion SSH, on redémarre le serveur pour qu'il boot sur la rescue BSD.
+
+	reboot
+
+On suit le redémarrage par un ping, pour moi ça a mis environ 90 secondes (cf ci-dessous)
+
+	ping 91.121.167.150
+
+	PING 91.121.167.150 (91.121.167.150) 56(84) bytes of data.
+	64 bytes from ks361272.kimsufi.com (91.121.167.150): icmp_seq=1 ttl=54 time=7.07 ms
+	64 bytes from ks361272.kimsufi.com (91.121.167.150): icmp_seq=2 ttl=54 time=6.51 ms
+	64 bytes from ks361272.kimsufi.com (91.121.167.150): icmp_seq=3 ttl=54 time=6.36 ms
+	64 bytes from ks361272.kimsufi.com (91.121.167.150): icmp_seq=95 ttl=54 time=6.24 ms
+	64 bytes from ks361272.kimsufi.com (91.121.167.150): icmp_seq=96 ttl=54 time=6.71 ms
+	64 bytes from ks361272.kimsufi.com (91.121.167.150): icmp_seq=97 ttl=54 time=6.85 ms
+	^C
+
+A nouveau, on a dû recevoir un email OVH avec le mot de passe pour l'accès au rescue.
+
+On se connecte au serveur en mode rescue BSD :
+
+	ssh root@91.121.167.150 -L 5900:localhost:5900
+
+*Remarque : On verra à l'étape 7 pourquoi on a créé une redirection de port TCP via -L*
+
+Comme tout à l'heure, SSH râle parce que le fingerprint du serveur a changé, donc on va lui dire d'oublier l'ancien comme on l'a fait tout à l'heure :
+
+	ssh-keygen -f "/home/npillot/.ssh/known_hosts" -R 91.121.167.150
+
+On s'y reconnecte, cette fois ci avec succès
+
+	ssh root@91.121.167.150 -L 5900:localhost:5900
+
+	The authenticity of host '91.121.167.150 (91.121.167.150)' can't be established.
+	ECDSA key fingerprint is 48:d9:ce:46:99:ed:1c:b9:84:1f:61:37:c0:9a:f2:9d.
+	Are you sure you want to continue connecting (yes/no)? yes
+	Warning: Permanently added '91.121.167.150' (ECDSA) to the list of known hosts.
+	root@91.121.167.150's password: 
+	FreeBSD 9.2-RELEASE (GENERIC) #0 r255898: Thu Sep 26 22:50:31 UTC 2013
+
+	Welcome to FreeBSD!
+
+	Before seeking technical support, please use the following resources:
+
+	o  Security advisories and updated errata information for all releases are
+		 at http://www.FreeBSD.org/releases/ - always consult the ERRATA section
+		 for your release first as it's updated frequently.
+
+	o  The Handbook and FAQ documents are at http://www.FreeBSD.org/ and,
+		 along with the mailing lists, can be searched by going to
+		 http://www.FreeBSD.org/search/.  If the doc package has been installed
+		 (or fetched via pkg_add -r lang-freebsd-doc, where lang is the
+		 2-letter language code, e.g. en), they are also available formatted
+		 in /usr/local/share/doc/freebsd.
+
+	If you still have a question or problem, please take the output of
+	`uname -a', along with any relevant error messages, and email it
+	as a question to the questions@FreeBSD.org mailing list.  If you are
+	unfamiliar with FreeBSD's directory layout, please refer to the hier(7)
+	manual page.  If you are not familiar with manual pages, type `man man'.
+
+	Edit /etc/motd to change this login announcement.
+
+
+	server    : 
+	ip        : 91.121.167.150
+	hostname  : rescue-bsd.ovh.net
+
+	rescue-bsd# 
+
+Bon, maintenant on va commencer le "vrai" travail :-)
+
+# Etape 4 - récupérer et vérifier l'image iso OpenBSD
+
+Comme on va partitionner/formater le disque cible du serveur, on ne peut pas stocker l'image ISO de l'install OpenBSD sur un disque dur du serveur... Il faut donc travailler en ram !
+
+On va créer un disque temporaire pour y stocker l'iso qui servira pour l'installation (la taille doit être suffisante pour l'iso, pas vraiment besoin de plus)
+
+	mkdir ~/iso
+	mdmfs -M -S -m 0 -o async -s 250m md ~/iso/
+
+En résumé, ça alloue 250Mo de ram, ça créé un périphérique disque qui va l'utiliser comme support, et on initialise un filesystem dans ce disque.
+
+On télécharge les fichiers
+
+	wget -P ~/iso/ ftp://ftp.fr.openbsd.org/pub/OpenBSD/5.6/amd64/install56.iso
+	wget -P ~/iso/ ftp://ftp.fr.openbsd.org/pub/OpenBSD/5.6/amd64/SHA256
+	wget -P ~/iso/ ftp://ftp.fr.openbsd.org/pub/OpenBSD/5.6/amd64/SHA256.sig
+
+On verifie l'intégrité l'image est bonne
+
+	sha256 ~/iso/install56.iso
+	SHA256 (install56.iso) = b38e1314b487d0970549fab1ae3ad7617d0d29a7bae52ea968d1d1d85d6bf433
+
+	grep install56.iso ~/iso/SHA256
+	SHA256 (install56.iso) = b38e1314b487d0970549fab1ae3ad7617d0d29a7bae52ea968d1d1d85d6bf433
+
+Les deux sont identiques, c'est tout est bon, on peut continuer.
+
+# Etape 5 - créer un espace en ram pour QEmu
+
+Quand on est en mode rescue, le filesystem principal de la rescue est monté via le réseau, et forcément, est surtout en "read-only"
+
+	mount
+
+	178.33.124.65:/home/pub/bsd9_64-rescue-pro on / (nfs, read-only)
+	devfs on /dev (devfs, local, multilabel)
+	/dev/md0 on /etc (ufs, local)
+	/dev/md1 on /root (ufs, local)
+	/dev/md2 on /var (ufs, local)
+	procfs on /proc (procfs, local)
+	devfs on /var/named/dev (devfs, local, multilabel)
+	/dev/md3 on /tmp (ufs, local)
+
+En conséquence, pour installer/stocker quoi ce que soit, il va falloir créer un disque en ram (ici 150M pour QEmu de FreeBSD 9.2 est suffisant)
+
+	mdmfs -M -S -m 0 -o async -s 150m md /usr/local
+
+Le plus important c'est que ce disque en ram sera "monté" au point `/usr/local` de l'arborescence (qui existe déjà !)
+
+Ca aura pour effet :
+
+- de *remplacer* tout l'existant dans `/usr/local` par une arborescence (vide, au début)
+- et cette nouvelle arborescence vide est en read-write, et non plus read-only !
+
+Et comme `/usr/local` est l'endroit par défaut d'install pour `pkg_add`, on va pouvoir installer des logiciels "dans" la rescue.
+
+L'incovénient, c'est qu'on a plus accès à ce qui s'y trouvait initialement dans `/usr/local` (tous les outils habituels non-root du système). 
+
+Mais de toute façon dans notre cas, on a plus besoin de ce qu'il y avait dedans vu qu'on a déjà vérifié et fait ce qu'on avait à faire :-)
+
+*Remarque : dans tous les cas, pas d'inquiétude à avoir car rien n'a été effacé, c'est juste "temporairement inaccessible" : il suffirait de démonter le ramdisk via `umount /usr/local` pour retrouver l'arborescence originelle.*
+
+# Etape 6 - installer QEmu "dans" la rescue FreeBSD
+
+Déjà, on va regarder quelle version de FreeBSD est utilisé pour cette rescue :
+
+	uname -a
+
+	FreeBSD rescue-bsd.ovh.net 9.2-RELEASE ... amd64
+
+On va créer un répertoire temporaire dans notre disque ram, pour stocker les fichiers téléchargés
+
+	mkdir /usr/local/tmp
+	setenv TMPDIR /usr/local/tmp
+	
+On sélectionne le mirroir FreeBSD d'où on récupérera QEmu (même version 9.2 amd64 que la rescue !)
+
+	setenv PACKAGESITE \
+	ftp://ftp.freebsd.org/pub/FreeBSD/ports/amd64/packages-9.2-release/Latest/
+
+Et on installe QEmu (les dépendances sont automatiques)
+
+	pkg_add -r qemu
+
+On verifie que tout fonctionne
+
+	/usr/local/bin/qemu-system-x86_64 --version
+
+	QEMU PC emulator version 0.11.1, Copyright (c) 2003-2008 Fabrice Bellard
+
+C'est bon, on peut continuer...
+
+# Etape 7 - utiliser QEmu et VNC pour installer à distance
+
+Maintenant l'idée est d'utiliser QEmu pour faire tourner un nouveau "pc virtuel"
+
+- le disque du "pc virtuel" sera mappé sur le disque du serveur KS-2G
+- le lecteur CD du "pc virtuel" sera mappé sur l'iso d'installation stocké en ram
+- l'écran VGA du "pc virtuel" sera mis à disposition en local par VNC (port TCP 5900)
+- et de booter ce "pc virtuel" sur le CD-ROM
+
+En résumé, on fait exactement comme on ferait avec VirtualBox ... mais à distance, et avec un déport graphique :-)
+
+On lance l'émulateur :
+
+	/usr/local/bin/qemu-system-x86_64 \
+	  -hda /dev/ada0 \
+	  -cdrom ~/iso/install56.iso \
+	  -vnc :0 \
+	  -boot d
+
+Dès que la ligne de commande est exécutée, on exécute VNC (client) sur notre propre PC, et on se connecte à **localhost**.
+
+Grâce à la redirection de port tcp que l'on a configuré via la connexion ssh (*-L 5900:localhost:5900*) le client VNC de notre poste de travail va se connecter (de manière sécurisée au travers de SSH) jusqu'à l'émulateur QEmu, et récupérera l'affichage de la console du "pc virtuel".
+
+*Information : Les accès disques sont relativement lents dans QEmu sur le KS-2G, sûrement parce qu'il n'y a aucune accélération matérielle pour la virtualisation (VT-x/AMD-v & co). C'est notement le cas pour le formatage des partitions, et pour l'installation des paquets. Soyez patients :-)*
+
+C'est parti pour l'installation en elle-même que je vous illustre ci-dessous :
+
+
+
+
+<img src="/files/openbsd-install-00.png" />
+
+Après avoir pressé entrée (ou avoir attendu), du texte défile en bleu : c'est le `dmesg` OpenBSD.
+
+<img src="/files/openbsd-install-01.png" />
+
+Quand ça a fini de défiler, on nous demande ce qu'on veut faire
+
+<img src="/files/openbsd-install-02.png" />
+
+Ci-dessous, on lance l'installation, et on commence à rentrer les informations.
+
+La topologie IPv6 "spécifique" de notre serveur OVH n'est pas configurable directement lors de l'installation. On répondra donc "none" (en rouge ci-dessous) et on configurera l'IPv6 une fois qu'on aura tout terminé.
+
+<img src="/files/openbsd-install-03.png" />
+
+Ci-dessous, en jaune, je choisis d'utiliser une référence NTP pour être maintenir l'horloge du serveur.
+
+En rouge, je décide de **ne pas utiliser** les UID disque (en rouge ci-dessous). Sachant que je n'ajout pas, ni ne remplace, ni ne bouge de disques durs ou de partitions dans le serveur Kimsufi, la stabilité des UID ne m'intéresse pas. Du coup, je trouve que ça rendrait juste la maintenance plus difficile.
+
+Et en bleu, je laisse l'installeur configurer les sysctl nécessaire au fonctionnement du serveur X. Dans tous les cas, le serveur X n'est pas et ne sera pas démarré, donc ça ne change rien...
+
+<img src="/files/openbsd-install-04.png" />
+
+On choisit d'utiliser tout le disque (ça créera juste un slice)
+
+On acceptera le partitionnement [par défaut](http://www.openbsd.org/cgi-bin/man.cgi/OpenBSD-56/man8/disklabel.8?query=disklabel&sec=8#x4155544f4d41544943204449534b20414c4c4f434154494f4e) qui alloue tout l'espace non utilisé à `/home`.
+
+<img src="/files/openbsd-install-05.png" />
+
+
+Le formatage de la plus grosse partition prend pas mal de temps, car les accès disque ne sont pas accélérés matériellement, mais ça finit par arriver à son terme.
+
+<img src="/files/openbsd-install-07.png" />
+
+On arrive à l'installation des ensembles de paquets (un simili tasksel sous Debian).
+
+A noter que comme l'indique la [FAQ](http://www.openbsd.org/faq/faq4.html#FilesNeeded), choisir d'installer un set ne constitue pas un "ramolissement" de la sécurité du système. C'est pour ça que tout est installé par défaut (sauf le kernel où seul un est choisi, dans notre cas c'est le kernel SP)
+
+Cependant, on choisit d'installer le kernel MP (multiprocesseur) quand même, on verra plus loin pourquoi.
+
+<img src="/files/openbsd-install-08.png" />
+
+En jaune, avant de copier les fichiers, l'installeur nous prévient qu'il n'a pas trouvé les informations de signature des fichiers. Ca n'est pas grave, on lui dit de continuer, *car on a déjà vérifié l'intégrité de l'image ISO* donc il n'y a aucun risque.
+
+Ensuite, la copie de fichier commence, et comme pour le formatage, c'est un peu long via QEmu (227Mo en 576s, soit ~400Ko/sec) mais ça va assez vite vu qu'il n'y a que "peu" à installer.
+
+<img src="/files/openbsd-install-09.png" />
+
+Ne reste plus qu'à configurer la timezone du serveur
+
+<img src="/files/openbsd-install-10.png" />
+
+Et la copie des fichiers est terminée, l'installation standard est "finie". Mais **il ne faut surtout pas rebooter maintenant** ! On doit d'abord configurer les spécificités "serveur réel" KS-2G *vs* "pc virtuel" QEmu
+
+# Etape 8 - finaliser l'installation
+
+Il faut *absolument* finaliser deux points avant de quitter/rebooter.
+
+## Tout d'abord, la carte réseau
+
+Sous \*BSD le nom de la carté réseau dépend du driver qu'elle utilise. Dans QEmu, lors de l'install, quand on a configuré le réseau, elle s'appelait `em0`, car QEmu utilise un driver [em](https://www.freebsd.org/cgi/man.cgi?query=em) pour les cartes virtuelles.
+
+Comme on avait pu le voir lorsqu'on avait démarré la FreeBSD tout au début, notre carte réseau s'appellera en fait `sis0`. Il faut donc qu'on renomme le fichier de configuration réseau généré lors de l'installation, pour que notre carte réseau soit bien configurée.
+
+Sinon le serveur sera injoignable même s'il boot correctement :-)
+
+	cd /mnt
+	mv etc/hostname.ne0 etc/hostname.sis0
+
+Bon, le vital est fait, reste l'essentiel.
+
+## Ensuite, le kernel
+
+Comme on a vu au début grâce à la FreeBSD, mon serveur KS-2G avec Celeron 220 a un seul processeur/coeur, donc je pourrais  tranquilement booter sur le kernel SP choisi par QEmu.
+
+Cependant, si le serveur s'avère avoir plusieurs coeurs (ou processeurs) il faut la version [SMP](http://www.openbsd.org/faq/faq8.html#SMP) du kernel et il faut vérifier qu'on boot bien sur le kernel MP.
+
+En résumé :
+
+- Si a qu'un coeur et qu'on boot sur un kernel SP : OK, nickel
+- Si a plusieurs coeurs et qu'on boot sur un kernel MP : OK, nickel
+- Si a qu'un coeur et qu'on boot sur un kernel MP : ça boot, mais c'est un peu inutile
+- Si a plusieurs coeurs et qu'on boot sur un kernel SP : ça boot, *mais un seul coeur va bosser !*
+
+Bref, dans tous les cas, mieux vaut booter sur un kernel MP. Vérifions :
+
+	ls -l bsd*
+
+	-rw-r--r--  1 root  wheel  11868163 Nov 10 17:17 bsd
+	-rw-r--r--  1 root  wheel  11908731 Nov 10 17:17 bsd.mp
+	-rw-r--r--  1 root  wheel   9091711 Nov 10 17:17 bsd.rd
+
+Si et **seulement si** vous avez le résultat ci-dessus, **alors** passez les commandes suivantes
+
+	mv bsd bsd.sp
+	cp bsd.mp bsd
+
+Et maintenant c'est vraiment fini, on va pouvoir arrêter le "pc virtuel"
+
+<img src="/files/openbsd-finalisation-02.png" />
+
+Maintenant que le "pc virtuel" est arrêté, on interrompt l'émulateur QEmu dans la fenêtre SSH
+
+	^C (Control-C)
+
+On va retourner dans le manager OVH pour dire au serveur de booter sur le disque dur
+
+<img src="/files/openbsd-boot-hd-00.png" />
+<img src="/files/openbsd-boot-hd-01.png" />
+<img src="/files/openbsd-boot-hd-02.png" />
+<img src="/files/openbsd-boot-hd-03.png" />
+
+On a tout fini, on redémarre le serveur KS-2G via le SSH, et on suit attends la fin du reboot 
+
+	rescue-bsd# reboot
+	Connection to 91.121.167.150 closed by remote host.
+	Connection to 91.121.167.150 closed.
+
+	$ ping 91.121.167.150
+	PING 91.121.167.150 (91.121.167.150) 56(84) bytes of data.
+	64 bytes from 91.121.167.150: icmp_seq=66 ttl=245 time=2022 ms
+	64 bytes from 91.121.167.150: icmp_seq=67 ttl=245 time=1015 ms
+	^C
+
+Après reboot, on se connecte en ssh (après avoir encore demandé d'oublier l'ancien fingerprint)
+
+	ssh-keygen -f "/home/npillot/.ssh/known_hosts" -R 91.121.167.150
+
+	ssh root@91.121.167.150
+
+	The authenticity of host '91.121.167.150 (91.121.167.150)' can't be established.
+	ECDSA key fingerprint is f5:4c:7b:cf:3c:04:85:60:d8:ad:28:99:19:e6:e9:c7.
+	Are you sure you want to continue connecting (yes/no)? yes
+	Warning: Permanently added '91.121.167.150' (ECDSA) to the list of known hosts.
+	root@91.121.167.150's password: 
+	OpenBSD 5.6 (GENERIC.MP) #333: Fri Aug  8 00:20:21 MDT 2014
+
+	Welcome to OpenBSD: The proactively secure Unix-like operating system.
+
+	Please use the sendbug(1) utility to report bugs in the system.
+	Before reporting a bug, please try to reproduce it with the latest
+	version of the code.  With bug reports, please try to ensure that
+	enough information to reproduce the problem is enclosed, and if a
+	known fix for it exists, include that as well.
+
+	# uname -a
+	OpenBSD isis.nipil.org 5.6 GENERIC.MP#333 amd64
+
+Tout est parfait, c'est gagné, notre Kimsufi 2G tourne sous OpenBSD.
+
+# Configuration IPv6 "propre"
+
+En fait, sous \*BSD, on ne peut pas configurer l'IPv6 comme on le faisait sous Linux, c'est à dire en trois partie (interface *publique* + route statique vers gateway *publique* + route par défaut via interface *physique*)
+
+Pour rappel, les équivalences "de principe" entre IPv4 et IPv6 sont
+
+- dialogue ARP/MAC en IPv4 <=> adresses link-layer (fe80::/10) en IPv6
+- adresses publiques IPv4 <=> adresses IPv6 global unicast (2000::/3)
+- récupération DHCP de la route par défaut IPv4 <=> écoute des router-advertisement IPv6
+
+En gros, ce qu'on va faire pour le routage IPv6, c'est :
+
+- ne **pas** utiliser les adresses publiques pour router (ce qui était fait sous linux)
+- utiliser les adresses link-local pour router (autoconfiguration + router-advertisement)
+
+L'énorme avantage, c'est que ça marche nickel, et ce *sans bidouiller ni changer les masques réseaux ni rien, c'est à dire en restant dans les clous de la topologie réseau allouée et fournie par le Kimsufi KS-2G d'OVH* (ie on n'utilise pas à tort un /64 ou un /56 : on configure **uniquement** ce qui nous a été donné !)
+
+On va déjà faire la configuration "à la volée" pour voir si ça marche, ensuite on pérénisera ces infos dans les fichiers de configuration.
+
+On commence par configurer l'adresse IPv6 sur l'interface, en conservant bien le masque /128 qui nous a été donné 
+
+	ifconfig sis0 inet6 2001:41D0:1:E896::1/128
+
+On regarde la configuration de notre interface `sis0`
+
+	ifconfig sis0
+
+	sis0: flags=208843<UP,BROADCAST,RUNNING,SIMPLEX,MULTICAST,AUTOCONF6> mtu 1500
+			lladdr 00:1c:c0:65:21:6e
+			priority: 0
+			groups: egress
+			media: Ethernet autoselect (100baseTX full-duplex)
+			status: active
+			inet6 fe80::21c:c0ff:fe65:216e%sis0 prefixlen 64 scopeid 0x1
+			inet 91.121.167.150 netmask 0xffffff00 broadcast 91.121.167.255
+			inet6 2001:41d0:1:e896::1 prefixlen 128
+
+On constate que l'interface a été configurée correctement :
+
+- d'une part on a notre adresse IPv6 globale fournie par OVH (2001:41d0:1:e896::1/128)
+- d'autre part on voit qu'on a bien autoconfiguré une adresse link-local
+
+Pour information, l'adresse link-local 
+
+- a été autoconfigurée lorsqu'on a affecté une adresse "globale" car elle est nécessaire pour dialoguer en IPv6
+- sa valeur "fe80::2**1c:c0**ff:fe**65:216e**%sis0" [se base sur l'adresse mac](http://en.wikipedia.org/wiki/IPv6_address#Modified_EUI-64) de notre interface sis0 00:**1c:c0**:**65:21:6e** et sera donc invariante
+
+On va récupérer les instructions de routage grâce aux *router-advertisements* IPv6 (on peut ignorer ce message de la première ligne, dans la mesure où il ne nous gènera pas)
+
+	rtsol -d sis0
+
+	rtsol: kernel is configured not to accept redirects
+	setting rdomain 0
+	checking if sis0 is ready...
+	sis0 is ready
+	send RS on sis0, whose state is 2
+	received RA from fe80::205:73ff:fea0:1 on sis0, state is 2
+	stop timer for sis0
+	there is no timer
+
+On regarde la table de routage (je ne donne ici que les lignes IPv6 et qui concernent sis0)
+
+	netstat -rn
+	
+	Internet6:
+	Destination                        Gateway                        Flags   Refs      Use   Mtu  Prio Iface
+	default                            fe80::205:73ff:fea0:1%sis0     UG         0        0     -    56 sis0
+	fe80::%sis0/64                     link#1                         UC         2        0     -     4 sis0
+	fe80::205:73ff:fea0:1%sis0         00:05:73:a0:00:01              UHLc       1        1     -     4 sis0
+	fe80::21c:c0ff:fe65:216e%sis0      00:1c:c0:65:21:6e              UHLl       0        0     -     1 lo0
+	fe80::2ff:ffff:feff:fffe%sis0      00:ff:ff:ff:ff:fe              UHLc       0       28     -     4 sis0
+	ff01::%sis0/32                     link#1                         UC         0        0     -     4 sis0
+	ff02::%sis0/32                     link#1                         UC         0        0     -     4 sis0
+
+On retrouve dans la table de routage ce qu'on a vu dans le debug de `rtsol` : fe80::2**05:73**ff:fe**a0:1**
+
+Ca signifie qu'un routeur nous a envoyé un *router-advertisement* IPv6 et qu'on peut donc définir une route par défaut qui passe par lui. Pour info, de cette adresse *link-local* on peut extraire la mac adress du routeur 00:05:73:a0:00:01 qui montre que c'[est un équipement Cisco](http://www.coffer.com/mac_find/?string=00%3A05%3A73)
+
+L'inconvénient de cette méthode est qu'on 
+
+On test que IPv6 fonctionne :
+
+	$ ping6 www.google.com
+	PING6(56=40+8+8 bytes) 2001:41d0:1:e896::1 --> 2a00:1450:4007:806::1012
+	16 bytes from 2a00:1450:4007:806::1012, icmp_seq=2 hlim=57 time=13.961 ms
+	16 bytes from 2a00:1450:4007:806::1012, icmp_seq=3 hlim=57 time=4.620 ms
+	16 bytes from 2a00:1450:4007:806::1012, icmp_seq=4 hlim=57 time=4.639 ms
+	^C
+
+C'est tout bon ! On peut péréniser ça dans les deux fichiers de configurations concernés 
+
+	cat /etc/hostname.sis0
+	
+	inet 91.121.167.150 255.255.255.0
+	inet6 2001:41D0:1:E896::1 128
+	up
+
+	cat /etc/mygate
+	
+	91.121.167.254
+	fe80::205:73ff:fea0:1%sis0
+
+Et redémarrer pour vérifier que est bien établi (tester le `ping6` ci-dessus à nouveau)
+
+# Rescue OpenBSD
+
+Et bien il n'y a pas de rescue OpenBSD, juste la rescue FreeBSD qu'on a utilisé !
+
+Avec le rescue FreeBSD, on ne pourra monter que la première partition :
+
+	mkdir ~/rootfs
+	mount /dev/ada0s4 ~/rootfs
+
+Mais tenter de monter les autres partitions du slice générera une erreur.
+
+En conséquence, si un jour vous en avez besoin d'un rescue pour les autres partitions, il sera nécessaire de refaire les étapes 3 à 6, puis booter QEmu, commencer l'installation `I` puis faire *Control-C* juste après avoir choisi la configuration clavier.
+
+On se retrouve alors dans un environnement *OpenBSD*, qui lui vous permettra de monter toutes les partitions OpenBSD du système :-)
+
+# Et maintenant ?
+
+Sinon, la première chose à faire pour ceux qui n'ont pas l'habitude d'un OpenBSD :
+
+	man afterboot
+
+A vous de jouer maintenant !
+

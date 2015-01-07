@@ -1,0 +1,69 @@
+---
+layout: post
+title: Backlog ... et yEd débloque Machinarium !
+tags: jeux
+---
+
+J'ai un backlog assez conséquent. Pour préciser, un *backlog* est une liste de choses à faire, qui est aux loisirs ce que la *todo-list* est aux corvées. Donc ça n'est pas coercitif, même si ça peut illustrer le "*tant de choses à faire, et si peu de temps*" de [Cecil Rhodes](https://fr.wikipedia.org/wiki/Cecil_Rhodes).
+
+L'inconvénient du backlog, c'est qu'on est toujours en retard vis à vis du reste du monde 
+- on est incapable de discuter des séries ou des livres qui viennent de sortir
+- on risque de se faire spoiler les histoires, gaffe aux sites communautaires et aux collègues
+- on est pas "hype", on est pas "in", on est grave à la rue
+
+L'avantage du backlog, c'est qu'on est toujours en retard vis à vis du reste du monde.
+- on peut regarder une saison (ou une série complète !) en une fois sans attendre des semaines
+- pas besoin de se trimbaler des pavés, on choppe les livres en format "poche" ou en occaz
+- les jeux sont débuggués/patchés, et en édition GOTY avec les DLC, bref il est "finalisé"
+- tout est dispo en super-promo (si on surveille) ou d'occasion ou même gratos-légal
+- pour faire tourner un jeu donné, le même matos PC coût bien moins cher 2 ans plus tard
+- on a toujours quelque chose à faire, même si pendant quelques temps rien de "bien" ne paraît
+
+C'est un concept qui peut paraître un peu dérangeant, mais de toute façon je ne sais pas (plus?) faire autrement : là maintenant tout de suite, j'ai 20 bouquins et 10 séries télé en attente, et environ 25 jeux commencés et 115 jeux en attente. Tout ça, *alors que je fais déjà une sélection extrêmement drastique* pour ne retenir que ce qui vaut vraiment le coup ...
+
+# Revenons à nos moutons
+
+[Machinarium](http://machinarium.net/demo/) est un jeu d'aventure type *point & click* en flash, que j'ai acheté il y acheté 6$ en août 2010, et auquel je joue seulement maintenant. A priori rien de spécial, mais un de ses puzzle m'a fait découvrir un logiciel plutôt cool, du coup je suis content et je partage.
+
+Ci-dessous le puzzle en question, et c'est une histoire de plomberie : l'eau entre par en bas à gauche, elle parcourt les tuyaux selon les jonctions et les vannes, et elle sort par les 6 sorties différentes en haut. Le but du jeu, ici c'est d'empêcher l'eau de sortir par la 3ème en partant de la guache, en utilisant les clés rouges qui ferment la vanne où elles sont mises.
+
+<img src="/files/yed-machinarium-1.jpg" />
+
+Il y a 6+5=11 vannes, si on voulait tout tester au pif, ça fait 11 choix pour la première clé, 10 choix pour la suivante (forcément, une est déjà occupée) et 9 choix pour la troisième clé (car on a déjà bloqué deux vannes au moment de choisir la troisième) soit 11x10x9=990 possibilités à tester.
+
+Hors de question de tout tester bêtement, car ça prendrait des plombesr. Et surtout ça ne serait pas satisfaisant ! Car en fait il s'agit d'un puzzle "accessible" (ie logique, compréhensible et visuel).
+
+Le seul problème, c'est de démêler le tout pour se faire une vision nette des tuyaux et des vannes. Et c'est là que j'ai coincé, armé de mon fidèle crayon-bout-de-papier... J'ai passé plus de quarantes minutes à redessiner la tuyauterie, en essayant de clarifier les tuyaux éviter les croisements, bref à mettre à plat pour visualiser clairement les points où couper l'eau permettrait d'assécher la sortie numéro trois.
+
+De rattures en re-dessinage, j'en suis arrivé à la conclusion que je mettais plus de temps à dessiner pour déplacer qu'à réfléchir. Et là je me dis, "t'es trop con, tu joues sur pc, et de la plomberie c'est un graph, on est en 2014, y a des logiciels pour faire des graphes".
+
+Trente secondes et un "google open source graph" plus tard, je tombe sur [yEd](http://www.yworks.com/yed).
+
+Cinq minutes plus tard, j'ai le graph ci-dessous, copie de la plomberie du jeu (les octogones sont les valves, les ronds les jonctions, et les carrés les sorties). Le fichier est disponible [ici](/files/yed-machinarium.graphml) si vous voulez jouer avec.
+
+<img src="/files/yed-machinarium-2.png" />
+
+Du coup, je peux déplacer, bouger, jouer avec sans perdre mon temps à dessiner, c'est top. Je pourrais démêler ça à la main. Mais c'est sans compter sur ce que le logiciel a dans le ventre, et qui me fait encore gagner du temps. Via les fonctions du menu *Layout*, on peut demander au logiciel de refaire la mise en page du graph, selon un mode [hiérarchique](/files/yed-machinarium-4.png), [organique](/files/yed-machinarium-5.png),  [orthogonal](/files/yed-machinarium-3.png), [circulaire](/files/yed-machinarium-6.png), arbre ou [radial](/files/yed-machinarium-7.png).
+
+Chacun a le cerveau câblé différemment, moi je préfère l'orthogonal, qui a ici l'avantage d'avoir décroisé tous les liens, et ça donne ça :
+
+<img src="/files/yed-machinarium-3.png" />
+
+En deux clicks, j'ai un truc net, propre et lisible, y a plus qu'à réfléchir, à résoudre le problème en se basant sur le graphe obtenu, et à reproduire la solution dans le jeu. Pour rappel, faut bloquer tous les chemins entre `I` et `O3`. Je vous laisse trouver, mais je trouve que c'est devenu super facile ... pas vous ?
+
+Allez, je vous aide : on voit qu'il n'y a que trois chemins (ici en bleu) qui permettent de relier le bas (où se trouve l'entrée) et le haut (où se trouve la sortie).
+
+<img src="/files/yed-machinarium-8.png" />
+
+Trois ? Ca tombe bien, on a trois clés à utiliser ! Du coup on cherche dans la partie du bas les octogones qui permettent de bloquer le chemin entre l'entrée `I` et ces trois liens bleus... et on voit vite que T2, B2 et T1 contrôlent l'accès aux liens bleus.
+
+Et ça donne la solution ci-dessous où la propagation de l'eau est représentée en bleue, et les vannes fermées sont coloriées en rouge. Plus rien ne peut arriver à `O3` et c'est exactement ce qu'on veut.
+
+<img src="/files/yed-machinarium-9.png" />
+
+Du coup, il suffit dans le jeu de mettre une clé sur la vanne en haut à gauche (T1 comme top-1), la deuxième vanne du haut (T2), et la deuxième du bas (B2), et bingo, la sortie 3 est bloquée !
+
+<img src="/files/yed-machinarium-0.jpg" />
+
+En résumé, on a résolu le problème *sans mater de soluce sur internet*, et on a remplacé le fastidieux crayon-papier par un outil qu'on vient de découvrir, qui est bien sympa et flexible, et du coup satisfaction maximale. Plutôt cool, non ?
+

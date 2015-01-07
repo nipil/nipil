@@ -1,0 +1,57 @@
+---
+layout: post
+title:  "Boules de poils"
+tags: chats
+---
+
+Aujourd'hui, on a concrétisé une envie longue de plusieurs années pour Cécile, et réitéré une expérience passée pour moi, en décidant qu'on allait agrandir notre foyer grâce à des boules de poils joueuses et câlines.
+
+Pour dire les choses clairement, on a jeté notre dévolu sur des chattons qui ont été recueillis par l'association [Le Chat Kremlinois](http://www.lechatkrem.com/) située au Kremlin-Bicêtre, association découverte sur internet.
+
+Il s'agit de deux petites chattes de 2 mois, qui ont été recueillies avec leurs deux frères dans un conduit de climatisation par hasard, après deux jours passés sans leur maman qui a sûrement dû périr en allant chercher de quoi les nourir. En tout cas, ces 4 chattons affamés ont trouvé refuge auprès d'une famille d'accueil de l'association, et sont tendrement soignés, et nourris par Gaëlle.
+
+Comment on en est arrivés là ? Par un raisonnement assez logique finalement, et beaucoup de lobbying de ma part pour arriver à celui-ci, je l'avoue, surtout au vu du postulat  de départ qui ne m'emballait pas trop.
+
+Elle a toujours eu envie d'avoir un petit compagnon animal, et elle penchait pour un chien. J'avais personnellement déjà fait l'expérience, grâce à mon séjour au Canada, où Julien, Louisa et moi-même avions accueilli Axis et Véga, donc j'étais loin d'être réticent à la présence d'un animal.
+
+Elle penchait pour un chien, habituellement considéré comme plus docile, et elle avait un peu peur d'avoir un chat, à cause du tempéramment indépendant, des potentiels coups de griffe, etc.
+
+Et moi je savais pertinemment qu'il était hors de question que je sorte le chien "à sa place" tous les jours de froid, de mauvais temps, de flemme, ou de "il est trop tôt/tard". Et qu'accessoirment un chien faut le tenir propre, alors qu'un chat a le bon goût d'être auto-nettoyant.
+
+Au bout de quelques jours, elle s'est rangée à cet argument de bon sens : vivre au rythme du chien, et tout ce qui va avec le contact d'un animal avec le monde extérieur, c'est pas pour nous.
+
+Mais côté chat, restait un argument de taille : un de ses collègues de bureau a une chatte adulte qui fait ses caprices, est à la fois jalouse et emmerdeuse, et particulièrement dévastatrice pour son appartement et ses fringues. Certes, elle n'est pas stérilisée, et elle est toute seule toute la journée, ce qui explique déjà en partie ses problèmes (**Update 2013-05-23:** depuis, il l'a fait stérilisée, et elle est redevenue tout à fait vivable et paisible)
+
+Pour ce qui est de la question de la stérilisation, il s'avère que la plupart des associations d'adoption ont justement pour règle vitale que la stérilisation est obligatoire, et ce afin de contrôler la population de chats dans la ville, tout en permettant d'avoir une meilleure vie à chaque nouveau chat qui nait.
+
+Restait la question des dégats potentiels, des griffes et du caractère.
+
+Ni une ni deux, je brandis la solution à ces problèmes : *prennons non pas un chat, mais deux !* Elles passeront la journée ensemble, elles pourront jouer et se taquiner l'une l'autre, et ça les occupera, au lieu qu'une s'ennuie et fasse des bétises. Là elle me regarde avec des yeux ronds...
+
+Je renchéris avec le dernier argument massue : avoir deux chats au lieu d'un seul, en termes de logistique, c'est seulement une question de gamelles qui se vide deux fois plus vite, et de bac à litière qui se remplis deux fois plus vite.
+
+En effet, tout le reste, c'est pareil : les visites chez le véto en même temps (avec réduction du prix de la consultation groupée), un arbre à chat pour les deux, et les mêmes problèmes de transport ou de gardiennage quand on doit s'absenter longtemps.
+
+Tout d'abord légèrement angoissée, elle se fait à l'idée durant quelques jours, histoire de passer par dessus l'impression du *ça va être compliqué à gérer*, et de *les chats c'est parfois des sales bêtes caractérielles qui vont me griffer*.
+
+Et quelques jours plus tard, elle me dit avec un sourire qu'elle a contacté l'association pour solliciter l'adoption des deux soeurs du groupe de quatre. L'une s'apelle actuellement Leïa, et est rayée grise, l'autre s'appelle actuellement Chipie, et est rayée brune.
+
+Depuis, les deux minettes ont maintenant deux mois, et il nous faudra attendre encore un peu (environ 1 mois et demi) pour qu'elles soient prêtes à être séparées des chats adultes de la famille d'accueil qui les éduquent actuellement (et elles sont encore nourries au biberon) pour arriver chez nous.
+
+On est passé les voir chez Gaêlle, et elles sont toutes mignonnes, curieuses et tellement rikiki, elles tiennent chacune dans une de mes grandes mains, c'est impressionnant.
+
+En tout cas, c'est une belle tranche de vie qui se profile à l'horizon.
+
+**Update 2009-06-15**
+
+Ca y est, les deux petites chattes sont arrivées chez nous !
+
+On est allés les chercher chez Gaëlle, leur famille d'accueil, et après un trajet mouvementé en voiture pour rentrer chez nous, elles ont pu faire leurs premiers pas chez nous.
+
+Depuis leur sortie de la cage directement dans le bac à litière, histoire qu'elle la retrouve facilement par la suite, elles ont passé la journée à tâtonner dans l'appartement en reniflant tous les coins et les recoins. Vu leur toute petite taille, ça en a pris du temps !
+
+Puis épuisées, elles se sont roulées en boule et ont fait une sieste, collées l'une à l'autre comme à leur habitude. En tout cas, elles ont l'air bien contentes, et nous on est aux ange.
+
+<a href='/files/chats-isis-vala-bebes.jpg'><img src='/files/chats-isis-vala-bebes_small.jpg' /></a>
+
+C'est le début d'une nouvelle vie pour elles et pour nous !

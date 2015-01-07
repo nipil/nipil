@@ -1,0 +1,252 @@
+---
+layout: post
+title:  "Passage sous Jekyll"
+tags: blog jekyll
+---
+
+# Site web, énième tentative
+
+Depuis 1997 et ma première page publiée sur internet, j'ai eu le temps de tergiverser entre plusieurs formats de site web : forum, site statique, partiellement dynamique ou entièrement généré, blog, collaboratif ou mono-utilisateur.
+
+Pour un site personnel, on passe souvent beaucoup de temps à penser à la présentation, à l'organisation et à la maintenance de son site. On est souvent tenté de rechercher *la* solution élégante aux problèmes et aux contraintes.
+
+Et on se rend compte qu'on passe environ 10-25% de notre temps à l'édition et la production de contenu réellement publié, alors que le reste est perdu en d'interminables modification parfois même invisibles du site web en lui même.
+
+Aujourd'hui, je reprends une fois de plus ma copie pour l'adapter au mieux à mes besoins. Mais la méthodologie sera radicalement différente cette fois, car l'accent sera mis sur la facilité de produire du contenu plutôt que l'outillage du site.
+
+Ensuite, j'importerai un par un tous les anciens contenus issus de mes anciens sites.
+
+## Les fonctionnalités souhaitées
+
+Comme d'habitude, conservera la maitrise complète en gérant en interne, et on commence d'abord par l'habituelle liste des fonctionnalités souhaitées
+
+- entrées blog courtes
+- articles de contenu long
+- pas de modification extérieure possible
+- contenu éditorial sous forme de fichiers textes
+- ouvert aux commentaires mais en évitant le spam
+- informations de formattage facile à écrire et lisibles
+- index et menus générés automatiquement
+
+Je m'oriente vers du contenu html généré statiquement par un outil, à partir de documents source qui pourront être édités facilement, simplement, par n'importe qui et n'importe quels éditeurs.
+
+Ca tombe bien, car suite aux problématiques de sécurité rencontrés par les poids lourds côté blog comme WordPress et Tumblr, une nouvelle tendance est apparue qui vise non pas à avoir des blogs ou sites dynamiques utilisant par exemple des scripts et des bases de données pour stocker les contenus, mais plutôt de générer des pages html statiques.
+
+L'intérêt est que des pages html statiques sont infiniment plus rapides à servir, et donc garantissent les performances même en cas de pic de charge.
+
+## Le coeur d'un site doit être le contenu
+
+Dans le contexte de la publication informatique, chaque minute qui n'est pas passée à produire du contenu est une minute de perdue. Chaque moment passé à penser à autre chose qu'à ce qu'on veut dire est un moment de perdu.
+
+Fort de cette constatation, de nouveaux types de *formatages légers* sont apparus, créés pour compenser les balises à ralonge. L'un d'entre eux s'appelle [Markdown](http://daringfireball.net/projects/markdown/), en opposition au markup html/xml.
+
+Chaque article, page, entrée de blog, sera donc écrite en markdown. Au moment de la publication, le contenu sera passé par cette moulinette PERL pour produire le contenu formaté en html.
+
+Le convertisseur n'entoure le contenu généré d'aucune balise, ce qui fait qu'il est facile d'assembler une page en partant d'une structure de site, en insérant le contenu, et en y ajoutant la partie commentaires, bref la structure du site.
+
+Et comme pour nous faire plaisir, il existe un [package debian stable](http://packages.debian.org/stable/main/markdown), ce qui évite les complications d'installation et de maintenance. Et ça s'arrête là si la partie "structure" est gérée par une solution codée personnellement 
+
+## Générateur de site "clé en mains"
+
+J'ai choisir Jekyll pour aggréger le tout. C'est un outil en [Ruby](http://www.ruby-lang.org/) et c'est le moteur qui gère les pages github. De plus il est compatible markdown, en utilisant l'une ou l'autre version complétée, comme [kramdown](http://kramdown.rubyforge.org/) ou une des [nombreuses](https://github.com/markdown/markdown.github.com/wiki/Implementations) autres, [Liquid](http://wiki.shopify.com/Liquid)...
+
+Il a l'immense bon goût d'être [présent dans debian stable](http://packages.debian.org/stable/main/jekyll), ce qui rend l'installation et la maintenance triviale : un simple `apt-get install jekyll` fera tout le boulot.
+
+Pour les utilisateurs Ubuntu, notemment la 12.04 LTS de ma moitié, la commande `sudo aptitude install ruby rubygems ruby-liquid libmysql-ruby1.9.1 libhtmlentities-ruby1.9.1 python-pygments && sudo gem install rdoc && sudo gem install jekyll` fait l'affaire, et ça permet de visualiser ses articles avant publication définitive sur le serveur.
+
+Ensuite, un simple `jekyll new monsite` et vous avez un template fonctionnel. dans ce répertoire Editer le fichier `_config.yml` pour y ajouter/editer les infos `name:` et effacez tout le reste. Ouvrez le fichier `index.html` et modifiez la ligne `title:` située au début pour y coller le nom de votre site. Editez `_layout/default.html` pour modifier les informations de contact.
+
+Créer finalement un répertoire `_posts`, qui est celui qui contiendra tous les posts effectivement rédigés, bref le vrai contenu important de votre site.
+
+Pour finir, executez `jekyll serve` dans le répertoire de votre site, et pointez votre navigateur vers <http://localhost:4000>. Le résultat est rapide, net et sans bavures.
+
+Pour publier "reelement" votre site, il suffit d'exécuter un `jekyll build`, d'attendre que ça soit fini, et de pousser le contenu du répertoire produit (`build` sous Debian 7 Wheezy ou `_site` sous Ubuntu 12.04) sur le serveur de votre hébergeur préféré ... *et c'est fini !*
+
+Pour plus de détails au cas où ça vous tenterait, vous pouvez [lire ce tutorial](http://www.andrewmunsell.com/tutorials/jekyll-by-example/) en anglais sur Jekyll.
+
+## Alimentation du contenu
+
+Point de vue du contenu éditorial, je voulais quelque chose de simple et de facile à appréhender, et je suis servi. Pour créer une nouvelle entrée, il suffit de placer un fichier nommé `YYYY-MM-DD-titre-du-post.markdown` dans le répertoire `_posts`.
+
+Commencer ce fichier par un en-tête délimité par des `---` (appelé *front-matter* dans le jargon), puis taper tout son texte formaté en markdown.
+
+Exemple :
+
+	---
+	layout: post
+	title:  "Passage sous Jekyll"
+	tags: blog jekyll
+	---
+	
+	# titre de niveau 1
+	
+	paragraphe
+	
+	## titre de niveau 2
+	
+	liste a puce
+	- aze
+	- qsd
+	
+	liste ordonnée
+	1. aze
+	2. qsd
+
+	[texte du lien](http://lien)
+	
+	texte en *italique*
+	
+	texte en **gras**
+
+Comme vous pouvez le voir, c'est extrêmement lisible, et facile à lire et à écrire. Alors hop hop, on va écrire pleins de billets et d'articles, car après tout, c'est ça qui compte, non ?
+
+Un prochain billet concernera la mise en place des commentaires.
+
+# Edition Jekyll sous windows
+
+Si vous éditez souvent sous windows, ou que vous éditez beaucoup de contenu, ça peut être appréciable d'avoir la visualisation du contenu "en temps réel". Pour ce faire, il faut installer Rubys, puis installer les gems, puis installer Jekyll.
+
+Installer Ruby et les RubyGems
+- aller sur la [page de téléchargement de Ruby](http://rubyinstaller.org/downloads/)
+- télécharger le fichier `Ruby 1.9.3-p...`
+- télécharger le fichier `DevKit-tdm...`
+- installer ruby dans `C:\Ruby193` en cochant les options tcl/path/associate
+- installer le devkit dans `C:\Ruby193\DevKit`
+- ouvrez une ligne de commande `Win+R, cmd, entrée`
+- allez dans le répertoire ruby `cd c:\Ruby193\DevKit`
+- exécuter la commande `ruby dk.rb init`
+- exécuter la commande `ruby dk.rb install`
+- fermer la ligne de commande `exit`
+
+Installer Jekyll
+- ouvrez une ligne de commande `Win+R, cmd, entrée`
+- exécuter la commande `gem install jekyll`
+
+Lancer la génération en temps réel
+- ouvrez une ligne de commande `Win+R, cmd, entrée`
+- aller dans le répertoire de base de votre blog
+- exécuter la commande `jekyll serve --watch`
+- ouvrir votre navigateur et aller à la page [localhost:4000](http://localhost:4000)
+
+Maintenant, à chaque fois que vous enregistrez un de vos posts, le programme le détecte et génère une copie **locale** de votre blog. Attention, ça ne publie pas votre blog sur internet, ça ne permet que de visualiser le contenu pendant l'édition.
+
+**Update 2013-05-23**
+
+Hier je vous ai montré comment se faire un blog basique mais très efficace, performant et sécurisé, et j'ai conclus succinctement par *"... pousser le contenu du répertoire produit sur le serveur de votre hébergeur préféré"*. Certes.
+
+La méthode *"à la main"* a deux principaux avantages
+- des prérequis logiciels ridicules : chaque personne voulant publier quelque chose n'a besoin en tout et pour tout que d'un [éditeur de texte brut](http://en.wikipedia.org/wiki/Text_editor), et de clients [Subversion](http://en.wikipedia.org/wiki/Apache_Subversion) et [SSH](http://en.wikipedia.org/wiki/Secure_Shell). Chaque système d'exploitation dispose de ces outils, soit en standard, soit via des applications gratuites.
+- on peut très bien travailler pendant des heures et des jours sans aucune connexion à internet, et profiter d'une poignée de minutes d'accès et du minimum de donnée transférées pour effectivement publier ses mises à jour, ce qui permet de minimaliser les frais de data en 3G ou pire, les tarifs du roaming à l'étranger.
+
+Par contre, avec cette méthode, l'utilisateur doit :
+1. faire un `svn update` avant toute modification
+2. respecter le nommage des fichiers pour chaque nouvel article
+3. ajouter le nouvel article via `svn add`
+4. retenir la syntaxe du Markdown pour rédiger correctement
+5. faire un `svn commit` pour pouvoir publier
+6. se connecter au serveur à la maison
+7. mettre à jour la copie de travail du serveur via `svn update`
+8. produire le site sur le serveur via `jekyll build`
+9. soit déplacer le contenu dans le répertoire du serveur web local
+10. soit uploader le contenu sur le site de l'hébergeur sur internet
+
+Ca peut faire beaucoup, et même si on se souvient de tout ça, ça fait du temps de perdu, environ 3 minutes à l'instant pour cet article. Face aux 3-10 minutes pour l'écriture d'un billet, ça fait 30-60% de temps perdu. Est-ce que ça vaut la peine d'automatiser ? Et si oui combien de temps y consacrer ?
+
+<a href="http://www.xkcd.com/1205/"><img src="http://imgs.xkcd.com/comics/is_it_worth_the_time.png" /></a>
+
+Pour se convaincre, regardons le graphe issu de [xkcd](http://www.xkcd.com) image ci-dessus. Est ce que ça vaut la peine d'automatiser ? En considérant qu'on postera 1 billet par semaine, et qu'on économise 5 minutes à chaque fois, alors oui ça vaut le coup car on économisera 21h de temps utile. Par utilisateur et par post. *C'est énorme*.
+
+# Automatisons un peu tout ça
+
+Plutôt que de faire un truc *user-friendly* qui prenne tout en charge de A à Z, on va se contenter de factoriser le tout en deux actions effectuées à distance : `blog-new` (actions 1 à 3) et `blog-publish` (action 5 à 10), afin de masquer la complexité et de rendre ça plus efficace.
+
+On pourrait implémenter ces commandes comme des alias au niveau du shell, ou un fichier bash, ou un fichier interprêté comme perl et consorts. Mais ça nécessiterait d'avoir un environnement compatible sur les périphériques d'édition.
+
+Le process devient alors
+1. la commande `ssh serveur blog-new chemin/du/blog`
+2. l'utilisateur met à jour sa copie locale via `svn update`
+3. l'utilisateur modifie ses fichiers locaux
+4. l'utilisateur sauvegarde ses modification via `svn commit`
+5. la commande `ssh serveur blog-publish chemin/du/blog`
+
+Et au pire on peut toujours caser quatre alias pour que les utilisateurs n'aient que des commandes intelligibles et mémorisables à taper. Ou faire un script qui prendrait quatre paramètres. Mais comme quatre commandes ça reste quatre commandes, j'ai préféré ne rien changer et conserver les commandes ci-dessus.
+
+# Détail des scripts
+
+Le script `blog-new` pour l'action 1 :
+
+	#! /bin/bash
+
+	echo "Usage: blog-new chemin/du/blog nom-de-l'article-sans-accents [YYYY-MM-DD]"
+
+	if [ -z $1 ]; then
+	  echo "Il manque le chemin d'accès au blog"
+	  exit
+	fi
+
+	if [ -z $2 ]; then
+	  echo "Il manque le nom de l'article"
+	  exit
+	fi
+
+	if [ -z $3 ]; then
+	  stamp=`date +%F`
+	else
+	  stamp=$3
+	fi
+
+	billet=$1/_posts/$stamp-$2.markdown
+	echo "Création de $billet"
+	echo "---" > $billet
+	echo "layout: post" >> $billet
+	echo "title:  $2" >> $billet
+	echo "---" >> $billet
+
+	svn update $1 && svn add $billet && svn commit $billet -m "import"
+
+Le script `blog-publish` pour l'action 5 :
+
+	#! /bin/bash
+
+	echo "Usage: blog-new chemin/du/blog"
+
+	if [ -z $1 ]; then
+	  echo "Il manque le chemin d'accès au blog"
+	  exit
+	fi
+
+	DELETE="--delete"
+
+	cd $1 && \
+	  svn update && \
+	  jekyll && \
+	  source _credentials.txt && \
+	lftp -c "set ftp:list-options -a;
+	set ftp:ssl-allow true;
+	set ftp:ssl-force true;
+	set ftp:ssl-protect-data yes;
+	set ftp:ssl-protect-list yes;
+	set ssl:check-hostname yes;
+	set ssl:verify-certificate no;
+	open ftp://$UPLOAD_USER:$UPLOAD_PASS@ftp.online.net;
+	lcd ./_site
+	cd /www
+	mirror --reverse -vvv $DELETE;"
+
+A noter que le deuxième script nécessite [LFTP](http://lftp.yar.ru/) qu'on installera via un simple `apt-get install lftp`. Ce logiciel permet de se connecter à des serveurs FTP**ES** (FTP + explicite TLS pour l'encryption des login/password) ce qui m'intéresse car c'est supporté par le serveur FTP d'upload de mon hébergeur [Online.net](http://www.online.net).
+
+LFTP propose aussi une fonction `mirror` qui facilitera le transfert de fichiers multiples, car sinon avec [cURL](http://curl.haxx.se/) par exemple il faudrait faire un script qui upload les fichiers 1-par-1 et qui créé les répertoires au fur et à mesure.
+
+Le fichier `_credential.txt` sera situé à la racine du blog, et doit avoir les permissions `400` afin d'être sûr que personne ne vous vole vos infos de connexion en cas de partage du serveur (celui qui est à domicile, pas le serveur d'hébergement dédié).
+
+Idem, les informations de host `ftp.online.net` et le chemin local pour les virtualhosts `/www` pourraient être placés dans des variables pour rendre ça multi-utilisateur, mais là honnêtement j'en ai pas besoin, alors on verra plus tard si Cécile veut un blog :)
+
+# Inconvénient restant à règler
+
+Dans la version ci-dessus, la fonction de mirroring proposée par LFTP effectue la synchronisation à la volée, et efface le fichier distant pour le remplacer par le fichier local de manière inconditionnelle.
+
+Il ne semble en effet pas y avoir de vérification de taille ni de date de modification pour éviter d'uploader des fichiers inchangés.
+
+Pour l'instant, ça n'est pas dérangeant, car la majorité des fichiers ressource (images, archives) sont disponibles en externes via des hébergeurs tiers, et donc le contenu effectivement uploadé se limite aux pages html statiques.
+
+

@@ -1,0 +1,615 @@
+---
+layout: post
+title:  Serveur e-mail personnel
+tags: server email
+---
+
+Pourquoi s'embêter à avoir un server mail chez soi ? Les fournisseurs de mail font ça très bien, et en plus avec le filtrage du spam etc. Et puis si j'ai un nom de domaine, l'hébergeur de celui-ci me propose déjà des boites mails et des redirections.
+
+Alors pourquoi s'embêter ?
+- Parce qu'on pourra créer autant de comptes qu'on veut
+- Parce qu'on pourra créer autant de redirections qu'on veut
+- Parce qu'on pourra détruire l'une ou l'autre quand on veut
+- Parce qu'on garde nos données si on change d'hébergeur
+
+En effet, en général, les hébergeurs limitent le nombre de comptes et redirections qui peuvent être créés. Et il y a très peu de fournisseurs d'email qui permettent de clore le compte, ce qui fait qu'on se retrouve avec des comptes un peu partout.
+
+A titre personnel, ça me permettra de créer des alias temporaires pour m'enregistrer avec des adresses différentes, de désactiver ces alias si un jour je reçois trop de spam, de  rediriger tous les couriers locaux du serveur vers une adresse perso, et donc de consulter tous ces comptes créés dans mon domaine via une seule adresse.
+
+# Mais mon hébergeur fourni déjà un service mail !
+
+Ca n'empêche pas d'avoir un serveur mail à domicile : celui-ci peut remplacer ou complémenter celui donné par votre fournisseur, rien n'est imposé ni interdit.
+
+Je dispose déjà d'un service de mail fourni par mon hébergeur, [online.net](http://www.online.net) en offre Basique, qui donne entre autres les services email suivants :
+- 3 comptes mails possibles
+- 1 go de stockage pour chacun
+- chaque mail fait un maximum de 50 mo
+- un nombre de redirections illimitées
+- possibilité de "catch-all" pour récupérer tous les emails envoyés au domaine.
+- consultation par POP/IMAP (avec sécurisation TLS)
+- envoi par SMTP [authentifié](http://documentation.online.net/fr/hebergement-mutualise/gestion-email/envoi-emails) (avec sécurisation TLS)
+- envoi de mail limité à 100 mails envoyés par heure (spammer-unfriendly)
+
+Comme les best-practices soulignent que pour chaque nom de domaine, un certain nombre d'adresses doivent exister, ou au moins, être capables de recevoir du courrier. La [RFC 2142](http://tools.ietf.org/html/rfc2142) donne la liste suivante : info, marketing, sales, support, abuse, trouble, noc, security, postmaster, hostmaster, usenet, news, webmaster, www, uucp, ftp, list, list-request et root.
+
+Pour ce faire, j'ai créé un seul compte mail auprès de mon fournisseur, et ensuite une foule d'alias pour chacun des noms ci-dessus, qui renvoient sur le compte créé précédemment. J'aurais pu configurer une redirection "catch-all", aussi appelé *"email collecteur"*, mais tous le spam aléatoirement généré, genre (`john@`, etc) aurait été reçu, traité et stocké ... et ça ferait beaucoup. Je consulte ensuite cette boîte mail de manière autonome comme n'importe quel autre compte mail, mais je pourrais aussi rediriger tout ce qui y aterrirait vers ma boite personnelle.
+
+Donc, comme vu auparavant, je vais quand même me monter un serveur mail à la maison, qui va gérer les mails d'un sous-domaine de ma zone de base, plutôt que de reprendre la gestion des mails de mon hébergeur. Pourquoi ? Parce que ça permet de monter qu'il est possible d'avoir plusieurs domaines de mail distincts par zone, contrairement à la majorité des exemples trouvés sur internet.
+
+# Spam et réputation : fais un effort, sinon hop indésirable
+
+Cependant, il va falloir faire avec le "problème" du spam : ne pas trop en recevoir, et ne pas passer pour un spammeur. Pouquoi doit on s'embêter avec ça ?
+
+On estime que 60% à 80% des emails transitant sur internet sont du spam ; inversement, près de 25% des emails commerciaux légitimes n'atteignent pas les boîtes de réception des destinataires. Le problème vient du fait que l'envoi de mail n'est pas authentifié : c'est le récepteur qui déterminer si le courrier est du spam ou non, et pour ça il peut évaluer à la fois **l'expéditeur** du message (l'adresse email, et le serveur SMTP) et **le contenu** du messaage (le texte, les liens, la structure, etc)
+
+Pour ce faire, différents outils ont été créé au fil du temps :
+- les *listes noires* de serveurs SMTP, pour bloquer complêtement certaines sources
+- les *listes blanches* auquelles on peut s'inscrire
+- le *senderscore* qui vise à établir votre réputation selon le retour des utilisateurs
+- l'enregistrement DNS SPF, qui vérifie que personne n'envoie de mails à notre place
+- la clé de domaine DKIM de **VERIFIER** l'enveloppe **VERIFIER** du message
+- DMARC
+- les outils d'analyse du contenu de chaque email
+
+Les listes noires sont constituées en temps réel, par exemple par [SpamHaus](http://www.spamhaus.org/lookup/), [CBL](http://cbl.abuseat.org/lookup.cgi), [SORBS](http://www.sorbs.net/lookup.shtml), ou [njabl](http://www.njabl.org/cgi-bin/lookup.cgi). Le forumlaire [SenderBase](http://www.senderbase.org/) permet de toutes les tester à la fois pour voir si votre IP est inclus dans l'une ou l'autres des listes. Pour information, chaque liste donne une procédure à suivre si on a été inclus dans l'une ou l'autre liste "à tort", mais si ça n'est pas instantané. Par exemple, si on a du mal à envoyer des mails à des destinataires AOL, on peut aller voir [ici](http://postmaster.aol.com/SupportRequest.php), pour Hotmail ça serait [ici](https://support.msn.com/eform.aspx?productKey=edfsmsbl2&ct=eformts) etc.
+
+Les listes blanches consistent à dire, "ce serveur n'est pas un mauvais serveur". Ca vaut ce que ça vaut, mais elles sont souvent utilisées par des outils comme SpamAssassin, et comme ça ne coûte rien d'autre qu'une inscription gratuie (par exemple sur [DnsWL](http://dnswl.org/) autant en profiter si besoin.
+
+Le SenderScore est un indicateur temps-réel, évalué sur 30 jours glissants, qui représente de manière agrégée la réputation de votre IP et de votre nom de courrier. Il est basé à la fois sur le comportement et les retours des utilisateurs recevant vos emails, mais aussi sur votre comportement lors de l'envoi de messages. Plus en détails dans cet [article](http://blog.hubspot.com/blog/tabid/6307/bid/31446/Everything-Email-Marketers-Need-to-Know-About-Sender-Score.aspx).
+
+L'enregistrement "Sender Policy Framework" ([SPF](http://fr.wikipedia.org/wiki/Sender_Policy_Framework)) est un champs texte stocké dans les enregistrements DNS, comme vu plus haut et Il sert à indiquer les serveurs autorisés à envoyer des mails en notre nom. Le serveur récepteur regardera ce champs et comparera avec l'adresse du serveur mail qui lui envoie ce courrier : si ça ne colle pas, c'est qu'on a essayé d'envoyer du spam en se faisant passer pour nous. Et ça ne "valide" que l'enveloppe du message (le "return-path"), pas le contenu du message (le "From:"). En gros, ce sont des [reverse-MX](http://www.openspf.org/FAQ/Examples).
+
+TODO: DKIM
+
+TODO: DMARC http://www.returnpath.com/solution-content/dmarc-support/
+
+Restent au final les outils d'analyse fine du contenu de chaque email qui passe, comme SpamAssassin. Ils analysent la structure, les pièces jointes, le contenu, et comparent ça à des modèles, et des variables heuristiques pour détecter si c'est un spam ou pas. C'est un sujet en soi, qui mériterait son propre article. Tant qu'on a pas trop de spam reçu sur notre serveur, on va s'en passer.
+
+*Bref, sans utiliser aucun de ces mécanismes, Hotmail et Google classait mes courriers en "indésirable". Une fois que j'ai configuré SPF, Google arrête de me mettre en indésirable, mais Hotmail continue. TODO: DKIM suffisant pour hotmail ?*
+
+# Ajout des enregistrements dans les DNS
+
+Pour que la réception du courrier puisse fonctionner, il faut pouvoir indiquer au monde entier comment nous envoyer des mails. C'est l'utilité des champs `MX` des enregistrements DNS.
+
+Par exemple, vu que j'ai un service mail auprès de mon hébergeur, il existe déjà deux champs dans le formulaire d'édition de zone de mon registrar :
+
+	@              IN      MX      10 mx.online.net.
+	@              IN      MX      20 mx-cache.online.net.
+
+Le symbole `@` est un racourcis qui fait référence à la zone dont il fait partie, ici `nipil.org` : il s'agit donc des deux serveurs SMTP qui recevront tous les emails adressés aux adresses `@nipil.org`. Les nombres 10 et 20 sont des priorités afin d'assurer la redondance, et le nombre le plus faible sera utilisé en premier.
+
+J'ai alors ajouté les lignes suivantes, car je voulais séparer mon service mail de celui de mon hébergeur, plutôt que de le remplacer :
+
+	mail         IN      MX      20 home.nipil.org.
+	home         IN      A       88.189.158.57
+	home         IN      AAAA    2a01:e35:8bd9:e390::2
+
+Ces trois lignes disent que les emails pour les destinataires `...@mail.nipil.org` doivent être envoyés au serveur `home.nipil.org`, qui est joignable en IPv4 et en IPv6. Dans mon cas, j'avais déjà créé les enregistrements pour `home`.
+
+A noter qu'il vaudrait mieux, pour éviter de potentiels problèmes plus tard, qu'il y ait correspondance entre le nom du serveur SMTP dans l'enregistrement `MX` et le FQDN (Fully Qualified Domain Name) de la machine à domicile, qu'on voit grâce à la commande `hostname -f`. Lors de l'installation initiale de mon serveur, j'ai choisi `nipil.org` comme domaine, et `home` comme hostname, ce qui fait que j'aboutis au résultat `home.nipil.org`.
+
+Idem, il est important de faire son possible pour qu'il existe des enregistrements DNS inverses (les lignes `PTR`) dans les DNS *de votre FAI*, afin que les autres relais email d'internet puissent faire correspondre votre adresse IP à votre nom de domaine.
+
+Bref, avec les 5 lignes ci-dessus, j'aurai les services mails suivant :
+- les courriers `@nipil.org` arrivera chez mon hébergeur hébergé
+- les courriers `@mail.nipil.org` arrivera sur le serveur à la maison
+
+Si jamais je n'avais voulu que redirriger les emails auparavant gérés par mon hébergeur vers mon serveur, j'aurais remplacé (après les avoir notées dans un coin) les deux lignes du début par la seule ligne suivante.
+
+	@            IN      MX      10 home.nipil.org.
+
+Mais comme dit plus hait, pour la suite de l'article, je considère que je veux recevoir à la maison les mails du type `@mail.nipil.org`, et que les mails `@nipil.org` continuent d'être envoyés à mon hébergeur. Dans ce cas, `mail.nipil.org` sera le "nom de courrier" associé à notre serveur.
+
+On insère ensuite les enregistrements TXT contenant les informations SPF (plus d'information à ce sujet plus loin dans l'article), afin de nous prémunir contre l'utilisation de nos noms de domaine en tant que source affichée d'envoi de spam. C'est juste totalement absolument indispensable de mettre ça en place.
+
+	; seul le serveur d'envoi de mon hébergeur (qu'on trouve dans le source d'un email
+	; transmis depuis son webmail) est autorisé à envoyer des mails dont l'adresse
+	; source est nipil.org (vu que @ est un alias de la zone, c'est à dire nipil.org)
+	@              IN      TXT     "v=spf1 a:smtpauth-vit.online.net. -all"
+	; seul le serveur désigné après est autorisé à envoyer des mails dont l'adresse
+	; source est mail.nipil.org
+	mail           IN      TXT     "v=spf1 a:home.nipil.org. -all"
+	; le serveur home.nipil.org peut envoyer des emails
+	home           IN      TXT     "v=spf1 a -all"
+	; tous les autres serveurs n'ont pas le droit d'envoyer des mails
+	ns0            IN      TXT     "v=spf1 -all"
+	ns1            IN      TXT     "v=spf1 -all"
+	; créer un enregistrement TXT pour chaque nom de la zone !
+
+Ce qui permettra, en regardant le code source d'un mail reçu dans une boite google, de voir que le SPF test est à "PASS" que ça soit pour un mail envoyé depuis mon hébergeur (le serveur smtpauth-vit.online.net, actuellement 88.190.253.76, qui gère les adresses @nipil.org), ou depuis mon serveur à domicile (le serveur smtp home.nipil.org qui gère les adresses @mail.nipil.org)
+
+	Received-SPF: pass (google.com: domain of toto@nipil.org
+	  designates 88.190.253.76 as permitted sender)
+	// mail envoyé via smtpauth-vit.online.net = 88.190.253.76
+
+	Received-SPF: pass (google.com: domain of toto@mail.nipil.org
+	  designates 2a01:e35:8bd9:e390::2 as permitted sender)
+	// mail envoyé via home.nipil.org = 2a01:e35:8bd9:e390::2
+
+Dans les deux cas Google a vérifié qu'il y a correspondance entre les adresses sources utilisées et les domaines autorisés, avec les serveurs smtp émetteurs autorisés dans les enregistrements TXT. Si vous rajoutez des noms de domaines dans votre zone, n'oubliez surtout pas de créer un enregistrement TXT/SPF pour chacun d'eux (sur le modèle du ns0 par exemple), sinon ils ne sont pas protégés !
+
+*Si vous hébergez votre zone DNS sur votre propre serveur DNS, ne pas oublier de mettre à jour le `serial`, de faire un `named-checkzone`, et de redémarrer/recharger le daemon Bind pour que les informations soient prises en compte au niveau des serveurs DNS SOA de la zone. Rappel : la propagation de ces informations peut prendre du temps (quelques minutes à quelques heures).*
+
+# Un daemon SMTP pour l'envoi et la réception de mail
+
+Que ce soit pour l'envoi de mails vers internet, ou lorsque quelqu'un veut nous envoyer un mail, un daemon SMTP qui sera utilisé. Il en existe plusieurs (postfix, sendmail, exim), et sous Debian, le daemon "usuel" est Exim4 et c'est donc celui-là qu'on va utiliser.
+
+En général il est installé par défaut (dans sa configuration "courrier local uniquement") sur tout système Debian, mais si ça n'était pas le cas, un simple `aptitude install exim4`.
+
+A noter qu'il existe deux versions du package exim : `light` et `heavy`. Light est suffisant, car il fait le job et permet l'utilisation de TLS pour les mails sortants (et *a priori* rentrant aussi). Cependant la version `heavy` permet l'utilisation d'annuaires LDAP, de base de données SQL, l'authentification SMTP, etc. On restera sur la version par défaut (light) pour l'instant.
+
+Sachant qu'Exim est à la fois un "Mail Transport Agent" (MTA) qui permet d'envoyer et de recevoir des emails, c'est aussi un "Mail Delivery Agent" (MDA) qui permet de déposer les emails dans les boites de réception des comptes locaux. Il existe deux types de boîtes de réception :
+- les [mbox](http://fr.wikipedia.org/wiki/Mbox) où tous les messages sont stockés dans un seul fichier, sans autre ordre que celui chronologique d'arrivée
+- les [maildir](http://fr.wikipedia.org/wiki/Maildir) où chaque message est un fichier, dans un répertoire décrivant une catégorie.
+
+Dans notre cas, on choisira le format `maildir`, qui est fiable et performant, mais aussi flexible ; de plus il est bien adapté pour les outils de consultation mail type IMAP.
+
+## Installation et configuration du daemon
+
+La configuration "basique" se fait via via `dpkg-reconfigure exim4-config`, que vous pouvez lancer aussi souvent que vous le voulez. Une configuration plus fine est possible en éditant les fichiers de conf, mais il faut alors se rapporter au doc [spécifique Debian](http://pkg-exim4.alioth.debian.org/README/README.Debian.html), au [wiki](http://wiki.debian.org/Exim) debian, et à la [documentation](http://www.exim.org/docs.html) officielle de l'outil
+
+Le reconfiguration se fait en quelques fenêtres :
+1. sélectionner "distribution directe par SMTP (site internet)"
+2. entrer le nom de courrier `mail.nipil.org`
+3. ne pas rentrer de liste d'ip d'écoute (on écoute partout)
+4. entrer à nouveau le nom de courrier `mail.nipil.org`
+5. ne pas rentrer de domaines à relayer
+6. ne pas rentrer de liste d'ip permettant le relais inconditionnel
+7. répondre non à la minimisation des requêtes dns
+8. sélectionner le format "Maildir" dans le répertoire home
+9. répondre non à la séparation de conf dans plusieurs fichiers
+
+Le daemon SMTP sera alors automatiquement redémarré pour prendre en compte la nouvelle configuration. Il ne recevra pas encore de mails, car on a pas encore configuré le pare-feux, mais on peut *a priori* déjà en envoyer.
+
+On choisis délibérément à l'étape 7 de ne pas relayer le courrier su LAN sans authentification. Ca serait pourtant le plus simple, et le plus pratique, mais ça permettrait aussi d'utiliser notre serveur comme relais ouvert si n'importe laquelle des machines du LAN était corrompue.
+
+A noter que certains opérateurs bloquent l'utilisation sortante du smtp (le port TCP 25) sur votre box : vérifiez dans votre interface de configuration que ça n'est pas le cas, et/ou corrigez ça. Par exemple, mon FAI (Free) indique dans la section "Ma freebox" de ma console de gestion, un paramètre "Blocage du protocole SMTP sortant", qui doit être sur "inactif" pour qu'on puisse utiliser le port TCP 25 pour envoyer des emails.
+
+On va finir par l'installation de deux outils :
+- `swaks`, le "Swiss Army Knife SMTP" qui est un outil permettant de tester plein de choses en ce qui concerne le transport de mail : `aptitude install swaks libnet-ssleay-perl`
+- `whois`, pour le sous programme `mkpassword` qui est un outil de génération de mots de passe extrêmement flexible et configurable : `aptitude install whois`
+
+On est maintenant prêt à commencer.
+
+## Configuration pare-feux
+
+Pour accepter les connexions entrantes en IPv4
+- ajouter la ligne `SMTP(ACCEPT) net $FW` à `/etc/shorewall/rules`
+- recharger le pare feu IPv4 via `/etc/init.d/shorewall force-reload`
+
+Pour accepter les connexions entrantes en IPv6
+- ajouter la ligne `SMTP(ACCEPT) net $FW` à `/etc/shorewall6/rules`
+- recharger le pare feu IPv6 via `/etc/init.d/shorewall6 force-reload`
+
+Pour vérifier ou suivre la propagation des requêtes, on peut ajouter le logging des connexions en utilisant `SMTP(ACCEPT):info` à la place. On pourra enlever le logging après coup quand on sera satisfaits.
+
+Pour débugger, on aura plusieurs sources d'information :
+- les logs du firewall
+- le suivi des paquets via `tcpdump -i any port smtp`
+- le log principal d'exim `/var/log/exim4/mainlog*`
+
+On va maintenant tester l'envoi et la réception de mails.
+
+## Test unitaire d'envoi
+
+Le second test sera d'envoyer un mail à une adresse extérieure depuis notre serveur. Pour ce faire, le plus simple est d'utiliser la commande suivante :
+
+	mail -s "test" monsieur.toto@gmail.com
+	ceci est un message de test
+	<taper un Contrôle-D>
+	EOT
+
+Le résultat dans les logs d'exim est le suivant :
+
+	2013-06-04 14:07:56 1Ujq1s-0006il-Dl <= toto@mail.nipil.org U=toto P=local S=504
+	2013-06-04 14:08:00 1Ujq1s-0006il-Dl => monsieur.toto@gmail.com R=dnslookup
+	    T=remote_smtp H=gmail-smtp-in.l.google.com [2a00:1450:400c:c05::1a]
+	    X=TLS1.2:RSA_ARCFOUR_SHA1:128 DN="C=US,ST=California,L=Mountain View,
+	    O=Google Inc,CN=mx.google.com"
+	2013-06-04 14:08:00 1Ujq1s-0006il-Dl Completed
+
+On voit dans cette transaction `1Ujq1s-0006il-Dl` que :
+- on a contacté le serveur SMTP de google en IPv6
+- le mail est en provenance de `toto@mail.nipil.org`
+- le mail est à destination de `monsieur.toto@gmail.com`
+- on constate que la transaction s'est bien passée (Completed).
+
+L'envoi de mail depuis notre serveur est fonctionnel.
+
+## Test unitaire de réception
+
+Le premier test consistera à se connecter à votre messagerie personnelle et vous envoyer un mail à votre compte local "toto" via l'adresse `toto@mail.nipil.org`. Le résultat, depuis une adresse gmail, est visible dans le log d'exim ci-dessous :
+
+	2013-06-04 13:51:51 1UjpmJ-0006fk-8Y DKIM: d=gmail.com s=20120113
+	    c=relaxed/relaxed a=rsa-sha256 [verification succeeded]
+	2013-06-04 13:51:51 1UjpmJ-0006fk-8Y <= monsieur.toto@gmail.com
+	    H=mail-qa0-x231.google.com [2607:f8b0:400d:c00::231] P=esmtp S=1495
+	    id=CAHMAURWc-Zhcj5PwY5Q7pifpTOd2g1kWKanwds6rwgoYigSWUA@mail.gmail.com
+	2013-06-04 13:51:51 1UjpmJ-0006fk-8Y => toto <toto@mail.nipil.org>
+	    R=local_user T=maildir_home
+	2013-06-04 13:51:51 1UjpmJ-0006fk-8Y Completed
+
+Chaque transaction porte un identifiant temporaire unique (ici c'est `1UjpmJ-0006fk-8Y`) qui permet de suivre le traitement d'un message dans les logs, et ce même s'il y a des milliers de transactions simultanées.
+
+On voit dans ce log que :
+- on a été contacté en IPv6 par les serveurs de google
+- le mail est en provenance de `monsieur.toto@gmail.com`
+- le mail est à destination de `toto@mail.nipil.org`
+- exim a défini que le récepteur est un compte local
+- le mail doit être stocké dans un Maildir
+- on constate que la transaction s'est bien passée (Completed)
+
+La réception de mail depuis notre serveur est fonctionnel.
+
+Attention, en IPv6 si votre fournisseur ne vous donne pas d'enregistrement DNS inverse (PTR) alors quand vous enverrez un mail à un serveur qui vérifie (gmail par exemple) au début ça passera puis avec le temps vous finirez par vous faire jeter. La seule solution que j'ai trouvée est de désactiver l'IPv6 pour Exim4, avec le paramètre `disable_ipv6 = true`en tête du fichier de configuration.
+
+## Restrictions, sécurisation et maintenance
+
+Un serveur SMTP doit relayer de 4 manières différentes :
+- de l'externe vers le domaine local
+- du domaine local vers l'externe
+- du domaine local vers le domaine local
+- de l'externe vers l'externe doit être interdit ([Open Relay](htts://en.wikipedia.org/wiki/Open_mail_relay))
+
+Il est *absolument vital* que votre serveur ne soit pas un "open relay" pour deux raisons :
+- la première est que n'importe qui pourrait utiliser votre serveur et votre connexion pour envoyer du spam, ce qui bouffe vos ressources et vous fait passer pour un spammeur, vous exposant à des poursuites
+- la deuxième est que dès que vous seriez détecté comme un relais smtp ouvert, vous seriez ajouté progressivement mais automatiquement aux listes anti-spam, et il deviendrait bien difficile d'envoyer du courrier à n'importe qui
+
+Pour vérifier qu'on est pas un "open relay", il suffit d'utiliser un formulaires dédié à cette tâche : [MailRadar](http://www.mailradar.com/openrelay/) où on rentre l'adresse IPv4 de notre serveur, et qui fait une foule de tests avant de donner le résultat. A noter qu'avec la configuration de base de Debian (tel qu'indiqué dans cet article) on est normalement pas un open relay.
+
+Ce qui suit est un détail, mais qui a son importance : la distribution locale est impossible vers des comptes contenant des majuscules, tout bêtement car une adresse email est insensible à la casse, et que s'il existait deux comptes `John` et `JOHN` sur le serveur, on ne saurait pas où déposer le courrier à destination de `john@example.com`. *Donc tous les comptes locaux doivent être en minuscule pour pouvoir recevoir des emails.*
+
+Pour information, il est impossible de faire la distribution locale pour le compte `root`, car seul le superutilisateur peut écrire dans le répertoire local de celui-ci, et exim tourne en tant qu'utilisateur normal. C'est pourquoi, l'utilisateur root **doit** être aliasé vers un compte réel dans le fichier `/etc/aliases` qui doit comporter une ligne du type : `root: un_utilisateur_local`. Ca tombe bien, c'est fait par défaut lors de l'installation initiale du système (si on a créé un premier compte utilisateur).
+
+Côté maintenance et surveillance du système, il faut savoir que lorsqu'un message doit être relayé, il est placé dans une file. Et qu'en cas de problèmes, il peut soit être mis à la poubelle, soit être "gelé" (*frozen* en anglais). Les messages "frozen" ne seront pas re-traités de manière cycliques contrairement aux messages subissant un blocage temporaire (souvent des "unroutable address"). On peut investiguer en `root` via `exim4 -d -bt identifiant_du_mail` et après investigations, il est possible de forcer une nouvelle tentative en tant que `root` via la commande `exim -qff`.
+
+# Identification nécessaire pour envoi d'email
+
+Une des conséquences logique du fait que notre serveur n'est pas un "open relay" est la suivante : seuls les emails envoyés depuis le serveur (c'est ce qu'on a fait jusqu'à maintenant) sont possibles car automatiquement authentifiés.
+
+Si on est à distance, que ça soit dans le LAN ou ailleurs sur Internet, tenter d'envoyer un mail via notre serveur serait considéré comme une tentative de relais, et donc rejeté. La solution est de mettre en place une authentification, qui une fois validée indiquera au serveur que ce client est digne de voir ses mails relayés.
+
+Pour ce faire, on va commencer par permettre l'encryption TLS :
+- soit en créant un un certificat auto-signé, valable 3 ans, avec une clé privée de 1024 bits via l'outil `/usr/share/doc/exim4-base/examples/exim-gencert` qui créera deux fichiers `exim.crt` et `exim.key` dans le répertoire de configuration d'Exim.
+- soit en important un certificat reconnu, en copiant les certificats fournis (au format texte) dans deux fichiers nommés comme ci-dessus.
+
+Dans les deux cas il est très important de vérifier que ces deux fichiers doivent appartenir à `root:Debian-exim` (corriger au besoin via `chown`) et les droits d'accès doivent être `600` (corriger au besoin via `chmod`).
+
+De même, la clé privée du certificat doit être stockée sans mot de passe de protection, afin de ne pas bloquer le lancement du daemon en demandant un mot de passe. Utiliser la commande `openssl rsa -in input.key -out exim.key` pour enlever le mot de passe.
+
+*Dans le cadre de vos modification de configuration d'Exim, en cas d'erreur un fichier `/var/log/exim4/paniclog` qui n'est pas effacé tout seul. A vous de l'effacer manuellement après avoir corrigé les erreurs.*
+
+Créez un fichier `/etc/exim4/exim4.conf.localmacros` pour y mettre `MAIN_TLS_ENABLE = 1`, et recharger ensuite le daemon SMPT via `/etc/init.d/exim reload`. Mettre simplement cette ligne permet déjà de s'assurer que nos mails arrivent chiffrés : on constaterait dans une capture réseau que notre serveur annonce `STARTTLS`, et que la suite du dialogue est chiffré.
+
+Il existe plusieurs drivers d'[authentification](http://www.exim.org/exim-html-current/doc/html/spec_html/ch-smtp_authentication.html) (et chapitres individuels suivants) : `CRAM-MD5` (RFC 2195), `CYRUS_SASL`, `DOVECOT` (serveur IMAP/POP), `GSASL`, `HEIMDAL_GSSAPI`, `PLAINTEXT` (en version PLAIN et LOGIN), `SPA` (Microsoft). Cependant, on ne va autoriser que les deux methodes du driver `PLAINTEXT`, qui n'est disponible que lorsque le client a effectivement activé le chiffrement au début de la transaction via `STARTTLS`.
+
+Pour activer l'authentification :
+- éditer le fichier `/etc/exim4/exim4.conf.template`
+- rechercher le texte `begin authenticators` pour arriver à la bonne section
+- *remarque : pour décommenter une ligne, enlever le `#` au début de celle-ci*
+- décommenter la ligne `plain_server:` et les lignes immediatement suivantes
+- décommenter la ligne `login_server:` et les lignes immediatement suivantes
+- sauvegarder et recharger ensuite la configuration via `/etc/init.d/exim reload`
+
+On a un serveur qui chiffre, on lui a dit d'accepter une authentification, il ne nous reste plus qu'à définir les login/password autorisés à relayer envoyer du courrier. Il en faut **jamais** lier l'authentification aux mots de passe du compte utilisateur local sur le serveur, car la compromission d'un seul d'entre eux entrainerait l'accès direct serveur.
+
+On voit dans les lignes `server_condition` du texte qui vient d'être décommenté, que la base de mots de passe local est de type "[lsearch](http://www.exim.org/exim-html-current/doc/html/spec_html/ch-file_and_database_lookups.html)", que le fichier est dans le répertoire `/etc/exim4`, et que le fichier lui-même doit s'appeler `passwd` : un `man exim4_passwd` donne plus d'informations.
+
+Pour initialiser le fichier de mot de passe :
+- Créer le fichier `echo "# Exim server passwords" > /etc/exim4/passwd`
+- Mettez les bons propriétaires `chown root:Debian-exim /etc/exim4/passwd`
+- Mettez les bonnes permissions `chmod 640 /etc/exim4/passwd`
+
+A noter que l'identifiant est *totalement indépendant* de l'adresse email utilisée, et c'est d'ailleurs une bonne chose : il ne sert qu'à autentifier le fait que l'on soit connu du système de mail afin de permettre le relais qui est normalement interdit.
+
+En conséquence, on peut par exemple identifier quelqu'un comme `Monsieur Toto` alors qu'il voudrait relayer des emails en provenance de son compte local, **vérifier** ou de n'importe quel compte local en fait, par exemple `jean dupond`. **vérifier**
+
+Faire ça permet de rendre les attaques plus dures, car l'attaquant s'attend à ce que le login d'une adresse email `toto@exemple.com` soit `toto`, et donc tentera pleins de mots depasse lié à celui-ci, qui sont tous voués à l'échec (même le bon mot de passe !) car l'identifiant n'est pas correct.
+
+On créé un petit script que j'appelerai `exim-auth-add-user` et qu'on pourra placer dans `/usr/local/bin` (ne pas oublier le chmod +x du script après l'avoir enregistré) pour ajouter facilement des identités smtp :
+
+	#!/bin/bash
+	FILE="/etc/exim4/passwd"
+	if [ -z $1 ]; then
+	  echo "Usage: exim-auth-add-user USERNAME"
+	  exit
+	fi
+	TMP_PASSWD=`mkpasswd -m sha-512`
+	echo "$1:$TMP_PASSWD:" >> $FILE
+	chown root:Debian-exim $FILE
+	chmod 640 $FILE
+
+La méthode de sécurisation de mots de passe choisie est issue de la liste récupérée à partir de la commande `mkpasswd -m help`, et on évitera comme la peste les méthodes `md5` et `des`, c'est pourquoi on a choisi le `sha-512`, qui est la même méthode que celle utilisée pour les comptes du systèmes (c'est pas pour rien !)
+
+Je créé alors un compte de test `toto-test-smtp` via `exim-auth-add-user toto-test-smtp` en tant que root, avec mot de passe `blahblahblahblahblah`. On va tester avec l'outil SWAKS que le relais fonctionne bien quand on est authentifié, en emettant un email dont la source est une des adresses de notre nom de courrier, vers une notre boite aux lettres. 
+
+	$ swaks --to xxxxxxxxxxx@gmail.com --from yyyyyyyyy@mail.nipil.org \
+	    --auth PLAIN -tls --auth-user toto-test-smtp -s home.nipil.org
+	Password: blahblahblahblahblah
+	=== Trying home.nipil.org:25...
+	=== Connected to home.nipil.org.
+	<-  220 home.nipil.org ESMTP Exim 4.80 Fri, 07 Jun 2013 10:44:40 +0200
+	 -> EHLO poulet
+	<-  250-home.nipil.org Hello poulet [37.160.10.209]
+	<-  250-SIZE 52428800
+	<-  250-8BITMIME
+	<-  250-PIPELINING
+	<-  250-STARTTLS
+	<-  250 HELP
+	 -> STARTTLS
+	<-  220 TLS go ahead
+	=== TLS started w/ cipher DHE-RSA-AES256-SHA
+	=== TLS peer subject DN="/description=8nEPamdpqoncifis/C=FR/
+	        CN=home.nipil.org/emailAddress=postmaster@nipil.org"
+	 ~> EHLO poulet
+	<~  250-home.nipil.org Hello poulet [37.160.10.209]
+	<~  250-SIZE 52428800
+	<~  250-8BITMIME
+	<~  250-PIPELINING
+	<~  250-AUTH PLAIN LOGIN
+	<~  250 HELP
+	 ~> AUTH PLAIN AHRvdG8tdGVzdC1zbXRwAGJsYWhibGFoYmxhaGJsYWhibGFo
+	<~  235 Authentication succeeded
+	 ~> MAIL FROM:<yyyyyyyyy@mail.nipil.org>
+	<~  250 OK
+	 ~> RCPT TO:<xxxxxxxxxxx@gmail.com>
+	<~  250 Accepted
+	 ~> DATA
+	<~  354 Enter message, ending with "." on a line by itself
+	 ~> Date: Fri, 07 Jun 2013 10:29:25 +0200
+	 ~> To: xxxxxxxxxxx@gmail.com
+	 ~> From: yyyyyyyyy@mail.nipil.org
+	 ~> Subject: test Fri, 07 Jun 2013 10:29:25 +0200
+	 ~> X-Mailer: swaks v20120320.0 jetmore.org/john/code/swaks/
+	 ~> 
+	 ~> This is a test mailing
+	 ~> 
+	 ~> .
+	<~  250 OK id=1Uks3Q-0001Tm-UZ
+	 ~> QUIT
+	<~  221 home.nipil.org closing connection
+	=== Connection closed with remote host.
+
+On refait la même chose avec la méthode `LOGIN` pour vérifier :
+
+	$ swaks --to xxxxxxxxxxxxxxxxx@gmail.com \
+	        --from yyyyyyyyyyyyyyyyyyy@mail.nipil.org \
+	        --auth LOGIN -tls --auth-user toto-test-smtp \
+	        -s home.nipil.org
+	Password: blahblahblahblahblah
+	=== Trying home.nipil.org:25...
+	=== Connected to home.nipil.org.
+	<-  220 home.nipil.org ESMTP Exim 4.80 Fri, 07 Jun 2013 10:55:56 +0200
+	 -> EHLO poulet
+	<-  250-home.nipil.org Hello poulet [37.160.10.209]
+	<-  250-SIZE 52428800
+	<-  250-8BITMIME
+	<-  250-PIPELINING
+	<-  250-STARTTLS
+	<-  250 HELP
+	 -> STARTTLS
+	<-  220 TLS go ahead
+	=== TLS started w/ cipher DHE-RSA-AES256-SHA
+	=== TLS peer subject DN="/description=8nEPamdpqoncifis/C=FR/
+	        CN=home.nipil.org/emailAddress=postmaster@nipil.org"
+	 ~> EHLO poulet
+	<~  250-home.nipil.org Hello poulet [37.160.10.209]
+	<~  250-SIZE 52428800
+	<~  250-8BITMIME
+	<~  250-PIPELINING
+	<~  250-AUTH PLAIN LOGIN
+	<~  250 HELP
+	 ~> AUTH LOGIN
+	<~  334 VXNlcm5hbWU6
+	 ~> dG90by10ZXN0LXNtdHA=
+	<~  334 UGFzc3dvcmQ6
+	 ~> YmxhaGJsYWhibGFoYmxhaGJsYWg=
+	<~  235 Authentication succeeded
+	 ~> MAIL FROM:<yyyyyyyyyyyyyyyyyyy@mail.nipil.org>
+	<~  250 OK
+	 ~> RCPT TO:<xxxxxxxxxxxxxxxxx@gmail.com>
+	<~  250 Accepted
+	 ~> DATA
+	<~  354 Enter message, ending with "." on a line by itself
+	 ~> Date: Fri, 07 Jun 2013 10:52:57 +0200
+	 ~> To: xxxxxxxxxxxxxxxxx@gmail.com
+	 ~> From: yyyyyyyyyyyyyyyyyyy@mail.nipil.org
+	 ~> Subject: test Fri, 07 Jun 2013 10:52:57 +0200
+	 ~> X-Mailer: swaks v20120320.0 jetmore.org/john/code/swaks/
+	 ~> 
+	 ~> This is a test mailing
+	 ~> 
+	 ~> .
+	<~  250 OK id=1UksQ9-0001UL-AH
+	 ~> QUIT
+	<~  221 home.nipil.org closing connection
+	=== Connection closed with remote host.
+
+Comme on peut le constater, les deux méthodes fonctionnent, et il n'y a strictement aucun lien entre l'identifiant d'authentification SMTP utilisé et l'adresse source du domaine qui est utilisée, car tout ce qu'on fait, c'est vérifier qu'un personne est habilitée à relayer un mail, quel qu'il soit, quels que soient les emetteurs et les destinataires, et même si l'adresse d'origine n'appartient pas à notre serveur. En résumé, pour les personnes authentifiés, notre serveur est un relais inconditionnel !
+
+# Consultation des emails en IMAP
+
+Il existe plusieurs daemon IMAP sur la debian, `citadel-server`, `courier-imap`, `cyrus-imapd-2.2`, `dbmail`, `dovecot-imapd`, `kolab-cyrus-imapd`, `mailutils-imap4d`, `uw-imapd`. Ici nous allons utiliser "[Dovecot](http://www.dovecot.org/)", qui est un daemon rapide, léger, fiable et très simple à configurer. La documentation et les exemples sont disponibles sur le [wiki](http://wiki2.dovecot.org/).
+
+On commencera par installer le daemon via `aptitude install dovecot-imapd`. Lors de l'installation, un certificat autosigné valable 10 ans est généré, ce qui garanti la confidentialité des données échangées ainsi que des informations d'authentification.
+
+Mais on peut remplacer ce certificat par un certificat "reconnu", afin d'éviter de devoir ajouter une exception de sécurité dans les clients qui s'y connecteront :
+- en remplaçant `/etc/dovecot/dovecot.pem` par un fichier contenant le certificat fourni, au format texte, ainsi que tous les certificats intermédiaires jusqu'à la racine de l'autorité qui l'a fourni
+- en remplaçant `/etc/dovecot/private` par la clé privée associée, au format texte
+- les deux fichiers doivent appartenir à l'utilisateur `root` et au groupe `dovecot`, ce qui peut être corrigé par un `chown root:dovecot /etc/dovecot/dovecot.pem /etc/dovecot/private/dovecot.pem`
+- la clé privée ne doit être lisible que par `root` ce qui peut être corrigé par un `chmod 600 /etc/dovecot/private/dovecot.pem` si ça n'est pas le cas
+- soit la clé privée n'est pas être protégée par un mot de passe (pour éviter le blocage dû à la demande du mot de passe lors du lancement du daemon)
+- soit elle est protégée par mot de passe, alors il faut créer un fichier appartenant à `root:root` avec permissions `600` et inclure ce fichier dans la configuration via `ssl_key_password = <chemin/vers/mon/fichier`
+- finalement recharger la configuration via `/etc/init.d/dovecot reload`.
+
+Si jamais vous avez oublié d'insérer les certificats multiples de l'autorité dans le fichier `dovecot.pem`, lors du test `openssl` donné plus bas vous aurez ce type d'erreurs :
+
+	depth=0 description = 8nEPamdpqoncifis, C = FR,
+	        CN = home.nipil.org, emailAddress = postmaster@nipil.org
+	verify error:num=20:unable to get local issuer certificate
+	verify return:1
+	depth=0 description = 8nEPamdpqoncifis, C = FR,
+	        CN = home.nipil.org, emailAddress = postmaster@nipil.org
+	verify error:num=27:certificate not trusted
+	verify return:1
+	depth=0 description = 8nEPamdpqoncifis, C = FR,
+	        CN = home.nipil.org, emailAddress = postmaster@nipil.org
+	verify error:num=21:unable to verify the first certificate
+	verify return:1
+
+Dovecot dispose d'un outil `doveconf` qui permet de dumper la configuration dans une version "simplifiée" par rapport à la lecture/recherche dans l'ensemble des fichiers de configuration, grâce à `doveconf -n` qui par exemple n'affiche que ce qui n'est pas aux valeurs par défaut. Les messages d'erreurs sont visibles par la commande `grep dovecot /var/log/syslog`, au besoin agrémentée de `| tail` pour n'avoir que les derniers.
+
+La configuration du daemon est modulaire, et permet l'inclusion d'un fichier `/etc/dovecot/local.conf` inclus en dernier, donc on placera tous nos paramètres dans celui-ci, car ils l'emporteront sur les paramètres par défaut ou ceux configurés ailleurs.
+
+Lors de la configuration initiale et des premiers test, il peut être utile d'avoir le plus d'informations possible, dans ce fichier, on mettra les lignes suivantes dans le fichier `local.conf` :
+
+	# A virer/commenter dès que ça marche !
+	dovauth_verbose = yes
+	auth_verbose_passwords = plain # no / plain / sha1
+	mail_debug = yes
+	verbose_ssl = yes
+
+On changera ensuite la méthode d'authentification, pour ne pas utiliser les comptes et les mots de passe système, mais des mots de passe virtuels, pour décorreler les comptes les uns des autres. Pour ce faire, éditer le fichier `/etc/dovecot/conf.d/10-auth.conf`, aller à la fin, commenter toutes les lignes `#!include auth-*******.conf.ext` (en ajoutant le `#` s'il n'y est pas), et décommenter uniquement la ligne `#!include auth-passwdfile.conf.ext` (en enleveant le `#` s'il y en a un).
+
+La commande `doveadm pw -l` permet de connaître les algorithmes disponibles sur votre plateforme. On choisira comme d'habitude ce qui se fait de mieux sur notre debian, donc  `SHA512-CRYPT`. On éditera alors le fichier `/etc/dovecot/conf.d/auth-passwdfile.conf.ext` et on remplacera `scheme=CRYPT` par `scheme=SHA512-CRYPT`.
+
+On va maintenant créer un fichier contenant les identifiants et mots de passe sécurisés, qui référencera aussi les informations nécessaires pour faire correspondre un utilisateur "virtuel" aux informations du compte "local" sur le serveur permettant l'accès à la base Maildir correspondante.
+
+Toutes ces informations seront contenues dans le fichier `/etc/dovecot/users`, qui est structuré des champs suivants séparés par des `:`
+- le nom d'utilisateur virtuel
+- le mot de passe (protégé par le `scheme` plus haut)
+- le numéro d'utilisateur du système à utiliser
+- le numéro de groupe de cet utilisateur à utiliser
+- un champs vide
+- le répertoire de stockage des informations de la session imap pour cet utilisateur
+- une série de paramètres séparés par des espaces
+
+Par exemple, pour un utilisateur du système `toto` qu'on souhaite identifier par `Monsieur Toto`, dont le mot de passe serait `pouet`, sachant que les UID/GUID sont donnés par la commande `id` une fois connecté au compte de l'utilisateur, et qu'on voudrait stocker le home de dovecot dans `/home/toto/.dovecot`, alors que le Maildir du user est dans `/home/toto/Maildir` du coup le maildir est dans le parent du home de dovecot donc dans `~/../Maildir`. Et ça donnerait le résultat suivant :
+
+	# user:password:uid:gid:(gecos):home:(shell):extra_fields
+	# (gecos) et (shell) ne sont pas utilisés par Dovecot, donc vides.
+	Mr Toto:{SHA512-CRYPT}$6$EmE...RL$T8x...n97GxwRqi1:1017:100::/home/toto/.dovecot/::userdb_mail=Maildir:~/../Maildir
+
+Ici, `extra_fields` est en fait une liste de paramètres "key=value" qui permet de préciser les infos liées à la partie [userdb](http://wiki2.dovecot.org/UserDatabase/ExtraFields) soit à la partie [passdb](http://wiki2.dovecot.org/PasswordDatabase/ExtraFields). Idem, le [wiki](http://wiki2.dovecot.org/Variables) liste aussi une série de variables qui facilite la configuration et les valeurs du fichier `/etc/dovecot/users` si on veut réutiliser certaines infos.
+
+On créé un petit script que j'appelerai `dovecot-auth-add-user` et qu'on pourra placer dans `/usr/local/bin` (ne pas oublier le chmod +x du script après l'avoir enregistré) pour ajouter facilement des identités virtuelles à dovecot :
+
+	#! /bin/bash
+	FILE="/etc/dovecot/users"
+	if [ -z "$1" -o -z "$2" ]; then
+	  echo "Usage: dovecot-auth-add-user LOCALNAME IMAPNAME"
+	  echo "Example: dovecot-auth-add-user toto \"Monsieur Toto\""
+	  exit
+	fi
+	TMP_UID=`id -u $1`
+	TMP_GUID=`id -g $1`
+	TMP_HOMEDIR="/home/$1/"
+	TMP_PASSWD=`doveadm pw -s SHA512-CRYPT`
+	echo "$2:$TMP_PASSWD:$TMP_UID:$TMP_GUID::$TMP_HOMEDIR::userdb_mail=Maildir:~/../Maildir" >> $FILE
+
+Ne reste plus qu'à recharger la configuration via `/etc/init.d/dovecot reload`, et tester l'accès au compte via la commande `openssl s_client -connect localhost:imaps` qui tentera de se connecter au daemon via la connexion sécurisée.
+
+	CONNECTED(00000003)
+	depth=2 C = IL, O = StartCom Ltd., CN = StartCom Certification Authority
+	verify error:num=19:self signed certificate in certificate chain
+	verify return:0
+	---
+	Certificate chain
+	 0 s:/description=8nEPamdpqoncifis/C=FR/CN=home.nipil.org/emailAddress=postmaster@nipil.org
+	   i:/C=IL/O=StartCom Ltd./CN=StartCom Class 1 Primary Intermediate Server CA
+	 1 s:/C=IL/O=StartCom Ltd./CN=StartCom Class 1 Primary Intermediate Server CA
+	   i:/C=IL/O=StartCom Ltd./CN=StartCom Certification Authority
+	 2 s:/C=IL/O=StartCom Ltd./CN=StartCom Certification Authority
+	   i:/C=IL/O=StartCom Ltd./CN=StartCom Certification Authority
+	---
+	Server certificate
+	-----BEGIN CERTIFICATE-----
+	MIIHUDCCBjigAwIBAgIDCqEIMA0GCSqGSIb3DQEBBQUAMIGMMQswCQYDVQQGEwJJ
+	... snip ... snip ... snip ... snip ... snip ... snip ...
+	L2298Yo2CMUqBWacdkF4WocP42BvoN7tDV3dXRUClaNZpqoQ/RtWZwU5wTP3AQWi
+	M7mszg==
+	-----END CERTIFICATE-----
+	subject=/description=8nEPamdpqoncifis/C=FR/CN=home.nipil.org/emailAddress=postmaster@nipil.org
+	issuer=/C=IL/O=StartCom Ltd./CN=StartCom Class 1 Primary Intermediate Server CA
+	---
+	No client certificate CA names sent
+	---
+	SSL handshake has read 2999 bytes and written 439 bytes
+	---
+	New, TLSv1/SSLv3, Cipher is DHE-RSA-AES256-SHA
+	Server public key is 4096 bit
+	Secure Renegotiation IS supported
+	Compression: zlib compression
+	Expansion: zlib compression
+	SSL-Session:
+	    Protocol  : TLSv1.1
+	    Cipher    : DHE-RSA-AES256-SHA
+	    Session-ID: E86D0ADA803ABC39C6...F817EEE93091ECAF5D
+	    Session-ID-ctx: 
+	    Master-Key: 1208A337D4C446BAC2B1887CA23D98632AE0524763...11023819C
+	    Key-Arg   : None
+	    PSK identity: None
+	    PSK identity hint: None
+	    SRP username: None
+	    TLS session ticket lifetime hint: 300 (seconds)
+	    TLS session ticket:
+	    ... snip ...
+
+	    Compression: 1 (zlib compression)
+	    Start Time: 1370875243
+	    Timeout   : 300 (sec)
+	    Verify return code: 21 (unable to verify the first certificate)
+	---
+	* OK [CAPABILITY IMAP4rev1 LITERAL+ SASL-IR
+	    LOGIN-REFERRALS ID ENABLE IDLE AUTH=PLAIN] Dovecot ready.
+	. login toto pouet
+	. OK [CAPABILITY IMAP4rev1 LITERAL+ SASL-IR
+	    LOGIN-REFERRALS ID ENABLE IDLE SORT SORT=DISPLAY THREAD=REFERENCES
+	    THREAD=REFS MULTIAPPEND UNSELECT CHILDREN NAMESPACE UIDPLUS LIST-EXTENDED
+	    I18NLEVEL=1 CONDSTORE QRESYNC ESEARCH ESORT SEARCHRES WITHIN CONTEXT=SEARCH
+	    LIST-STATUS SPECIAL-USE] Logged in
+	. list "" "*"
+	* LIST (\HasNoChildren) "." "INBOX"
+	. OK List completed.
+	. logout
+	* BYE Logging out
+	. OK Logout completed.
+	closed
+
+Dans le syslog ça donne ça (j'ai viré une dizaine de ligne liées au TLS)
+
+	Jun 10 16:32:47 home dovecot: imap-login: Warning: SSL: where=0x2002,
+	    ret=1: SSL negotiation finished successfully [127.0.0.1]
+	Jun 10 16:33:02 home dovecot: imap-login: Login: user=<toto>, method=PLAIN,
+	    rip=127.0.0.1, lip=127.0.0.1, mpid=18703, TLS, session=<kuZzqM3emQB/AAAB>
+	Jun 10 16:33:03 home dovecot: imap(toto): Debug: Effective uid=1000, gid=1000,
+	    home=/home/toto/
+	Jun 10 16:33:03 home dovecot: imap(toto): Debug: Namespace inbox: type=private,
+	    prefix=, sep=, inbox=yes, hidden=no, list=yes, subscriptions=yes
+	    location=maildir:~/Maildir
+	Jun 10 16:33:03 home dovecot: imap(toto): Debug: maildir++: root=/home/toto//Maildir,
+	    index=, control=, inbox=/home/toto//Maildir, alt=
+	Jun 10 16:33:03 home dovecot: imap(toto): Debug: Namespace : /home/toto//Maildir 
+	    doesn't exist yet, using default permissions
+	Jun 10 16:33:03 home dovecot: imap(toto): Debug: Namespace : Using permissions
+	    from /home/toto//Maildir: mode=0700 gid=-1
+	Jun 10 16:33:29 home dovecot: imap(toto): Disconnected: Logged out in=22 out=399
+
+Comme ça fonctionne, ne reste plus qu'à configurer le pare-feux IPv4 et IPv6. 
+- ajouter la ligne `IMAPS(ACCEPT) net $FW` à `/etc/shorewall/rules`
+- recharger le pare feu IPv4 via `/etc/init.d/shorewall force-reload`
+- ajouter la ligne `IMAPS(ACCEPT) net $FW` à `/etc/shorewall6/rules`
+- recharger le pare feu IPv6 via `/etc/init.d/shorewall6 force-reload`
+
+Pour vérifier ou suivre la propagation des accès, on peut ajouter le logging des connexions en utilisant `IMAPS(ACCEPT):info` à la place. On pourra enlever le logging après coup quand on sera satisfaits. 
+
+Pour débugger, on aura plusieurs sources d'information :
+- les logs du firewall
+- le suivi des paquets via `tcpdump -i any port imaps`
+- l'outil `doveconf -n` pour vérifier les paramètres modifiés
+- les messages d'erreurs via `tail -f /var/log/syslog | grep dovecot`
+
+Voilà, ce fut long, mais on est arrivé au bout !
+
+TODO: input complicated password =  password ?! => . BAD Invalid characters in atom
+

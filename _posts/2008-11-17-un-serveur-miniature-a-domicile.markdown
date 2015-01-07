@@ -1,0 +1,172 @@
+---
+layout: post
+title:  "Un serveur miniature à domicile"
+tags: server
+---
+
+Quand on est un geek, on a des besoins informatiques en terme de services et de données très variés, et il y a plusieures manières d'y répondre.
+
+La première solution serait de chercher un fournisseur de service sur internet pour chaque besoin, mais ça impose de leur faire confiance, ça pose des problèmes de performances, et on peut parfois être incapable de récupérer/migrer nos données d'un fournisseur à l'autre si on est plus satisfait du service, des tarifs, ou qu'il cesse son activité. Bref, ça peut être une vraie galère.
+
+L'autre solution est de se monter un serveur à domicile, qui va proposer ces services, tout en offrant pérénité, sécurité, performance, et une totale flexibilité. C'est pourquoi j'ai décidé de me créer un serveur "dédié" à la maison.
+
+Le but du jeu ? Avoir la maîtrise totale, et essayer d'appliquer pour chaque point les "règles de l'art". Et aussi monter en compétence pour éviter le syndrôme du *"qui ne progresse pas régresse"* bien connu en informatique !
+
+Mes besoins sont les suivants:
+- un petit serveur silencieux et faible consommation
+- un fonctionnement sans écran ni clavier
+- un système d'exploitation stable et sécurisé
+- une connectivité IPv4 et IPv6 pour le serveur
+- un firewall réseau pour chaque équipement LAN
+- un point d'accès Wifi
+- un partage de fichiers LAN Windows/Linux
+- un dépôt de code source
+- un serveur web pour les sites et les blogs
+- un serveur mail pour son nom de domaine
+- une seedbox avec au besoin un tunnel VPN
+- un mécanisme de sauvegarde système
+- un mécanisme de sauvegarde hors-site pour les données importantes
+- un service SSH pour l'administration à distance
+- un service VPN pour accéder aux service locaux à distance
+
+A noter qu'un principe de base de la sécurité, qui est de séparer les services fournis les uns des autres, et de séparer le tout du transport et du contrôle d'accès, n'est pas respectée.
+
+Il serait possible de dédier une ressource aux aspects réseaux, et de dédiée d'autres ressources indépendantes aux services, que ça soit physiquement (via des machines distinctes) ou ou logiquement (via la mise en place de virtualisation Xen/KVM/autres)
+
+Je reste pour l'instant sur la solution "tout sur une machine", et je décrirai autant que possible chaque élément à configurer dans des billets à venir.
+
+**Update 2008-11-21**
+
+Depuis qu'on a déménagé à Paris, on a plus vraiment une pièce ou un placard, ou une cave qui permettrait d'y caser un PC standard format "tour", qui aurait une propension à faire du bruit, et consommer une bonne quantité d'énergie.
+
+Récupérer un boîtier existant reste la solution la plus simple et la moins chère dans la mesure où on a tous une "boite" qui traine et qui pourait faire l'affaire.
+
+Mais autant pour mon plaisir personnel de monter un nouveau jouet, que de satisfaire à des contraintes d'ordre conjugo-diplomatiques pour ce qui est du bruit et de l'esthétique, il a fallu trouver "mieux".
+
+Idéalement, un équipement qui soit petit, discret, et silencieux.
+
+# La perle rare
+
+Après avoir découvert l'existance de cartes mères au format mini-ITX, et des boitiers qui vont avec, je suis tombé sur ce qui l'a semblé être la solution parfaite, l'Alix 2d3, créé par [PCEngines](http://www.pcengines.ch)
+
+<a href="/files/alix2d3.jpg"><img src="/files/alix2d3_small.jpg" /></a>
+
+En détails, il s'agit
+- un boitier de la taille d'un double CD
+- absolument aucun ventilateur
+- un cpu monocoeur AMD Geode 800 à 500 mhz
+- 256 mo de ram non extensible car soudée
+- un connecteur interne mini-PCI pour une carte Wifi
+- un connecteur interne pour une carte CF
+- 2 ports usb dont 1 utilisé pour 1 tera de stockage
+- 3 prises réseaux 10/100
+- une prise série RS232 (pas d'écran)
+- une alimentation externe
+
+Ca m'aura coûté 250 euros (carte mère + carte CF + carte wifi + boitier + antennes + alimentation + adaptateur RS 232, mais hors disque dur que j'avais déjà) sur le site [Think-ITX](http://www.think-itx.com) (**Update 2013-05-22:** ce site en particulier a disparu depuis, mais il existe un grand nombre de [revendeurs](http://pcengines.ch/order.php)).
+
+Certes ça pouvait paraître cher, mais faut quand même réaliser qu'on parle d'un truc totalement fanless, et microscopique comparé à une tour traditionnelle.
+
+Avec ce modèle, impossible d'y connecter un écran, et y connecter un clavier serait inutile, car tout se fait via le port série RS 232. Il vous faudra donc un adaptateur USB-Série pour communiquer avec le boitier au tout début de l'installation, avant qu'on puisse s'y connecter en SSH.
+
+A noter qu'il existe d'autres versions, notemment avec une prise VGA, mais moins de prises réseaux, selon vos besoins chacun voit midi à sa porte. 
+
+**Update 2013-05-22:** Même si depuis, beaucoup de choses ont évolué dans le monde des ordinateurs de faible dimension, notemment avec Raspberry, Anduino, et autres types de clé-PC, je reste serein sur l'aspect "performance vs taille vs prix des mini-ITX versus les ordinateurs plus petits.
+
+A noter que la primo-installation du système doît être fait avant l'assemblage, car il faut ouvrir le boitier et sortir la carte mère pour insérer ou retirer la carte CF du système.
+
+Comme on le verra plus tard, ce dernier point n'est pas un problème, car la carte CF n'est utilisée que jusqu'à ce qu'on ait vérifié que le système boot, et qu'on a bien la main via la liaison série RS 232.
+
+# Recyclage ultérieur possible
+
+La faible capacité mémoire, et le CPU sans comparaison avec un PC de bureau récent, montre clairement que cette machine ne sera plus un "serveur" dans 10 ou 15 ans, ou alors très limité.
+
+Mais il restera un élément parfait pour tout ce qui a trait à la gestion du réseau, et pourra toujours être utilisé/restreint à la fonction de routeur/firewall/vpn compatible IPv4 et IPv6 avec par exemple une image PfSense (iso readonly orientée sécurité réseau).
+
+Et redistribuer les flux vérifiés qui le traverse vers un serveur "adapté" dans une DMZ locale : c'est pas parce qu'un matériel est périmé techniquement qu'il devient inutile !
+
+**Update 2008-12-14**
+
+Après avoir reçu le matériel, et ressenti le plaisir habituel quand on a un nouveau joujou, va falloir quand même penser à faire démarrer la bête.
+
+Sans surprise, on va mettre un linux là dessus. Que ça soit pour des raisons de performances au regard des specs du CPU et de la RAM, que pour el fait qu'on veuille en faire un serveur, et pour la robustesse vis à vis du fait qu'il sera connecté direct sur internet, c'est une évidence.
+
+Quelle distribution j'ai choisi ? Debian stable.
+
+Je ne précise pas la version, car on maintiendra évidement le système à jour. **Update 2013-05-04:** Debian stable vient de passer en version 7, nom de code Wheezy, et le serveur a été mis à jour sans problème.
+
+# Installation pour un serveur "normal"
+
+Il y a des tonnes de documents expliquant comment installer une Debian, notemment le [wiki](http://www.debian.org/releases/wheezy/i386/index.html.fr) officiel. Mais bon en quelques lignes ça donne ça sur un serveur normal :
+- télécharger une iso d'installation Debian *i386* (attention *pas* une amd64)
+- graver sur un RW, ou sur une clé USB avec [unetbootin](http://unetbootin.sourceforge.net/)
+- déconnecter les interfaces réseau de la machine
+- installer le système normalement pour tout sauf le "tasksel"
+- faut *tout décocher* au moment du choix de la "Sélection de logiciels"
+- terminer l'installation et rebooter
+- installe run pare-feux (shorewall / shorewall6)
+- configurer le FW de manière basique (deny in, allow out)
+- changer les sources APT et faire un update complet
+
+Bref, c'est simple, et rapide, et y a plein d'aide sur internet.
+
+# Installation pour mon serveur utilisant la liaison série
+
+La primo installation du système se fait en 4 étapes
+- préparation de l'installation
+- installation du système sur la carte CF
+- post-configuration pour prise en compte du port série
+- insertion de la CF et test de démarrage via port série
+
+Préparation
+- se munir d'une carte CF de 2 go minimum et d'un lecteur de cartes CF
+- se munir d'un cable adaptateur RS-232 reconnu par votre PC
+- télécharger une image ISO Debian-live
+- mettre l'image sur une clé USB ou un cd/dvd RW
+- démarrer sur le support amovible Debian-live
+- faire un aptitude update
+- installer debootstrap
+
+En imaginant que la carte CF soir le device `/dev/sde`
+- `fdisk /dev/sde`
+- `mke2fs /dev/sde1` pour la partition boot
+- `mke2fs /dev/sde2` pour la partition root
+- `mkdir /mnt/cfroot`
+- `mount /dev/sde2 /mnt/cfroot`
+- `mount /dev/sde1 /mnt/cfroot/boot`
+
+Installer le système
+- `debootstrap --arch i386 squeeze /mnt/cfroot http://ftp.debian.org/debian`
+- documentation annexe sur le [wiki](http://wiki.debian.org/fr/Debootstrap) officiel
+
+Passer du système "hôte" au système "cible"
+- `mount –bind /dev/ /mnt/cfroot/dev`
+- `mount -t proc /proc /mnt/cfroot/proc`
+- `mount -t sysfs /sys /mnt/cfroot/sys`
+- `chroot /mnt/cfroot /bin/bash`
+
+La mainenant on est "en cible"
+- `aptitude update`
+- `aptitude install grub2`
+- `mkdir /boot/grub/`
+- `cp /usr/lib/grub/i386-pc/* /boot/grub`
+
+Prendre en compte le port série
+- éditer le fichier `/etc/default/grub`
+- changer `GRUB_CMDLINE_LINUX="console=ttyS0,38400n8 rootdelay=10"`
+- changer `GRUB_TERMINAL=serial`
+- ajouter `GRUB_SERIAL_COMMAND="serial --speed=38400 --unit=0 --word=8 --parity=no –stop=1"`
+- faire un `update-grub` pour prendre en compte les modifications
+
+Identification des partitions
+- utiliser la sortie de la commande `ls -l /dev/disk/by-uuid/` pour construire `/etc/fstab` en se basant sur  le format suivant `UUID=xxx /mntpnt  fstype defaults 0 N` où N vaut 1 pour la partition root, ou 2 pour les autres partitions
+- éditer `/etc/inittab` pour y mettre `s0:12345:respawn:/sbin/agetty -L 38400 ttyS0 vt100` afin qu'on ait un invité de connexion sur le port série
+
+Insérer la carte CF dans la carte Alix, l'alimenter après avoir connecté le port série, et vérifier que tout démarre. Accepter le "rescue" pour avoir une ligne de commande. Dès que c'est possible, re-lancer un `update-grub` pour virer toutes les références mises lors de l'install après le debootstrap.
+
+Redémarrer encore une fois, et on a un serveur autonome qui fonctionne.
+
+Quelques autres liens d'installation debian pour alix2d3
+- [ericbosdure.com](http://ericbosdure.com/2012/01/16/debian-6-sur-alix-2d13/)
+- [bitprocessor.be](http://www.bitprocessor.be/2011/11/13/alix-2d13-debian-squeeze/)
+
