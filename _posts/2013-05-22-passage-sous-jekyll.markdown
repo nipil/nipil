@@ -132,6 +132,121 @@ Lancer la génération en temps réel
 
 Maintenant, à chaque fois que vous enregistrez un de vos posts, le programme le détecte et génère une copie **locale** de votre blog. Attention, ça ne publie pas votre blog sur internet, ça ne permet que de visualiser le contenu pendant l'édition.
 
+**Update 2015-02-22**
+
+Récemment, suite à la remarque judicieuse d'un visiteur, j'ai ajouté la prise
+en charge d'un flux RSS. Au début j'avais pensé que ça serait compliqué, mais
+avec le système de template utilisé par Jekyll, ça a vraiment été simple.
+
+Tout d'abord, je n'ai rien inventé, mais j'ai utilisé ce qui existait :
+
+- [jekyll-rss-feeds](https://github.com/snaptortoise/jekyll-rss-feeds) par
+snaptortoise, pour le template RSS automatisé
+- et cette [documentation](http://www.rssboard.org/rss-autodiscovery) pour
+l'auto-découverte des flux RSS
+- une icône RSS avec transparence trouvée via google image
+
+Let's go.
+
+# Installation RSS
+
+La mise en place d'un flux RSS commence par la dépose du fichier `feed.xml`
+issu du dépôt git sus-cité à la racine du répertoire du blog, avec l'icône
+RSS qu'on aura déniché.
+
+On prendra la peine d'ajouter quelques éléments dans le flux RSS pour
+indiquer aux aggrégateur RSS de nos visiteurs quelques infos de dates,
+ce qui leur permettra de faire le tri dans les posts, en ajoutant dans
+la balise `<channel>` du fichier `feed.xml` :
+
+	<pubDate>{{ site.time | date_to_rfc822 }}</pubDate>
+	<lastBuildDate>{{ site.time | date_to_rfc822 }}</lastBuildDate>
+
+Ensuite, on inclus les référence vers le RSS dans `_layouts/default.html`.
+Tout d'abord dans la balise `<head>` de la page :
+
+	<!-- rss feed -->
+	<link rel="alternate" type="application/rss+xml" title="RSS"
+	href="/feed.xml" />
+
+Toujours dans ce fichier, on insère aussi une référence dans le corps du site,
+histoire de signaler au visiteur qu'un flux RSS existe :
+
+	<a href="feed.xml">
+	<img src="rss.png" width="16px" height="16px" />
+	</a>
+
+Ensuite on ajoute dans `_config.yaml` l'url de notre blog, pour qu'un lien
+cliquable soit généré :
+
+	url: "https://nipil.org"
+
+*A noter que, par défaut seuls les 10 articles les plus récents sont listés.
+De plus, le flux RSS reprendra l'intégralité de l'article,* **sauf si** *la
+variable `excerpt` est définie dans l'en-tête de l'article :*
+
+Ca se fait en ajoutant dans le bloc `--` au début du post :
+
+	excerpt: blah blah bli blah blah blah ceci est un résumé
+
+C'est tout, c'est simple, et ça marche. Le fichier feeds.xml sera généré
+*statiquement* comme le reste du site, à chaque re-génération et publication.
+
+# Tuning des résumés
+
+Ajouter un `excerpt` par article, ça ne me plait pas trop (je suis fainéant,
+alors pourquoi ajouter un résumé, alors que mes articles commencent tous déjà
+par quelques lignes d'intro ?
+
+Du coup, j'ai personalisé le fichier `feed.xml` de la manière suivante :
+
+	{% raw %}{% if post.excerpt %}
+		<description>{{ post.excerpt | xml_escape }}</description>
+	{% else %}{% endraw %}
+
+est devenu
+
+	{% raw %}{% if post.excerpt %}
+		<description>{{ post.excerpt | xml_escape }}</description>
+	{% elsif post.content contains '<!--more-->' %}
+		<description>
+			{{ post.content | split:'<!--more-->' | first | xml_escape }}
+		</description>
+	{% else %}{% endraw %}
+
+Et dans chaque article, j'ai inséré le texte suivant, sur une ligne vide,
+à l'endroit où je voulais que mon résumé s'arrête :
+
+	<!--more-->
+
+Comment ça marche ? Pour générer le flux RSS d'un post :
+
+- jekyll va d'abord regarder s'il contient un `excerpt` : si oui, alors c'est
+ce que l'excerpt contient qui sera utilisé comme résumé.
+- ensuite, il va regarder si le contenu du post contient le texte
+`<!--more-->` : si oui, il va prendre uniquement le texte entre le début du
+post et le `<!--more-->` et utiliser ça comme résumé.
+- sinon, il prendra tout le texte du post comme résumé.
+
+De cette manière, pas besoin de dupliquer les infos, mais on peut toujours
+choisir de conserver un résumé défini manuellement, ou de tout prendre.
+
+# Limiter le nombre de posts présents dans le RSS ?
+
+Pour finir, comme je publie peu d'articles, **et** que j'ai mis un résumé pour
+chaque, je peux me permettre de lister *tous* les articles existants dans le
+flux RSS sans que ça fasse un fichier trop gros.
+
+Pour ce faire, dans `feed.xml` la ligne
+
+	{% raw %}{% for post in site.posts limit:10 %}{% endraw %}
+
+est devenue
+
+	{% raw %}{% for post in site.posts %}{% endraw %}
+
+Mais en temps normal, mieux vaut laisser cette limite...
+
 **Update 2013-05-23**
 
 Hier je vous ai montré comment se faire un blog basique mais très efficace, performant et sécurisé, et j'ai conclus succinctement par *"... pousser le contenu du répertoire produit sur le serveur de votre hébergeur préféré"*. Certes.
