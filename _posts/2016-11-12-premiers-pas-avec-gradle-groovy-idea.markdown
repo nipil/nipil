@@ -575,6 +575,7 @@ Exemple 1
 	// pas de package
 	println "Hello world"
 
+	// fichier build.gradle
 	// le chemin est relatif au nom de package
 	// le script n'appartient à aucun package
 	// le script est compilé dans build/classes/main
@@ -587,6 +588,7 @@ Exemple 2
 	package a.b.c
 	println "Hello world"
 
+	// fichier build.gradle
 	// le chemin est relatif au nom de package
 	// le script appartient au package a.b.c
 	// le script est compilé dans build/classes/main/a/b/c
@@ -757,3 +759,100 @@ Quand on lance l'application avec le logger, ça donne ça :
 	Total time: 1.169 secs
 
 On voit qu'il y a bien un message de loggué, et que les informations de contexte (timestamp, thread, class, loglevel) ont été ajouté au message en plus du corps de celui-ci.
+
+## Utilisation d'IDEA
+
+IDEA est une interface de développement intégrée (comme Eclipse, Visual Studio, etc) qui est directement compatible Groovy et Gradle, et qui est légère et rapide.
+
+On l'installe :
+
+- [télécharger](https://www.jetbrains.com/idea/) IDEA d'Intellij
+- décompresser dans son $HOME
+- lancer avec `bin/idea.sh`
+
+IDEA peut interagir avec nos projets Gradle/Groovy de deux manières :
+
+- en utilisant les fichiers "idea" générés par gradle
+- en important le fichier build.gradle
+
+Dans les faits, on utilisera les deux :
+
+- on "ouvrira" le projet en utilisant les fichiers idea générés par gradle
+- on "importera" le projet en utilisant le fichier `build.gradle`
+
+Tout d'abord, on va générer les fichiers de projets pour IDEA. On commence par ajouter le plugin 'idea' au fichier `build.gradle` :
+
+	apply plugin: 'idea'
+
+Ensuite on génèrera les fichiers concernés :
+
+	$ ./gradlew idea
+	:ideaModule
+	Download https://repo1.maven.org/maven2/org/codehaus/groovy/groovy-all/2.3.1/groovy-all-2.3.1-sources.jar
+	Download https://repo1.maven.org/maven2/org/slf4j/slf4j-api/1.7.21/slf4j-api-1.7.21-sources.jar
+	Download https://repo1.maven.org/maven2/ch/qos/logback/logback-classic/1.1.7/logback-classic-1.1.7-sources.jar
+	Download https://repo1.maven.org/maven2/ch/qos/logback/logback-core/1.1.7/logback-core-1.1.7-sources.jar
+	:ideaProject
+	:ideaWorkspace
+	:idea
+
+	BUILD SUCCESSFUL
+
+	Total time: 3.313 secs
+
+Il télécharge le nécessaire et créé trois fichiers.
+
+*Remarque : on voit qu'il a téléchargé la variante '-all' de groovy, telle qu'on la définie dans les dépendances. Il existe deux variantes '-bin' et '-all', et la variante '-all' est plus utile dans le cas où on utilise un IDE, car elle permet d'avoir l'autocomplétion complète.*
+
+Il utilise le nom du projet (cf `settings.gradle`) pour nommer les fichiers :
+
+	./article.iml
+	./article.ipr
+	./article.iws
+
+On ajoutera ces fichiers au fichier `.gitignore` du dépôt de code.
+
+Pourquoi ? Pour éviter qu'ils ne soient transmis à d'autres utilisateurs : ces fichiers peuvent contenir des données et paramères locaux à chaque personne. Et dans tous les cas, les autres utilisateurs peuvent les générer par gradle.
+
+Ensuite on passe dans IDEA.
+
+Dans la fenêtre de bienvenue, on clique sur le bouton "**ouvrir**" (j'ai bien dit *ouvrir*) puis on va chercher le répertoire où se trouve les trois fichiers idea (iml, ipr et iws).
+
+On laisse idea charger notre projet, analyser tout ce qu'il faut.
+
+On constate une première fenêtre pop-up, qui nous dit un truc du genre :
+
+	Unlinked gradle Project ?
+	Import Gradle project, this will also enable Gradle Tool Window...
+
+On s'empressera de cliquer le lien ! On choisira :
+
+- `Use auto-import`
+- `Create directories for empty content roots automatically`
+- `Create separate module per source set`
+- `Use default gradle wrapper`
+- on confirmera par `OK`
+
+Si vous avez loupé le lien pour importer le projet gradle et que vous ne le retrouvez plus, allez dans `File` / `New` / `Files from existing sources` / `Import project from external model` / `Gradle` puis on fait la liste ci-dessus.
+
+L'import du projet `build.gradle` déclenche l'activation de la fenêtre accessible via le menu `View` / `Tool windows` / `Gradle`.
+
+On y retrouve :
+
+- toutes les tâches du projet
+- toutes les propriétés du projet
+- les sourceSets et les dépendances
+- la possibilité de lancer une tâche à la main
+
+La [documentation](https://www.jetbrains.com/help/idea/2016.2/gradle-tool-window.html) est disponible sur le site de l'éditeur.
+
+## Fichier `ignore` pour GIT/SVN/etc
+
+Ces fichiers n'ont pas vocation à être intégrés au gestionnaire de code :
+
+	.gradle
+	.idea
+	*.iml
+	*.ipr
+	*.iws
+	build
