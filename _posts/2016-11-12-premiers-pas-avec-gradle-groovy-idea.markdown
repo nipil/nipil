@@ -327,6 +327,8 @@ Pour les plus affamés, vous pouvez allez lire la [documentation](https://docs.g
 
 De la même manière qu'on peut choisir la version de gradle utilisée par le projet, on peut choisir la version de groovy utilisée par le projet.
 
+## Les fichiers utilisés par gradle
+
 On va commencer par générer un script de build "par défaut" via la tâche "init" de gradle :
 
 	./gradlew init
@@ -348,6 +350,8 @@ Le fichier `settings.gradle`
 - vous pouvez bien sûr le modifier
 
 Ajoutez ces deux fichiers à votre gestionnaire de code source.
+
+## Dépôts et les dépendances du fichier `build.gradle`
 
 On va maintenant gérer les dépôts et les dépendances.
 
@@ -372,7 +376,7 @@ Cette commande :
 - charge le plugin java de gradle
 - donne accès au paramètre `repositories`
 - donne accès au paramètre `dependencies`
-- ajoute des tâches, notamment `build` et `clean`
+- ajoute des tâches, notamment `build` et `clean`, et `javadoc`
 
 On va ensuite ajouter un dépôt de code aux `repositories` :
 
@@ -468,3 +472,200 @@ On voit qu'il a téléchargé la version 2.3.1 demandée de Groovy !
 Il l'a d'ailleurs à nouveau installé *en dehors du répertoire du projet*, dans un sous répertoire de `$HOME/.gradle` (vous pouvez vérifier par vous même :-)
 
 On a donc maintenant un environnement gradle qui permet d'importer des librairies issues de MavenCentral, dont groovy.
+
+## Plugin Groovy
+
+Mais vous me direz, on a ajouté un plugin 'java' ... alors qu'on veut faire du groovy.
+
+Simple, on ajoute le plugin 'groovy' au script ... aussi simple que ça !
+
+	apply plugin: 'groovy'
+
+Mais la documentation indique que ce plugin importe automatiquement le plugin 'java'. On peut donc soit lister les deux plugins dans le script gradle, ou bien seulement lister le plugin 'groovy', pour plus de simplicité
+
+Le plugin ajoute notamment les éléments suivants :
+
+- des tâches de compilation comme `compileGroovy` et de génération de documentation `groovydoc`
+- définit la structure par défaut du code source (les `sourceSets`)
+
+A nouveau, on retrouve la notion de convention : si on respecte la convention, on a rien à spécifier. C'est seulement si la convention n'est pas respectée (*ie* qu'on met les fichiers ailleurs, alors il faut spécifier quelque chose)
+
+En l'occurence, l'arborescence conventionnelle est la suivante :
+
+	src/main/java       Production Java source
+	src/main/resources  Production resources
+	src/main/groovy     Production Groovy sources
+
+	src/test/java       Test Java source
+	src/test/resources  Test resources
+	src/test/groovy     Test groovy sources
+
+On créé alors les répertoires listés ci-dessus :
+
+	mkdir -p src/{main,test}/{java,resources,groovy}
+
+A partir de là, dès qu'on met un fichier `.groovy` au bon endroit, il sera pris en compte automatiquement au titre des tâches `compileGroovy` du plugin, qui est déclenchée par la tâche standard `build` de gradle.
+
+C'est ce que nous allons faire ensuite !
+
+Sinon, vous pouvez allez lire la [documentation](https://docs.gradle.org/current/userguide/groovy_plugin.html) du plugin Groovy
+
+# Groovy, étape 2 : script, compilation et lancement
+
+Nous venons de voir la convention qui définit l'arborescence de fichiers.
+
+Les fichiers `.groovy` devront placés dans le répertoire `src/main/groovy` (ou un de ses sous répertoires, au regard de norme de nommage des packages)
+
+Prenons un fichier script que nous appellerons `Main.groovy`
+
+	// fichier src/main/groovy/Main.groovy
+	println "Hello world, this is groovy version ${GroovySystem.version}"
+
+On lance la compilation (on nettoie juste )
+
+	./gradlew build
+
+On trouvera dans le répertoire `build` (encore une convention) les fichiers suivants :
+
+	build/
+	build/classes
+	build/classes/main
+	build/classes/main/Main.class
+	build/libs
+	build/libs/article.jar
+	build/tmp
+	build/tmp/jar
+	build/tmp/jar/MANIFEST.MF
+	build/tmp/compileGroovy
+	build/tmp/compileGroovy/groovy-java-stubs
+
+Parmi ces éléments, on notera :
+
+- le fichier groovy `Main.groovy` compilé en bytecode java `Main.class`
+- un fichier `.jar` utilisant le nom du projet (cf `settings.gradle`)
+- ce fichier jar contient tous les `.class` de notre projet
+
+Le reste, je ne sais pas encore trop à quoi ça sert mais pour l'instant on s'en fiche un peu :-)
+
+Lançons notre programme !
+
+## Packaging, installation et lancement de l'application
+
+Pour lancer le programme, le plus simple est de passer par un plugin gradle, qui va packager notre application et permettre son lancement d'une manière simple et robuste.
+
+Ajouter le plugin Gradle 'application' ([doc](https://docs.gradle.org/current/userguide/application_plugin.html)) au fichier `build.gradle`:
+
+	apply plugin: 'application'
+
+Ce plugin fournit les éléments suivants :
+
+- le paramètre `mainClassName` qui définit la classe principale (le nom du script, dans le cas d'un script groovy)
+- la tâches `run` qui exécute le programme sans paramètres
+
+Le plus important ici est ce paramètre `mainClassName`, il s'agira
+
+- soit de la classe qui contient la méthode "static main"
+- soit du nom du script groovy "principal"
+
+*Attention, dans les deux cas, le nom de la classe doit être le nom complet en incluant le package !*
+
+Exemple 1
+
+	// fichier src/main/groovy/Main.groovy
+	// pas de package
+	println "Hello world"
+
+	// le chemin est relatif au nom de package
+	// le script n'appartient à aucun package
+	// le script est compilé dans build/classes/main
+	// le chemin contient alors juste le nom du script
+	mainClassName="Main"
+
+Exemple 2
+
+	// fichier src/main/groovy/a/b/c/Main.groovy
+	package a.b.c
+	println "Hello world"
+
+	// le chemin est relatif au nom de package
+	// le script appartient au package a.b.c
+	// le script est compilé dans build/classes/main/a/b/c
+	// le chemin contient le nom du script avec son **package**
+	mainClassName="a.b.c.Main"
+
+Et c'est pareil si on utilise des classes plutôt que des scripts.
+
+On peut alors lancer l'application (sans paramètres) via gradle :
+
+	$ ./gradlew run
+	:compileJava UP-TO-DATE
+	:compileGroovy
+	:processResources UP-TO-DATE
+	:classes
+	:run
+	Hello world, this is groovy version 2.3.1
+
+	BUILD SUCCESSFUL
+
+	Total time: 2.02 secs
+
+On constate :
+
+- qu'on peut lancer notre application
+- qu'on a bien la version de groovy qu'on a demandé à utiliser
+
+C'est pas génial tout ça ?!
+
+Pour finir, le plugin 'application' applique automatiquement le plugin 'distribution' ([doc](https://docs.gradle.org/current/userguide/distribution_plugin.html)) qui fournit les éléments suivants :
+
+- générer une archive (`distZip` et `distTar`) pour distribution)
+- `installDist` qui installe localement l'application
+
+On utilisera la tâche `installDist` pour installer notre programme, ainsi que toutes ses dépendances, dans un répertoire local.
+
+La tâche génère même un script de lancement qui configure tout bien pour que "tout fonctionne" : il inclus tous les jars, les ajoute au classpath, et lance la classe spécifiée par `mainClassName`.
+
+*Remarque : en l'installant localement, il est plus simple de lui passer des paramètres en ligne de commande*
+
+Pour la lancer, on commence par demander l'installation :
+
+	$ ./gradlew installDist
+	:compileJava UP-TO-DATE
+	:compileGroovy UP-TO-DATE
+	:processResources UP-TO-DATE
+	:classes UP-TO-DATE
+	:jar
+	:startScripts
+	:installDist
+
+	BUILD SUCCESSFUL
+
+	Total time: 0.851 secs
+
+Puis on la lance à la main (on peut y passer des paramètres)
+
+	$ build/install/article/bin/article
+	Hello world, this is groovy version 2.3.1
+
+Comme tout à l'heure avec `run`, on constate :
+
+- qu'on peut lancer notre application
+- qu'on a bien la version de groovy qu'on a demandé à utiliser
+
+*Whouhouuuu ça y est on est montés sur la première marche, on a tout ce qu'il faut côté gradle et environnement, pour se lancer dans la programmation de notre application !*
+
+Si vous avez suivi jusqu'ici, merci pour votre attention, et amusez vous bien pour la suite.
+
+Cependant, je vais continuer avec quelques élements qui sont (à mon humble avis) tout aussi indispensables que le reste, mais qui peuvent rester facultatifs.
+
+# Aller plus loin !
+
+Voici quelques points qui permettront d'aller plus loin, en ajoutant des éléments supplémentaires (version, test, logging) qui sont généralement nécessaires à chaque application
+
+## Versionning de l'application (optionnel)
+
+Le versionning de notre application est possible grâce au paramètre `version` du fichier `build.gradle` :
+
+	version = "1.2.3"
+
+Une fois configuré, il sera utilisé pour les tâches de packaging (zip, tar, jar). Mais dans tous les cas, il est facultatif.
