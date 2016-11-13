@@ -1,0 +1,27 @@
+---
+layout: post
+title: Vélib-Stats, consultation des statistiques vélib'
+tags: velib php javascript foundation python sqlite
+---
+
+Un nouvel article, quasiment un an après le dernier ? Ouaip. Ces 18 derniers mois ont été intenses, rattrapons le temps perdu !
+
+En parlant de rattrapage, côté boulot, j'ai fait beaucoup de "catch-up" (rattrapage) technologique. Et pour me mettre au goût du jour sur les technos utilisées par l'un des quelques projets que je gère, j'ai créé [velib-stats](https://nipil.org/velib-stats/)
+
+L'idée derrière ce site, est de pouvoir connaître (parce que publiées nulle part), visualiser et utiliser les informations d'utilisation des Vélibs, d'une part pour satisfaire ma curiosité, et d'autre part pour optimiser mes déplacements.
+
+La page *conception* du site explique comment la solution est construite. Les trois répos de code sont présents sur GitHub avec des licences sympas, et les données collectée et affichées par le programme sont libres et téléchargeables.
+
+Sachant que mon dernier contact avec PHP datait de l'époque où on mélangeait allègrement le php et le html, la présentation avec le contenu, et que dans mes souvenirs le javascript ça servait à changer les images ... la route était longue devant moi !
+
+Après "un certain temps" (soirées et week-ends), en m'activant les neurones pour aborder tous les aspects de ces technos, j'ai pu finalement arriver au bout (je considère que le projet est fini, d'où l'article d'aujourd'hui)
+
+Techniquement, ça m'a permis de faire les choses "au goût du jour" : en utilisant un/plusieurs frameworks, des gestionnaires de dépendances, de la programmation orientée objet *en php* (j'avais au moins 12 ans de retard en php).
+
+Ne manque à ce "rattrapage" que des tests automatisés (unitaires, intégration, utilisateur) et l'utilisation de SCSS. Mais j'attendrai d'avoir un autre projet perso pour appliquer ces outils !
+
+Au final, j'ai pu comprendre comment et dans quel ordre les briques techniques sont agencées et mises en place, comprendre comment elles fonctionnent, et à quoi elles servent, à quels problèmes elles répondent et pourquoi.
+
+D'un côté, ça m'a permis de re-tracer et de maîtriser les dépendances et la génèse technique du projet côté professionnel, et d'un autre côté je me sens maintenant bien plus à l'aise et en confiance sur le projet pro, où je n'ai plus qu'à "ingurgiter" la partie fonctionnelle/métier.
+
+Et promis, bientôt pour un nouvel article : depuis un mois, j'ai repris un autre projet pro, un prototype développé avec un nouvel ensemble de technos orientées java, que je ne connaissais absolument pas il y a un mois ... encore une occasion de faire du "rattrapage" !
