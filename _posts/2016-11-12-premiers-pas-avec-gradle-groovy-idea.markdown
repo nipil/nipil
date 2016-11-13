@@ -123,11 +123,11 @@ Par exemple, un script Gradle pour un programme Groovy peut se résumer à :
 	apply plugin: 'groovy'
 
 	repositories {
-	    mavenCentral()
+		mavenCentral()
 	}
 
 	dependencies {
-	    compile 'group:name:version'
+		compile 'group:name:version'
 	}
 
 Ce qui est succinct, vous en conviendrez !
@@ -322,3 +322,149 @@ Et quand on voudra changer de version gradle pour le projet, il suffit de regén
 Puis d'inclure les fichiers regénérés dans le gestionnaire de code.
 
 Pour les plus affamés, vous pouvez allez lire la [documentation](https://docs.gradle.org/current/userguide/gradle_wrapper.html) de la tâche wrapper
+
+# Groovy, étape 1 : dépendances et installation
+
+De la même manière qu'on peut choisir la version de gradle utilisée par le projet, on peut choisir la version de groovy utilisée par le projet.
+
+On va commencer par générer un script de build "par défaut" via la tâche "init" de gradle :
+
+	./gradlew init
+
+Cette tâche a généré deux fichiers :
+
+	./build.gradle
+	./settings.gradle
+
+Le fichier `build.gradle`
+
+- sera chargé par défaut par gradle à chaque appel du wrapper
+- il contiendra toutes les tâches et le paramétrage gradle du projet
+- pour l'instant, tout est commenté, il est *virtuellement* vide.
+
+Le fichier `settings.gradle`
+- contient le nom du projet via le paramètre `rootProject.name`
+- le nom par défaut est "le nom du répertoire du projet"
+- vous pouvez bien sûr le modifier
+
+Ajoutez ces deux fichiers à votre gestionnaire de code source.
+
+On va maintenant gérer les dépôts et les dépendances.
+
+Mais tout d'abord, quelques faits/rappels ou choses nouvelles :
+
+- java dispose d'un dépôt de librairies appelé "maven central"
+- on peut y récupérer tout ce qu'on souhaite
+- groovy est basé sur java
+- groovy peut être publié sur "maven central"
+- on récupèrera logiquement groovy depuis "maven central" :-)
+- on a vu qu'on peut utiliser la version qu'on veut de gradle
+- on utilisera logiquement la version qu'on veut de groovy
+
+Comment on fait tout ça ? On va le voir maintenant, ouvrez le fichier `build.gradle` et videz le (ou modifiez le contenu).
+
+On fait du gradle, qui est une sorte de java. On va donc avoir besoin du plugin 'java'. Ajoutez la ligne suivante dans le fichier :
+
+	apply plugin: 'java'
+
+Cette commande :
+
+- charge le plugin java de gradle
+- donne accès au paramètre `repositories`
+- donne accès au paramètre `dependencies`
+- ajoute des tâches, notamment `build` et `clean`
+
+On va ensuite ajouter un dépôt de code aux `repositories` :
+
+	repositories {
+		mavenCentral()
+	}
+
+Ici on indique `mavenCentral()` qui n'est pas une chaine de caractère, parce que gradle se charge de mettre la bonne valeur pour MavenCentral, parce que tout le monde l'utilise, autant que ça soit fait au plus simple.
+
+Vous me direz, pourquoi il ne l'inclus pas tout automatiquement ? Parce qu'en interne entreprise vous pourriez avec un dépôt local, copie de MavenCentral, pour plus de performance et pour épargner les accès internert de votre boîte, qui sont sûrement déjà bien chargés !
+
+Ensuite on déclarera les dépendances nécessaires (ie les librairies et compagnie) pour notre projet.
+
+	dependencies {
+		compile 'mygroup:myname:myversion'
+		compile group: 'mygroup', name: 'myname', version: 'myversion'
+		testCompile 'mygroup:myname:myversion'
+		testCompile group: 'mygroup', name: 'myname', version: 'myversion'
+	}
+
+Le `group` est généralement un nom de du producteur du package (nom de domaine inversé), `name` est le nom du package à importer, et `version` la version demandée.
+
+Chaque dépendance peut être nécessaire pour compiler le programme (mot clé `compile`) ou n'être nécessaire que pour compiler les tests (mot clé `testCompile`) mais ne sont pas nécessaire pour le programme en lui même.
+
+Les deux premières lignes `compile` sont équivalentes, et les deux lignes `testCompile` aussi. Il s'agit juste de deux syntaxes possible, choisissez l'une ou l'autre syntaxe.
+
+Dans notre cas, on se contentera de mentionner la dépendance **vers la version de groovy qu'on souhaite utiliser** ... qui est logiquement nécessaire pour compiler des programmes groovy.
+
+On aura le fichier suivant :
+
+	apply plugin: 'java'
+
+	repositories {
+		mavenCentral()
+	}
+
+	dependencies {
+		compile 'org.codehaus.groovy:groovy-all:2.3.1'
+	}
+
+Là j'ai mis la version 2.3.1 de groovy, pour bien montrer :
+
+- qu'on peut choisir la version qu'on veut !
+- qu'elle peut être différente de la version installée nativement (2.4.5, voir début de l'article)
+- qu'elle peut être différente de la version apportée par la version gradle utilisée (groovy 2.4.7 apportée par gradle 3.1)
+
+On verifiera que les dépendances sont bien importées :
+
+	$ ./gradlew dependencies
+	:dependencies
+
+	------------------------------------------------------------
+	Root project
+	------------------------------------------------------------
+
+	archives - Configuration for archive artifacts.
+	No dependencies
+
+	compile - Dependencies for source set 'main'.
+	Download https://repo1.maven.org/maven2/org/codehaus/groovy/groovy-all/2.3.1/groovy-all-2.3.1.pom
+	\--- org.codehaus.groovy:groovy-all:2.3.1
+
+	compileClasspath - Compile classpath for source set 'main'.
+	\--- org.codehaus.groovy:groovy-all:2.3.1
+
+	compileOnly - Compile dependencies for source set 'main'.
+	\--- org.codehaus.groovy:groovy-all:2.3.1
+
+	default - Configuration for default artifacts.
+	\--- org.codehaus.groovy:groovy-all:2.3.1
+
+	runtime - Runtime dependencies for source set 'main'.
+	\--- org.codehaus.groovy:groovy-all:2.3.1
+
+	testCompile - Dependencies for source set 'test'.
+	\--- org.codehaus.groovy:groovy-all:2.3.1
+
+	testCompileClasspath - Compile classpath for source set 'test'.
+	\--- org.codehaus.groovy:groovy-all:2.3.1
+
+	testCompileOnly - Compile dependencies for source set 'test'.
+	\--- org.codehaus.groovy:groovy-all:2.3.1
+
+	testRuntime - Runtime dependencies for source set 'test'.
+	\--- org.codehaus.groovy:groovy-all:2.3.1
+
+	BUILD SUCCESSFUL
+
+	Total time: 1.787 secs
+
+On voit qu'il a téléchargé la version 2.3.1 demandée de Groovy !
+
+Il l'a d'ailleurs à nouveau installé *en dehors du répertoire du projet*, dans un sous répertoire de `$HOME/.gradle` (vous pouvez vérifier par vous même :-)
+
+On a donc maintenant un environnement gradle qui permet d'importer des librairies issues de MavenCentral, dont groovy.
