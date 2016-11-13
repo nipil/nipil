@@ -669,3 +669,91 @@ Le versionning de notre application est possible grâce au paramètre `version` 
 	version = "1.2.3"
 
 Une fois configuré, il sera utilisé pour les tâches de packaging (zip, tar, jar). Mais dans tous les cas, il est facultatif.
+
+## Logging
+
+Dans un programme, généralement on log des trucs. Que ça soit du debug, que ça soit de l'info, un programme ça log, surtout si ça tourne pendant longtemps.
+
+Comment logger ? Il existe des dizaines de framework, mais [Slf4j]()+[Logback]() semblent être sur le devant de la scène.
+
+Commen ça se présente :
+
+- une interface API commune (Slf4j) qui définit l'interface
+- une implémentation réelle du logger (Logback) qui fait le taf
+- l'intégration facile du logger à notre code (annotation groovy Slf4j)
+
+Pour les utiliser, c'est super simple :
+
+- on va ajouter les dépendances Slf4j et Logback à notre `build.gradle`
+- on va importer l'annotation groovy @Slf4j dans nos fichiers
+- on applique l'annotation à toutes les classes où on veut logger
+
+Simple non ? On y va !
+
+On édite d'abord la section `dependencies` du fichier `build.gradle` :
+
+	dependencies {
+		...
+		compile 'org.slf4j:slf4j-api:1.7.21' // used by logging
+		compile 'ch.qos.logback:logback-classic:1.1.7' // used by logging
+		compile 'ch.qos.logback:logback-core:1.1.7' // used by logging
+		...
+	}
+
+Pour rappel, on a retrouvé les groupes, les noms, et les versions pour construire la ligne de dépendance via les infos consultables sur le dépôt [MavenCentral](http://search.maven.org/)
+
+Ensuite, dans notre script principal :
+
+- on définit une classe "bidon"
+- on définit la classe comme "loggueuse" à l'aide de l'annotation
+- l'annotation injectera un logger dans la classe
+- on utilise le logger pour logguer un message d'info
+
+Ça donne ça :
+
+	// fichier src/main/groovy/Main.groovy
+
+	import groovy.util.logging.Slf4j
+
+	@Slf4j
+	class Toto {
+	  Toto() {
+	    log.info "ceci est un message d'info loggué"
+	  }
+	}
+
+	def t = new Toto()
+	println "Hello world, ${t}"
+
+Ici, le simple fait d'avoir mis l'annotation, va avoir pour effet :
+
+- un logger dont le nom est celui de la classe va être créé
+- il sera  injecté dans la classe en tant que membre de classe nommé `log`
+- chaque message qu'on lui envoie sera formaté "proprement" et affiché
+
+*Rappel : toujours dans une logique de simplification, le mot clé `this` semble optionnel en groovy lorsqu'on souhaite accéder aux membres d'une classe depuis celle-ci, quand ça n'est pas ambigü :
+
+Donc d'après ci-dessous, on écrit plutôt le premier que le deuxième
+
+	// en groovy
+	log.info "message"
+
+	// en java
+	this.log.info("message");
+
+Quand on lance l'application avec le logger, ça donne ça :
+
+	$ ./gradlew run
+	:compileJava UP-TO-DATE
+	:compileGroovy UP-TO-DATE
+	:processResources UP-TO-DATE
+	:classes UP-TO-DATE
+	:run
+	19:29:07.301 [main] INFO Toto - ceci est un message d'info loggué
+	Hello world, Toto@7276c8cd
+
+	BUILD SUCCESSFUL
+
+	Total time: 1.169 secs
+
+On voit qu'il y a bien un message de loggué, et que les informations de contexte (timestamp, thread, class, loglevel) ont été ajouté au message en plus du corps de celui-ci.
