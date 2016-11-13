@@ -10,7 +10,9 @@ Depuis septembre, j'ai aussi repris un autre projet (qui est encore à l'état d
 
 Bref tout est à faire, mais la base techno est déjà posée et ne changera pas (il y a de bonnes raisons pour ça, qui sont hors sujet ici). Pas grave, ça me dérange pas, je maîtris le "saut dans la piscine en mode éponge" !
 
-Aujourd'hui, je vous parlerai de mes premiers pas avec [Groovy](http://groovy-lang.org/). Et donc avec [Gradle](https://gradle.org/). En utilisant [IDEA](https://www.jetbrains.com/idea/). Prenez une boisson chaude, et des petits gateaux, et allons y relax...
+Aujourd'hui, je vous parlerai de mes premiers pas avec [Groovy](http://groovy-lang.org/). Et donc avec [Gradle](https://gradle.org/). En utilisant [IDEA](https://www.jetbrains.com/idea/).
+
+Prenez une boisson chaude, et des petits gateaux, et allons y relax...
 
 # Groovy, kezako ?
 
@@ -67,3 +69,256 @@ Pour finir, un script groovy ça s'exécute de la manière suivante :
 	java -jar /usr/share/groovy2/embeddable/groovy-all-2.4.5.jar -cp . a
 
 Il a des tonnes d'autres trucs que je suis loin de maîtriser, mais la [documentation](http://groovy-lang.org/documentation.html) du langage est très bien faite et agréable à lire, il faut juste prendre le temps de l'ingurgiter et de la digérer.
+
+# Gradle, kezako ?
+
+De quoi on parle :
+
+- Gradle est ce un "task-runner", écrit en Groovy
+- un task-runner, c'est un machin qui fait des boulots
+- les boulots peuvent être liés entre eux (A dépend de B), ou pas
+- un boulot n'est à refaire que quand c'est nécessaire (on bosse pas pour rien)
+- un task-runner s'appuie sur un script qui lui dit ce qu'il doit faire
+- le script dit comment faire chaque tâche
+- dans le cas de Gradle, le script est écrit en Groovy
+
+Quand on parle de tâches, on peut déjà penser aux tâches suivantes :
+
+- compiler du code
+- exécuter une application avec des paramètres par défaut
+- générer de la documentation
+- produire un fichier 'zip' de l'application pour distribution
+- pousser un site web vers un serveur
+- lancer une campagne de tests automatisés
+- poster un tweet
+- faire le café
+
+*Un task-runner, c'est un truc qui automatise une chaine de tâches répétitives.*
+
+Si vous avez déjà programmé un jour dans votre vie, vous avez sûrement du voir l'un ou l'autre des trucs suivants :
+
+- `build.bat`
+- `make` avec un `Makefile` manuel ou généré par `./configure`
+- `grunt` et `gulp` pour du javascript
+- `ant`, `maven` et`gradle` pour du java
+- `Robo` pour PHP
+- et plein d'autres ...
+
+Ben voilà, ces trucs là, c'est sous une forme ou l'autre, des task-runners, qui utilisent un script d'une forme ou d'une autre pour définir leurs tâches et qui exécutent ensuite les tâches demandées, en plus de celles qui sont nécessaires
+
+## Gradle, quel intérêt ?
+
+On peut se poser la question. La réponse ? La simplification, comme pour Groovy ! On parle ici de simplifier au minimum l'*écriture* du script de définition des tâches. Pour le reste, ça *fonctionne* comme les autres.
+
+L'idée derrière Gradle, part du constat que :
+
+- un script Makefile ([exemple](https://www.gnu.org/software/make/manual/html_node/Simple-Makefile.html)) décrit explicitement toutes les actions attendues
+- un script Ant ([exemple](https://ant.apache.org/manual/using.html)) décrit explicitement toutes les actions attendues
+- un script Maven ([exemple](https://maven.apache.org/pom.html)) décrit explicitement toutes les actions attendues
+
+En comparaison avec les scripts donnés en exemple ci-dessus, un script Gradle se contente de **décrire ce qui change de la norme**.
+
+Par exemple, un script Gradle pour un programme Groovy peut se résumer à :
+
+	apply plugin: 'groovy'
+
+	repositories {
+	    mavenCentral()
+	}
+
+	dependencies {
+	    compile 'group:name:version'
+	}
+
+Ce qui est succinct, vous en conviendrez !
+
+Tout ça parce qu'on n'exprime dans le script que ce qui *dévie de la convention* (Gradle), au lieu de *répéter des choses qui doivent de toute façon suivre la convention* (Ant, Maven, make, ...)
+
+## Gradle, structure en plugins
+
+La force de Gradle réside dans le fait que ces fameuses conventions que l'on a pas besoin de spécifier, résident dans des plugins, qu'il suffit d'appliquer au script.
+
+Un plugin, c'est ni plus ni moins constitué :
+
+- d'une "liste de tâches" automatiquement importées au chargement du plugin
+- d'éléments de configuration, avec des valeurs par défaut
+- de convention sur l'organisation, reflétées dans les actions et la config
+- de dépendance sur d'autres plugins éventuels
+
+Avoir des conventions, qui sont implicites (mais documentées !) plutôt qu'explicite permet d'avoir par exemple :
+
+- un script gradle "vide" qui dispose déjà de tâches standard (init, tasks, wrapper ...) sans qu'on ait besoin de les définir !
+- on configure simplement les dépendances de code utilisées (les librairies via le paramètre `dependencies`) et où il ira les chercher (via le paramètre `repositories`)
+- le plugin pour un langage 'X' définit l'arborescence par défaut à suivre pour l'emplacement des fichiers sources X (`src/main/X`), des tests X (`src/test/X`)
+- un plugin 'A' va appliquer automatiquement un plugin 'B' parce que sa fonctionnalité est utile/nécessaire à l'utilisateur du plugin 'A'
+
+Tout ça en ayant toujours à l'idée, que *tout ce qui respecte les conventions prises n'a pas besoin d'être spécifié dans le script du task-runner*, ce qui économise du temps, des problèmes et des emmerdes au développeur.
+
+## Gradle, étape 1 : installation native
+
+Gradle gère les dépendances. Gradle est donc capable d'importer tout ce qui est nécessaire à son fonctionnement.
+
+Pour installer gradle, prenez votre gestionnaire de package habituel (apt-get pour Debian, rpm pour CentOS, sdkman, etc) et installez le package "gradle"
+
+Une fois que vous pouvez taper la commande suivante avec succès, vous êtes bon :
+
+	gradle --version
+
+Vous avez une version gradle qui est "ce qu'elle est" (là sur ma version Ubuntu Mate 16.04 LTS, j'ai le résultat suivant :
+
+	$ gradle --version
+
+	------------------------------------------------------------
+	Gradle 2.10
+	------------------------------------------------------------
+
+	Build time:   2016-01-26 15:17:49 UTC
+	Build number: none
+	Revision:     UNKNOWN
+
+	Groovy:       2.4.5
+	Ant:          Apache Ant(TM) version 1.9.6 compiled on July 8 2015
+	JVM:          1.8.0_111 (Oracle Corporation 25.111-b14)
+	OS:           Linux 4.4.0-47-generic amd64
+
+Ici, d'une part, j'ai gradle en version 2.10. Mais je vois aussi que j'ai un groovy en version 2.4.5... WTF ? Ben oui, gradle est écrit en groovy, donc il lui faut un groovy fonctionnel, et la version que ma distribution a installé est celle-là (on peut confirmer par un `roovy --version`)
+
+## Gradle, étape 2 : le wrapper, et les versions choisies pour votre projet
+
+Vous avez un nouveau projet tout beau. Vous voulez utiliser les dernières versions stables. Comme pour plein d'autres langages, on arrive à un point qui génère généralement des galères : installer d'autres versions que celles dont on dispose.
+
+Je passe sur la problématique (vu qu'on ne la rencontrera pas), mais résumons par les faits avérés suivants :
+
+- on peut utiliser une autre version de *gradle* pour le projet que celle qui est installée nativement
+- on peut utiliser une autre version de *groovy* pour le projet que celle qui est installée nativement
+- gradle se chargera de récupérer les versions nécessaires
+- gradle utilisera automatiquement les versions demandées
+- on pourrait même au final désinstaller les versions natives !
+
+Comment on fait cette magie ? En générant un `wrapper`.
+
+Un `wrapper` (enrobeur en français) ça fait ça :
+- truc prend un bidule, et s'emballe autour
+- truc reçoit un machin
+- truc adapte machin à bidule
+- truc transmet le machin adapté à bidule
+- bidule bidouille
+- bidulle donne son résultat à truc
+- truc dés-adapte le résultat
+- truc donne le résultat adapté à qui lui avait fourni
+
+*En résumé, un `wrapper` fait l'interface et masque ce qu'il contient*
+
+Le wrapper de Gradle fait exactement ça :
+
+- il prend les commandes qu'on lui donne
+- il prend les informations configurées (ie les versions requises)
+- il récupère les trucs nécessaires (si pas déjà récupérées)
+- il transmet les commandes aux outils dans la version demandées
+- il redonne le résultat
+
+Et ça permet donc d'utiliser n'importe quelle version de Gradle pour le projet, sans avoir à installer, ni gérer quoi que ce soit sur la machine.
+
+Ça permet aussi, en le distribuant avec le projet, de permettre à tous ceux qui veulent participer à notre projet, d'utiliser automatiquement et implicitement les versions prévues, comme ça tout le monde aura exactement le même comportement.
+
+Pour notre projet, on va donc générer un wrapper, et l'ajouter au code source pour qu'il soit distribué avec.
+
+Pour générer un wrapper, il suffit de passer la commande suivante :
+
+	gradle wrapper --gradle-version 3.1
+
+Cette commande va travailler, et générer des fichiers dans le répertoire.
+
+Le premier lot de fichier est le suivant :
+
+	./.gradle
+	./.gradle/2.10
+	./.gradle/2.10/taskArtifacts
+	./.gradle/2.10/taskArtifacts/cache.properties
+	./.gradle/2.10/taskArtifacts/cache.properties.lock
+	./.gradle/2.10/taskArtifacts/fileHashes.bin
+	./.gradle/2.10/taskArtifacts/fileSnapshots.bin
+	./.gradle/2.10/taskArtifacts/outputFileStates.bin
+	./.gradle/2.10/taskArtifacts/taskArtifacts.bin
+
+Ce répertoire `.gradle` et son contenu contient les fichiers de travail locaux, en fonction des versions qui les ont lancées. Par exemple, on a lancé la création du wrapper avec le gradle local (en version 2.10) on a donc des fichiers qui ont été créé dans le répertoire 2.10.
+
+L'important à retenir sur le répertoire de travail `.gradle` (avec un **.** devant) est qu'il ne sert à rien de le mettre dans le gestionnaire de code, et qu'on s'en contrefout si on l'efface (il sera recréé). Bref, on l'ignore !
+
+Le deuxième lot de fichiers est le suivant :
+
+	./gradlew
+	./gradlew.bat
+	./gradle
+	./gradle/wrapper
+	./gradle/wrapper/gradle-wrapper.jar
+	./gradle/wrapper/gradle-wrapper.properties
+
+Ceci constitue le "wrapper" en tant que tel. Ce sont les fichiers réellement utiles du wrapper (les deux scripts à la racine, et le contenu du répertoire). Ajoutez les à votre gestionnaire de code.
+
+Vous me direz, "ouais, ok, et maintenant" ?
+
+Et bien maintenant, **partout où on devrait/voudrait taper la commande `gradle`, on tapera plutôt une commande `./gradlew`** de manière à utiliser la version choisie par le projet, plutôt que la version installée par votre distribution.
+
+On lance ce wrapper pour voir la version :
+
+	$ ./gradlew --version
+	Downloading https://services.gradle.org/distributions/gradle-3.1-bin.zip
+	.....................................
+	.....................................
+	.....................................
+	.....................................
+	...
+	Unzipping /home/nipil/.gradle/wrapper/dists/gradle-3.1-bin/37qejo6a26ua35lyn7h1u9v2n/gradle-3.1-bin.zip to /home/nipil/.gradle/wrapper/dists/gradle-3.1-bin/37qejo6a26ua35lyn7h1u9v2n
+	Set executable permissions for: /home/nipil/.gradle/wrapper/dists/gradle-3.1-bin/37qejo6a26ua35lyn7h1u9v2n/gradle-3.1/bin/gradle
+	Starting a Gradle Daemon (subsequent builds will be faster)
+	:help
+	------------------------------------------------------------
+	Gradle 3.1
+	------------------------------------------------------------
+
+	Build time:   2016-09-19 10:53:53 UTC
+	Revision:     13f38ba699afd86d7cdc4ed8fd7dd3960c0b1f97
+
+	Groovy:       2.4.7
+	Ant:          Apache Ant(TM) version 1.9.6 compiled on June 29 2015
+	JVM:          1.8.0_111 (Oracle Corporation 25.111-b14)
+	OS:           Linux 4.4.0-47-generic amd64
+
+On voit alors les choses suivantes :
+
+- on a simplement appelé le wrapper
+- il a téléchargé la version de gradle demandée (ie la version 3.1)
+- la version récupérée est dans sa variante "bin" (on verra ça plus tard)
+- il a installé la version *hors du dossier du projet* (ie dans `$HOME/.gradle`)
+- le gradle 3.1 récupéré inclus une version 2.4.7
+- la version affichée est 3.1, le wrapper utilise bien la version demandée au lieu du gradle natif (2.10)
+
+Et pour finir, on retrouve dans le dossier de travail les fichiers de travail de la version 3.1 en plus des fichiers de travail de la 2.10:
+
+	./.gradle/3.1
+	./.gradle/3.1/taskArtifacts
+	./.gradle/3.1/taskArtifacts/cache.properties
+	./.gradle/3.1/taskArtifacts/cache.properties.lock
+	./.gradle/3.1/taskArtifacts/fileHashes.bin
+	./.gradle/3.1/taskArtifacts/fileSnapshots.bin
+	./.gradle/3.1/taskArtifacts/taskArtifacts.bin
+
+Tout fonctionne correctement.
+
+Si je résume les points importants :
+
+- notre projet utilise gradle 3.1 aussi longtemps qu'on utilise le wrapper
+- les gens utilisent le wrapper, récupérent et utilisent la bonne version
+
+Personne n'aura "besoin" d'avoir gradle installé nativement.
+
+Elle est pas belle la vie ?
+
+Et quand on voudra changer de version gradle pour le projet, il suffit de regénérer le wrapper :
+
+	gradle wrapper --gradle-version 3.2
+
+Puis d'inclure les fichiers regénérés dans le gestionnaire de code.
+
+Pour les plus affamés, vous pouvez allez lire la [documentation](https://docs.gradle.org/current/userguide/gradle_wrapper.html) de la tâche wrapper
