@@ -1,15 +1,21 @@
 # nipil.org website
 
+# license
+
+Every file of this project is covered by the MIT license, EXCEPT FOR the files in sources/_posts/ and sources/files which are Copyright (C) nipil@users.noreply.github.com
+
+# install
+
 ## system packages
 
   ruby 2.1.5+
   gem
 
-# bundler gem
+## bundler gem
 
   gem install --user-install bundler
 
-# website gems
+## website gems
 
 For development
 
@@ -20,7 +26,7 @@ For production
 
   bundler install
 
-# generate site
+# generate
 
 For development
 
