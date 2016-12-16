@@ -9,6 +9,7 @@ Every file of this project is covered by the MIT license, EXCEPT FOR the files i
 ## system packages
 
   ruby 2.1.5+
+  ruby-dev
   gem
 
 ## bundler gem
@@ -24,7 +25,7 @@ For development
 
 For production
 
-  bundler install
+  bundler install --deployment
 
 # generate
 
