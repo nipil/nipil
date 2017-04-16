@@ -8,7 +8,7 @@ tags: raspberry 3g modem
 
 En fait, j'aimerais pouvoir faire des trucs à distance, mais sans avoir sur place une connexion permanente (pas d'adsl) pour des questions de coût, de maintenance.
 
-L'idée c'est d'installer sur place un raspberry pi (v1 parce que j'en ai un qui trainte) qui serait alimenté en permanence, vu que ça ne consomme quasiment rien.
+L'idée c'est d'installer sur place un raspberry pi (v1 parce que j'en ai un qui traine) qui serait alimenté en permanence, vu que ça ne consomme quasiment rien.
 
 Ensuite on déclencherait la connexion 3G en envoyant un SMS au numéro de la carte SIM. Et on finit par une connexion VPN vers une adresse IP prédéfinie (car généralement via une clé 3G on reçoit une adresse "privée" en 10.A.B.C qui n'est pas joignable directement).
 
@@ -16,6 +16,8 @@ Ensuite on déclencherait la connexion 3G en envoyant un SMS au numéro de la ca
 
 - on fera à terme un filesystem en lecture seule pour ne pas avoir de soucis de carte SD
 - on le redémarre une fois par jour au cas où quelque chose a planté
+
+Bref, *dans ce post je montrerai 3 façons de créer une connexion 3G avec une clé 3G (un modem usb quoi) sous Linux*. Les autres points feront l'objet d'autres posts !
 
 # Modem
 
