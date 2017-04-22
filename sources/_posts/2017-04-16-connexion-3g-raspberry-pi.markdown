@@ -4,9 +4,11 @@ title: Connexion 3G avec raspbian jessie
 tags: raspberry 3g modem
 ---
 
+**Ajout 2017-04-22** : ajout des remarques sur les déconnexions périodiques de l'opérateur, et sur les paramètres `persist` et `maxfail` de `pppd`
+
 # L'objectif
 
-En fait, j'aimerais pouvoir faire des trucs à distance, mais sans avoir sur place une connexion permanente (pas d'adsl) pour des questions de coût, de maintenance.
+J'aimerais pouvoir faire des trucs à distance, mais sans avoir sur place une connexion permanente (pas d'adsl) pour des questions de coût, de maintenance.
 
 L'idée c'est d'installer sur place un raspberry pi (v1 parce que j'en ai un qui traine) qui serait alimenté en permanence, vu que ça ne consomme quasiment rien.
 
@@ -14,10 +16,14 @@ Ensuite on déclencherait la connexion 3G en envoyant un SMS au numéro de la ca
 
 À terme en plus on prendra soin des éléments additionnels :
 
-- on fera à terme un filesystem en lecture seule pour ne pas avoir de soucis de carte SD
-- on le redémarre une fois par jour au cas où quelque chose a planté
+- on montera le filesystem en lecture seule pour ne pas avoir de soucis de carte SD
+- on le redémarre une fois par jour au cas où quelque chose a planté.
 
-Bref, *dans ce post je montrerai 3 façons de créer une connexion 3G avec une clé 3G (un modem usb quoi) sous Linux*. Les autres points feront l'objet d'autres posts !
+*Dans le post d'aujourd'hui, je montrerai 3 façons de créer une connexion 3G avec une clé 3G (un modem usb quoi) sous Linux*.
+
+À titre personnel, j'ai finalement décidé d'utiliser la méthode `pppd` car c'est celle qui est la plus "bas niveau", et donc à mon avis la plus fiable.
+
+Les autres points évoqués ci-dessus feront l'objet d'autres posts !
 
 # Modem
 
@@ -35,6 +41,15 @@ Pour savoir quel fichier sert à quoi, on regardera dans `/sys` :
     ... /ttyHS3/hsotype:Modem
 
 Le device pour le modem (3G/SMS) est `ttyHS3`.
+
+# Déconnexions automatiques
+
+**Ajout 2017-04-22** : Pour information, j'ai constaté qu'on était périodiquement déconnecté du réseau de l'opérateur :
+
+* au bout de 120 minutes (2 heures) dans le cas d'une inactivité totale (aucun paquet émis/reçus)
+* au bout de 720 minutes (12 heures) même si des données transitent régulièrement
+
+Pour cette raison, j'ai ajouté la remarque sur les options `persist` et `maxfail` de `pppd`.
 
 # Désactivation du code PIN
 
@@ -99,9 +114,9 @@ Quand on dispose d'une interface graphique, rien de plus simple avec NetworkMana
 
 Lors de la première connexion, on nous demandera un mot de passe : saisir `free` puis entrée. Ce mot de passe sera mémorisé pour la suite.
 
-Pour se connecter, cliquer sur l'option `Free Mobile Free-mobile` de NetworkManager.
+Pour se connecter, cliquer sur l'option `Free Mobile Free-mobile` du menu de NetworkManager.
 
-Pour se déconnecter, cliquer sur l'option `Se déconnecter`.
+Pour se déconnecter, cliquer sur l'option `Se déconnecter` du menu de NetworkManager.
 
 # Connexion avec WVDIAL
 
@@ -241,6 +256,11 @@ On définit les options pour le fournisseur `/etc/ppp/peers/freemobile` :
     connect 'chat -v -t 60 -f /etc/ppp/chat/freemobile.chat'
     noauth
 
+**Ajout 2017-04-22** : Si vous voulez que la connexion reste active en permanence une fois lancée, ajouter aussi les options suivantes :
+
+    persist
+    maxfail 0
+
 Pour débugger ce qui se passe : `sudo tail -f /var/log/message`
 
 On active la connexion : `pon freemobile`
@@ -309,15 +329,9 @@ Pour désactiver la connexion : `poff`
     Apr 16 12:45:20 localhost pppd[2493]: Connection terminated.
     Apr 16 12:45:21 localhost pppd[2493]: Exit.
 
-Configurer `/etc/network/interfaces` :
+Pour activer la connexion : `sudo pon freemobile`
 
-    # auto ppp0
-    iface ppp0 inet ppp
-        provider freemobile
-
-Pour activer la connexion : `sudo ifup ppp0`
-
-On désactive la connexion : `sudo ifdown ppp0`
+On désactive la connexion : `sudo poff`
 
 ## Routage restreint
 
@@ -325,25 +339,29 @@ Si on ne souhaite pas que la route par défaut soit utilisée via la connexion 3
 
 - d'abord ajouter `nodefaultroute` à `/etc/ppp/peers/freemobile`
 
-- ensuite, ajouter des lignes `post-up` et `pre-down` à la définition de l'interface `ppp0` dans `/etc/network/interfaces` :
+- ensuite, créer un script qui devra être exécutable et qui sera exécuté quand l'interface devient up
 
-Par exemple :
+On l'appellera `/etc/ppp/ip-up.d/0100local_freemobile` et il aura avec le contenu suivant :
 
-    iface ppp0 inet ppp
-        provider freemobile
-        post-up sleep 10 && /sbin/ip route add 8.8.8.8 dev ppp0
-        pre-down /sbin/ip route del 8.8.8.8 dev ppp0
+    #!/bin/sh
+    SPECIFIC_ROUTE="8.8.8.8"
+    if test "${CALL_FILE}" = "freemobile"
+    then
+        /sbin/ip route replace ${SPECIFIC_ROUTE} dev ${PPP_IFACE}
+    fi
 
-Remarque: ici le `sleep 10` sert à attendre que l'interface `ppp0` arrive avant d'essayer d'ajouter des routes dessus.
+Les paramètres et variable d'environnements utilisables dans ce script sont décrits dans `man pppd` section `SCRIPTS`. Ce script est appelé par `/etc/ppp/ip-up` qui lui-même est automatiquement appelé par `pppd` quand l'interface ip est disponible.
 
-On affiche le routage une fois la connexion établie : `ip route`
+Une fois la connexion établie, on affiche le routage  : `ip route`
 
     default via 192.168.1.1 dev eth0
     8.8.8.8 dev ppp0  scope link
     10.64.64.64 dev ppp0  proto kernel  scope link  src 10.92.216.131
     192.168.1.0/24 dev eth0  proto kernel  scope link  src 192.168.1.3  metric 202
 
-Ici, seul le trafic vers 8.8.8.8 partira via la connexion 3G (latence élevée) et le reste du trafic partira via la route par défaut :
+On voit dans cette table de routage que seul le trafic vers `8.8.8.8` partira via la connexion 3G `ppp0` (et aura donc une latence plus élevée). Le reste du trafic partira via la route par défaut (s'il y en a une !) et aura donc une latence faible vu que ce serait de l'ADSL ou de la fibre. Vérifions tout ça.
+
+Traffic via la connexion 3G :
 
     $ ping -c 3 8.8.8.8
 
@@ -355,6 +373,8 @@ Ici, seul le trafic vers 8.8.8.8 partira via la connexion 3G (latence élevée) 
     --- 8.8.8.8 ping statistics ---
     3 packets transmitted, 3 received, 0% packet loss, time 2001ms
     rtt min/avg/max/mdev = 316.072/483.529/628.004/128.381 ms
+
+Traffic hors connexion 3G :
 
     $ ping -c 3 8.8.4.4
 
