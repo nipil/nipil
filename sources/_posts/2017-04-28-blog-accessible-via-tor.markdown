@@ -1,0 +1,320 @@
+---
+layout: post
+title: Blog accessible via le réseau TOR
+tags: tor
+---
+
+Ce blog est maintenant disponible **aussi** via le réseau TOR !
+
+Pour se connecter au réseau TOR :
+
+* sur android, installez [Or](https://play.google.com/store/apps/details?id=org.torproject.android) et [Orfox](https://play.google.com/store/apps/details?id=info.guardianproject.orfox)
+* sur PC, installer le [TorBrowser](https://www.torproject.org/projects/torbrowser.html.en).
+
+Ensuite, il suffit de se rendre à l'adresse [http://v43wxiogkhnflac6.onion](http://v43wxiogkhnflac6.onion).
+
+# Introduction
+
+Ça fait plusieurs années que j'utilise TOR de temps en temps en tant qu'utilisateur, mais je n'avais jamais été plus loin. Aujourd'hui, je vais vous montrer comment créer un site acessible par TOR (ce qui est appelé un "TOR Hidden Site").
+
+Pourquoi on appele ça un site caché ?
+
+* parce que l'adresse utilisée pour joindre le site ne permet pas de savoir "à qui" il appartient (par exemple : `http://duskgytldkxiuqc6.onion/`)
+
+* parce que quand on accède à un site on ne connaît aucune des informations réelles permettant de le joindre (notamment on ne connait pas son adresse ip réelle)
+
+Remarques techniques :
+
+* il n'y a pas besoin d'avoir une adresse ip fixe, ni d'autoriser des flux rentrants pour publier un site sur TOR, et ça marche aussi même s'il y a du NAT etc.
+
+* tout se base sur la connection au réseau TOR qui elle est sortante, et donc aussi longtemps qu'on peut s'y connecter, on peut publier un site
+
+* il est même possible de publier un site via la connexion 3G d'un smartphone, avec l'application Android "Orbot" ... la classe non ?
+
+# Test en local sur des VM
+
+Avant de faire ça "en vrai", on va tester en bac à sable, en créant deux VM de test. Vous pouvez utiliser n'importe quel environnement de gestion de machines virtuelles.
+
+Tout d'abord :
+
+* télécharger une [iso live debian](https://www.debian.org/CD/live/)
+* créer une VM "navigateur" utilisant cette iso LIVE
+* créer une VM "serveur" utilisant cette iso LIVE
+
+Ensuite on va installer le logiciel sur chaque VM en suivant les [instructions](https://www.torproject.org/docs/debian.html.en)
+
+On commence par ajouter les clés GnuPG du projet Tor, qui servent à signer les listes de package qui seront récupérées par `apt-get update`)
+
+    gpg --keyserver keys.gnupg.net --recv A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89
+
+    gpg --export A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89 | sudo apt-key add -
+
+Ensuite on ajoute le dépôt maintenu par le TorProject :
+
+    cat << "EOF" | sudo tee /etc/apt/sources.list.d/tor.list
+    deb http://deb.torproject.org/torproject.org jessie main
+    deb-src http://deb.torproject.org/torproject.org jessie main
+    EOF
+
+Puis on met à jour la liste des paquets disponibles :
+
+    sudo apt-get update
+
+Maintenant on installe le package de `keyring` du projet Tor (qui sert à signer les packages `.deb` récupérés lors des `apt-get install`)
+
+    sudo apt-get install deb.torproject.org-keyring
+
+Finalement on install le package `tor` qui donne accès au réseau
+
+    sudo apt-get install tor
+
+Le logiciel `tor` fonctionne comme un daemon en arrière-plan, il est automatiquement lancé après installation et lors de chaque redémarrage.
+
+* pour l'arrêter : `sudo systemctl stop tor`
+* pour ne plus le lancer au démarrage : `sudo systemctl disable tor`
+* pour le lancer manuellement : `sudo systemctl start tor`
+* pour voir s'il est lancé : `sudo systemctl status tor` ou `pgrep tor`
+
+# Fonctionnement
+
+Le logiciel `tor` créé un tunnel vers le réseau TOR, et en gros c'est tout.  Fonctionnellement, il réalise la même chose qu'un tunnel OpenVPN, IPSEC ou L2TP : il prend un point de sortie, il crée un tunnel sécurisé vers celui ci, et fait transiter le trafic qu'on lui donne jusqu'au point de sortie.
+
+La différence principale avec les tunnels que je viens de citer, c'est qu'au lieu de faire la sélection au niveau des couches réseau (via routage) le choix est fait au niveau applicatif (via configuration d'un proxy)
+
+En ce sens, il foncitonne plus comme un tunnel SSH, qui écoute sur un port donné et ne transmet par le tunnel que ce qu'on envoie explicitement sur ce port.
+
+Et TOR, lui attend qu'on le nourrisse sur le port `TCP 9050` de l'adresse locale `127.0.0.1`, où il offre un service de relai [SOCKS](https://fr.wikipedia.org/wiki/SOCKS) ... exactement comme le fait un `ssh -D` pour un tunnel SSH !
+
+En résumé, il faut explicitement forcer chaque application à envoyer son traffic au proxy. Sinon le traffic sort directement, en clair.
+
+Constatons ça depuis une de nos VM, en accédant à un site "normal" (disponible à la fois directement, et aussi via les relais de sortie du réseau TOR)
+
+    curl http://monip.org
+    # on voit l'adresse de votre abonnement FAI
+
+    torsocks curl http://monip.org
+    # on voit une adresse qui n'est pas la notre
+
+Vérifions maintenant qu'on peut accéder aux sites "TOR-only" (ie les sites "cachés" en `.onion`)
+
+    curl http://duskgytldkxiuqc6.onion/
+    curl: (6) Could not resolve host: duskgytldkxiuqc6.onion
+    # on ne passe pas par le proxy, ça ne marche pas
+
+    torsocks curl http://duskgytldkxiuqc6.onion/
+    # on passe par le proxy, ça marche !
+
+En résumé :
+
+* pour tous les sites disponibles directement sur internet, on peut y accéder "en clair" par internet, ou "de manière privée" en passant par TOR
+
+* par contre, il n'est possible d'accéder aux sites `.onion` **uniquement via TOR** via le wrapper `torsocks` qiu force l'utilisation du proxy TOR.
+
+# Créer un site caché "Tor-only" sur la VM "serveur"
+
+On va suivre la [documentation officielle](https://www.torproject.org/docs/tor-hidden-service.html.en) et j'ajouterai des éléments d'infos au fur et à mesure.
+
+On commencer par installer un serveur web :
+
+    # installation
+    sudo apt-get install nginx-light
+
+    # arrête pour modifier la configuration
+    sudo systemctl stop nginx
+
+    # on chargera pas la conf par défaut
+    sudo rm /etc/nginx/sites-enabled/default
+
+    # on vire le "site" par défaut
+    sudo rm /var/www/html/index.nginx-debian.html
+
+    # on créé une page d'accueil "bidon"
+    echo "success!" | sudo tee /var/www/html/index.html
+
+    # on créé une config pour le site caché
+    cat << "EOF" | sudo tee /etc/nginx/sites-available/tor
+    server {
+        listen localhost:8080 default_server;
+        root /var/www/html;
+        server_name _;
+        location / {
+                try_files $uri $uri/ =404;
+        }
+    }
+    EOF
+
+    # on utilisera la nouvelle conf
+    sudo ln -s /etc/nginx/sites-available/tor /etc/nginx/sites-enabled/
+
+    # on vérifie la conf avant de démarrer
+    sudo nginx -t
+
+    # on redémarre le serveur web
+    sudo systemctl start nginx
+
+    # le serveur doit écouter sur 127.0.0.1:8080
+    sudo netstat -lntp
+
+    # on vérifie que le serveur répond bien
+    curl http://localhost:8080/
+    success !
+
+On va ensuite configurer le site caché via TOR :
+
+    # on commence par arrêter le service TOR
+    sudo systemctl stop tor
+
+    # IMPORTANT !
+    # ce répertoire DOIT être un sous répertoire
+    # de l'option de configuration DataDirectory
+    # située dans la config par défaut qui se trouve dans
+    # le fichier /usr/share/tor/tor-service-defaults-torrc
+    #
+    # le répertoire qui contiendra les infos permettant
+    # d'accéder à nos sites cachés
+    sudo mkdir -p /var/lib/tor/hidden_services
+
+    # le répertoire en question doit être accessible
+    # au user/group qui exécute le programme `tor`
+    # sur Debian, il s'agit de 'debian-tor'
+    sudo chown debian-tor:debian-tor /var/lib/tor/hidden_services
+
+    # on protège ce répertoire sensible
+    sudo chmod 700 /var/lib/tor/hidden_services
+
+    # la configuration TOR étant actuellement
+    # entièrement commentée, on la met de côté
+    sudo mv /etc/tor/torrc /etc/tor/torrc.original
+
+    # et on en créé une basique qui dit que :
+    # - accessible en local sur l'adresse 127.0.0.1
+    # - accessible en local sur le port tcp 8080
+    # - accessible via tor sur le port tcp 80
+    #
+    # ici on demande la création d'un sous-répertoire
+    # 'test', vu qu'on peut avoir plusieurs sites cachés
+    cat << "EOF" | sudo tee /etc/tor/torrc
+    HiddenServiceDir /var/lib/tor/hidden_services/test
+    HiddenServicePort 80 127.0.0.1:8080
+    EOF
+
+    # on vérifie la configuration
+    sudo -u debian-tor tor --verify-config
+
+    # on redémarre tor
+    sudo systemctl start tor
+
+    # le log TOR est dans le fichier `/var/log/tor/log`
+
+On trouve les fichiers suivants dans `/var/lib/tor/hidden_services`
+
+    drwx--S--- 3 debian-tor debian-tor  60 Apr 28 14:49 hidden_services/
+    drwx--S--- 2 debian-tor debian-tor  80 Apr 28 14:49 hidden_services/test
+    -rw------- 1 debian-tor debian-tor  23 Apr 28 14:49 hidden_services/test/hostname
+    -rw------- 1 debian-tor debian-tor 887 Apr 28 14:49 hidden_services/test/private_key
+
+Ils servent à quoi ?
+
+* `hostname` : contient l'adresse URL du site caché TOR
+* `private_key` : permet de garantir que l'URL `.onion` est bien "à nous"
+
+On teste depuis la VM "navigateur" que le site est bien joignable via TOR :
+
+    torsocks curl http://votre_url_du_fichier_hostname.onion/
+
+Après quelques secondes d'attente lors de la première requête, on obtient :
+
+    success!
+
+Bref, ça marche, et on a mis un site sur TOR. Maintenant, faisons ça en vrai pour ce blog.
+
+# Mise en ligne réel de ce blog sur TOR
+
+On va refaire grosso modo là même chose que ce qu'on a fait sur la VM "serveur".
+
+D'abord l'install et la configuration TOR :
+
+    gpg --keyserver keys.gnupg.net --recv A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89
+    gpg --export A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89 | sudo apt-key add -
+
+    cat << "EOF" | sudo tee /etc/apt/sources.list.d/tor.list
+    deb http://deb.torproject.org/torproject.org xenial main
+    deb-src http://deb.torproject.org/torproject.org xenial main
+    EOF
+
+    sudo apt-get update
+    sudo apt-get install deb.torproject.org-keyring
+    sudo apt-get install tor
+
+    torsocks curl http://monip.org
+    torsocks curl http://duskgytldkxiuqc6.onion/
+
+    sudo systemctl stop tor
+
+    sudo mkdir -p /var/lib/tor/hidden_services
+    sudo chown debian-tor:debian-tor /var/lib/tor/hidden_services
+    sudo chmod 700 /var/lib/tor/hidden_services
+
+    cat << "EOF" | sudo tee -a /etc/tor/torrc
+    HiddenServiceDir /var/lib/tor/hidden_services/nipil_blog
+    HiddenServicePort 80 127.0.0.1:8080
+    EOF
+
+    sudo systemctl start tor
+
+    sudo cat /var/lib/tor/hidden_services/nipil_blog/hostname
+    v43wxiogkhnflac6.onion
+
+*L'adresse de ce blog sur TOR sera donc [v43wxiogkhnflac6.onion](http://v43wxiogkhnflac6.onion/) !*
+
+On vérifie que tout est OK au niveau réseau :
+
+    # côté serveur
+    sudo tcpdump -lni lo tcp port 8080
+    tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+    listening on lo, link-type EN10MB (Ethernet), capture size 262144 bytes
+
+    # côté client
+    torsocks curl http://v43wxiogkhnflac6.onion
+
+    # on voit arriver des paquets réseau côté serveur, c'est bon
+    16:04:43.575598 IP 127.0.0.1.33316 > 127.0.0.1.8080: Flags [S], seq 3994787516, win 43690, options [mss 65495,sackOK,TS val 71358355 ecr 0,nop,wscale 7], length 0
+    16:04:43.575629 IP 127.0.0.1.8080 > 127.0.0.1.33316: Flags [R.], seq 0, ack 3994787517, win 0, length 0
+
+    # côté client on a une erreur : c'est normal le serveur web est pas configuré  :-)
+    [avril 28 16:04:43] ERROR torsocks[3202]: Connection refused to Tor SOCKS (in socks5_recv_connect_reply() at socks5.c:532)
+    curl: (7) Couldn't connect to server
+
+Bref, au niveau transport, c'est fonctionnel.
+
+Ne reste plus qu'à configurer le serveur web !
+
+    sudo systemctl stop nginx
+
+    cat << "EOF" | sudo tee /etc/nginx/sites-available/nipil_tor.conf
+    server {
+        listen localhost:8080 default_server;
+        server_name _;
+        location / {
+            root /var/www/html;
+            index index.html;
+        }
+    }
+    EOF
+
+    sudo ln -s /etc/nginx/sites-available/nipil_tor.conf /etc/nginx/sites-enabled/
+
+    sudo nginx -t
+
+    sudo systemctl start nginx
+
+    sudo netstat -lntp
+
+Tout est configuré, on fait une vérification finale :
+
+    # côté client
+    torsocks curl http://v43wxiogkhnflac6.onion
+
+On voit qu'on récupère le HTML de la page d'accueil du blog : ÇA MARCHE !
+
+\o/
