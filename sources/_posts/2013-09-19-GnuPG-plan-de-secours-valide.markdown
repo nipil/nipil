@@ -14,15 +14,15 @@ Une clé GnuPG/PGP ça permet :
 
 Ca permet aussi de construire un réseau de confiance en signant les clés que tu as vérifié (en personne, par téléphone, etc). Ce principe de signature est similaire à ce que font les autorités de certifications lorsqu'ils donnent des certificats, sauf que là c'est d'humain à humain, et qu'il n'y a pas de certificats "racine" : c'est donc une toile de confiance, et non pas une "pyramide de confiance".
 
-Retour au 24 avril 2001, où je découvre le système GnuPG. Aussi sec, je me créé une clé, et sans trop comprendre les implications ni savoir comment ça se gère, je créé une clé qui n'expire pas (d'où les deux colonnes vides ci-dessous), et je publie la partie publique sur un [serveur de clé](http://pgp.mit.edu/) (peu importe lequel, ils se répliquent les uns les autres). 
+Retour au 24 avril 2001, où je découvre le système GnuPG. Aussi sec, je me créé une clé, et sans trop comprendre les implications ni savoir comment ça se gère, je créé une clé qui n'expire pas (d'où les deux colonnes vides ci-dessous), et je publie la partie publique sur un [serveur de clé](http://pgp.mit.edu/) (peu importe lequel, ils se répliquent les uns les autres).
 
-	pub  1024D/26A2F0AE 2001-04-24            
-		 Fingerprint=8A6D 48BB 5DB9 2BDE 6065  3F39 0CC2 128E 26A2 F0AE 
-	
+	pub  1024D/26A2F0AE 2001-04-24
+		 Fingerprint=8A6D 48BB 5DB9 2BDE 6065  3F39 0CC2 128E 26A2 F0AE
+
 	uid Nicolas Pillot <nicolas.pillot@ifrance.com>
 	sig  sig   26A2F0AE 2001-04-24 __________ __________ [selfsig]
-	
-	sub  2048g/FAE19092 2001-04-24            
+
+	sub  2048g/FAE19092 2001-04-24
 	sig sbind  26A2F0AE 2001-04-24 __________ __________ []
 
 Remarque : On obtient les mêmes infos sans uploader sa clé via l'option `--list-keys --fingerprint`
@@ -40,15 +40,15 @@ Du coup, j'ai perdu mes données cryptées, j'ai perdu ma réputation, et je ris
 
 Je génère une nouvelle clé via `--gen-key`
 
-Je l'upload vers un serveur de clé via `--send-keys` 
+Je l'upload vers un serveur de clé via `--send-keys`
 
-	pub  1024D/2BCABBDA 2007-10-27            
-		 Fingerprint=3CDE AC7D 2771 9B5A 7450  C28D 0EDE 91EE 2BCA BBDA 
-	
+	pub  1024D/2BCABBDA 2007-10-27
+		 Fingerprint=3CDE AC7D 2771 9B5A 7450  C28D 0EDE 91EE 2BCA BBDA
+
 	uid Nicolas Pillot (nipil.org) <nicolas.pillot@gmail.com>
 	sig  sig3  2BCABBDA 2007-10-27 __________ __________ [selfsig]
-	
-	sub  2048g/52E7BBFF 2007-10-27            
+
+	sub  2048g/52E7BBFF 2007-10-27
 	sig sbind  2BCABBDA 2007-10-27 __________ __________ []
 
 Puis je réfléchis à ce que j'aurais dû faire la première fois :
@@ -74,7 +74,7 @@ On génère un certificat de révocation avec l'option `--gen-revoke`, et on peu
 	-----BEGIN PGP PUBLIC KEY BLOCK-----
 	Version: GnuPG v1.4.14 (GNU/Linux)
 	Comment: A revocation certificate should follow
-	
+
 	iQEfBCABCAAJBQJSPEOGAh0CAAoJEPewhXw/whdWTQgH/24EOPoPa7CsLpgn9JPp
 	imy2Y8q9htPgpXaYe/4TFNz7LSm2YxLWR2AoKJbm7Lo0m2VSGkp5UmwfBBtlYSZz
 	oxM=
@@ -89,7 +89,7 @@ On exporte sa clé privée via `--armor --export-secret-key`
 
 	-----BEGIN PGP PRIVATE KEY BLOCK-----
 	Version: GnuPG v1.4.14 (GNU/Linux)
-	
+
 	lQO+BFI8QRkBCADD/5O3H1RY8hOYfi/l5M5CKbBVydHufo05TiDGxMyspZGyAw/s
 	WFvEQ96axp9OBc5NxSlin4BjDagBDtpxpjO/dRQFSH8l5X3kr/1nDrjIRpjsqSRq
 	...
@@ -173,22 +173,4 @@ Comme le mot de passe peut être composé de pleins de caractères spéciaux (ac
 
 **Update 2013-09-21** : Je viens de faire un script qui fait tout ça. Ensuite, ne vous reste plus qu'à l'imprimer (que ça soit directement, ou par un traitement de texte et plusieurs polices)
 
-	#! /bin/bash
-	echo "Usage info : $0 NUMERICAL_KEY_ID > hardcopy.txt" >&2
-	read -r -p "Please enter your passphrase so it can be appened to the hardcopy : " PASS
-	TMP=`tempfile`
-	gpg --gen-revoke $1 > $TMP
-	echo -e "\nKey information:\n"
-	gpg --list-key --fingerprint $KEY
-	echo -e "\nPassphrase dump:\n"
-	echo $PASS | hd
-	echo -e "\nRevocation certificate (ascii with control checksums):\n"
-	cat $TMP | while read n; do echo -e -n "${n}\t"; echo "${n}"|cksum; done
-	echo -e "\nRevocation certificate (hexdump of raw ascii):\n"
-	cat $TMP | hd
-	echo -e "\nEncrypted secret key (ascii with control checksums):\n"
-	gpg --export-secret-key -a $KEY | while read n; do echo -e -n "${n}\t"; echo "${n}" | cksum; done
-	echo -e "\nEncrypted secret key (hexdump of raw ascii):\n"
-	gpg --export-secret-key -a $KEY | hd
-	rm -f $TMP
-
+**Update 2017-04-28** : Je viens de supprimer le script de ce post pour en faire un projet sur GitHub, pour qu'il soit plus facile à maintenir, et à récupérer. Allez voir, c'est par là : https://github.com/nipil/gnupg-hardcopy
