@@ -22,10 +22,12 @@ For development
 
   bundler config path vendor/bundler
   bundler install
+  bundler clean
 
 For production
 
   bundler install --deployment
+  bundler clean
 
 # generate
 
