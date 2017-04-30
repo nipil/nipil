@@ -10,7 +10,7 @@ Pour accéder aux stockage OpenStack, on utilise un client Swift quelconque : [s
 
 Mais pour accéder à Hubic, on ne peut pas utiliser directement un client Swift directement. Je voulais comprendre la manière dont les choses s'articulent, donc ce billet d'aujourd'hui est un récapitulatif de ce que j'ai trouvé.
 
-# OpenStack/Swift, habituellement, comment ça marche ?
+== OpenStack/Swift, habituellement, comment ça marche ?
 
 Comme toujours quand les choses sont sécurisées, l'accès à une resource se fait toujours en deux étapes : d'une part l'authentification pour vérifier que celui qui demande l'accès a le droit d'atteindre la resource, et ensuite l'accès à la resource proprement dite.
 
@@ -26,7 +26,7 @@ On voit ça sur le diagramme ci-dessous :
 
 Dans tous les cas, c'est "juste un protocole". *N'importe quelle application* qui respecte ce protocole *peut accéder à toutes les resources accessibles* offerte via ce protocole. 
 
-# Pourquoi OVH a décidé de faire autrement ?!
+== Pourquoi OVH a décidé de faire autrement ?!
 
 La raison se trouve dans la dernière phrase du paragraphe ci-dessus : à la première lecture, on peut se dire "c'est super, c'est générique". Mais justement, c'est générique, et c'est bien là le problème :
 
@@ -52,7 +52,7 @@ En conséquence, OVH a choisi :
 
 En bref, ces changements permettent de contrôler l'accès des applications aux resources Hubic de l'utilisateur et de sécuriser les informations client. Mais forcément, ça va compliquer un peu la tâche...
 
-# Pré-habilitation des applications auprès d'Hubic
+== Pré-habilitation des applications auprès d'Hubic
 
 Hubic demande d'abord la pré-habilitation des applications souhaitant utiliser les services d'Hubic : si vous voulez faire une application (un client mobile, une application web, n'importe quoi) qui utiliserait l'API d'Hubic, il faut pré-habiliter cette application dans l'infrastructure Hubic.
 
@@ -87,7 +87,7 @@ Ce qu'on obtient sont :
 
 A partir de ce moment là, cette application "existe" au sein d'Hubic, et pourrait dans l'absolu être utilisée par tous les utilisateurs du service.
 
-# Définir les autorisations d'accès de l'application
+== Définir les autorisations d'accès de l'application
 
 Toujours par rapport à l'explication de tout à l'heure, ce n'est pas parce que l'application "existe" et qu'elle respecterait un "protocole" qu'elle est effectivement autorisée à accéder aux fichiers du compte du client.
 
@@ -130,7 +130,7 @@ Plutôt élégant non ?
 
 *Et on constate aussi qu'à aucun moment l'application n'a "vu" le mot de passe de l'utilisateur !*
 
-# Demander un accès temporaire à l'API Hubic de l'utilisateur
+== Demander un accès temporaire à l'API Hubic de l'utilisateur
 
 Si je continue l'analogie, maintenant qu'on a un badge, on va certainement vouloir jouer avec les légos de Michel à un moment ou un autre.
 
@@ -185,7 +185,7 @@ Je ne vous ai pas parlé du jeton `refresh_token` : comme le jeton d'accès a un
 
 Laquelle choisir ? Réfléchissons : d'un côté, passer par le `code` revient à nouveau à consulter toute la base. Alors que comme il y a un jeton de rafraichissement par jeton d'accès en cours, et donc de "sessions" en cours, il est donc beaucoup plus rapide de passer par le jeton de rafraichissement que par le code pour renouveler le jeton d'accès.
 
-# Utiliser l'API Hubic ... dans quel but ?
+== Utiliser l'API Hubic ... dans quel but ?
 
 Grâce à ce jeton d'accès à l'API Hubic, on peut faire dans l'API Hubic toutes les opérations qui nous ont été autorisées :
 
@@ -214,7 +214,7 @@ Et bien oui, après tout ce travail, on a récupèré de quoi faire un appel en 
 
 On pourrait donc uploader/downloader/supprimer des fichiers de notre compte avec les outils Swifts, si seulement ils savaient gérer l'authentification complexe d'Hubic !
 
-# Synthèse
+== Synthèse
 
 Après tout ça, après avoir vu chaque étape en détails, on tout réassembler, et dé-zoomer pour voir l'ensemble du processus :
 
@@ -222,7 +222,7 @@ Après tout ça, après avoir vu chaque étape en détails, on tout réassembler
 
 Impressionnant, non ?
 
-# La gateway Hubic/Swift
+== La gateway Hubic/Swift
 
 Quand on regarde le schémas ci-dessus, on peut condenser le jaune, le vert, et le rose en un seul bloc "bleu" qui résumererait l'authentification Hubic :
 

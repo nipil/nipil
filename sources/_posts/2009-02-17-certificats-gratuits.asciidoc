@@ -24,7 +24,7 @@ Un certificat "nom de domaine" permet d'autentifier un serveur, et de chiffre le
 
 A noter que la délivrance et le renouvellement de certificats est gratuite, mais que la révocation avant expiration peut avoir un coût, mais si on fait pas les idiots on en aura  jamais besoin.
 
-# Inscription auprès de StartSSL
+== Inscription auprès de StartSSL
 
 L'inscription se fait sur le site [StartSSL](https://www.startssl.com), et au lieu de vous demander un identifiant et un mot de passe, ils ont décidé de vous créer un *certificat client*.
 
@@ -66,7 +66,7 @@ Pour générer un certificat "email" basé sur une identité :
 
 A noter que n'importe quel certificat d'identité créé sur le site permet de s'authentifier auprès de StartSSL, vu qu'ils ont tous été générés par le même "compte".
 
-# Utilisation de ce certificat "email" pour la messagerie
+== Utilisation de ce certificat "email" pour la messagerie
 
 Pour utiliser un certificat avec votre messagerie il est indispensable d'avoir un logiciel de messagerie : il n'est pas possible de signer ses emails quand on utilise un webmail. Il faut donc utiliser un truc style Thunderbird (ou autre).
 
@@ -91,7 +91,7 @@ A noter que
 
 Maintenant on a une messagerie sûre (authentifiée, non-modifiable et confidentielle).
 
-# Création d'un certificat serveur
+== Création d'un certificat serveur
 
 Une remarque importante : StartSSL ne permet de valider des zones directes (exemple.com, azerty.org, etc) et pas des sous domaines
 
@@ -122,7 +122,7 @@ des deux liens "intermediate" et "root", pour qu'il puissent être référencés
 
 Dans tous les cas, un certificat serveur est consituté d'une partie "publique" (qui peut être diffusées sans restriction), c'est le bloc de texte délimité par `BEGIN/END CERTIFICATE` alors que la clé privée (qui ne devrait jamais quitter votre serveur) est le bloc de texte délimité par `BEGIN/END PRIVATE KEY`.
 
-# Gestion de la clé privée
+== Gestion de la clé privée
 
 Un serveur (web par exemple) aura besoin d'avoir accès à la clé privée à chaque démarrage. Il demandera donc par défaut un mot de passe de manière interactive, et pendant ce temps il ne démarre pas. Pour éviter ça, on préfère généralement décrypter la clé privée (ôter l'effet du password utilisé à la création) via la commande `openssl rsa -in ssl-chiffree.key -out ssl-dechiffree.key`.
 

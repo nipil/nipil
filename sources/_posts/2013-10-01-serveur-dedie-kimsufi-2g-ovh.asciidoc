@@ -23,7 +23,7 @@ Mon serveur est hébergé dans un datacenter d'OVH situé à Roubaix, dont la su
 
 J'ai anonymisé les informations réseau données ci-dessous, même si dans l'absolu un certain nombre sont de toute façon publiques, mais ça fait partie des "best practices" en plus de faire une sécurisation réseau correcte sur le serveur.
 
-# Matériel
+== Matériel
 
 Côté hardware, le rapport me donne l'information du type de carte mère (intel [D201GLY](http://www.intel.com/p/fr_FR/support/highlights/dsktpboards/d201gly)) et la version du bios détectée (LY66210M.86A.0137.2008.0104.1540) c'est du matos qui a environ 4 ans je dirais.
 
@@ -92,7 +92,7 @@ Seul truc surprenant, `lsmod` ne retourne rien et remonte une erreur, mais bon o
 
 En résumé, on a un serveur dédié limitée en puissance, qui peut faire plein de choses à condition de pas trop lui en demander.
 
-# Réseau
+== Réseau
 
 Après connexion, on a la bannière suivante qui rappelle les informations relatives au serveur
 
@@ -205,7 +205,7 @@ En clair, si toute la capacité est disponible en amont, on peut atteindre les 1
 
 Bref, on a ce qu'il faut question tuyau.
 
-# Système de fichiers
+== Système de fichiers
 
 Lors de la commande, on a pas demandé de partitionnement spécifique, ni de LVM ni d'encryption ni rien de spécial, et qu'il n'y a qu'un disque donc pas de RAID.
 
@@ -233,7 +233,7 @@ On a donc largement assez de place pour stocker les fichiers d'un site web, d'un
 
 A noter qu'il s'agit ici de la primo installation par défaut, et qu'il suffit de réinstaller le serveur pour repartitionner comme on le souhaite (primaire, secondaire, LVM, ext3, ext4, etc)
 
-# Spécificités OVH
+== Spécificités OVH
 
 Bonne nouvelle, côté gestion des packages et des sources d'installation Debian, OVH dispose d'un mirroir local. Ca permet d'avoir des mises à jour extrêmement rapides et efficaces, et d'avoir un système initialement installé qui est déjà à jour (aptitude full-upgrade m'informe que tout est à jour).
 
@@ -277,7 +277,7 @@ Cette Debian "OVH" est donc une Debian standard, si ce n'est:
 
 Bref, pas de surcouche à la noix, c'est parfait.
 
-# Services OVH
+== Services OVH
 
 Pour la gamme Kimsufi, tout le support est effectué via le forum [kimsufi](http://forum.kimsufi.com)
 
@@ -285,7 +285,7 @@ A priori le système d'incident disponible dans le manager OVH n'est là que pou
 
 Dans tous les cas, les [guides](http://guides.ovh.net) sont là pour mieux comprendre la manière de faire OVH et les services associés à la location du serveur.
 
-## Manager v3
+=== Manager v3
 
 Dans le [manager v3](https://www.ovh.com/managerv3/) on retrouvera les informations "externes"
 - un résumé des infos du serveur (DC, baie, numéro du serveur)
@@ -299,7 +299,7 @@ Pour la gestion du serveur lui même on retiendra surtout
 
 Il y a tout ce qu'il faut pour faire ce dont j'aurai besoin. Tout au plus l'encryption du disque manque à l'appel, si on ne peut pas la créer/gérer manuellement dans le LVM post-installation, mais c'est juste pour le principe.
 
-## Manager v6
+=== Manager v6
 
 Le [manager v6](https://www.ovh.com/manager) est le futur de l'interface OVH, mais il est en développement, et très peu de fonctions sont disponibles au moment où j'écris ce post. Cependant, on y retrouve déjà la gestion du netboot, du reboot hard, et du système [anti-ddos VAC](http://www.ovh.com/fr/anti-ddos/)
 
@@ -307,7 +307,7 @@ L'anti-ddos est vu dans le manager comme un firewall réseau et la mitigation (I
 
 Dans ce manager, on peut configurer les règles du firewall, activer ou désactiver le firewall réseau, activer/désactiver la mitigation permanente, et consulter les stats entrantes quand la mitigation est active (qu'elle soit permanente ou détectée à la volée)
 
-## API
+=== API
 
 L'[API OVH](http://api.ovh.com) est l'épine dorsale sur laquelle vont au final se greffer toutes les fonctions des managers.
 
@@ -318,7 +318,7 @@ Elle permet
 
 Actuellement l'API permet de gérer : le CDN, le PCA/PCS, les NAS, les serveurs dédiés, les VPS, le VRACK, les noms de domaine, les emails, les IP failover, les blocs RIPE, l'anti-ddos, les comptes SMS, les infos de contact, de facturation, les commandes, et les liaisons DSL. Et elle s'étoffe au fur et à mesure.
 
-# Conclusion
+== Conclusion
 
 Je suis très content de ce petit serveur, qui me permettra de faire tout ce que je faisais déjà sur mon serveur à la maison, avec du CPU en plus, de la mémoire en plus, et surtout plus de bande passante.
 

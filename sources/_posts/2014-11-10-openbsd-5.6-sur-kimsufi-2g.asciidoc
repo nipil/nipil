@@ -25,7 +25,7 @@ Si vous connaissez déjà vos infos techniques (surtout le nom "BSD" de la carte
 
 Je précise aussi que ce billet détaillé se base sur [ce post](http://forum.kimsufi.com/showthread.php?11363-Installation-d-OpenBSD-5-3-sur-kimsufi-mKS-2g) des forums Kimsufi où la méthode est décrite.
 
-# Etape 1 - installer une FreeBSD via le manager OVH
+== Etape 1 - installer une FreeBSD via le manager OVH
 
 Euh, pourquoi ça ? On veut plutôt une OpenBSD !
 
@@ -47,7 +47,7 @@ Après environ 12 minutes, l'installation est terminée
 
 On a aussi reçu un email de confirmation de la part d'OVH, avec un mot de passe "root" initial.
 
-# Etape 2 - récupérer via FreeBSD les infos/noms "BSD" de notre matos
+== Etape 2 - récupérer via FreeBSD les infos/noms "BSD" de notre matos
 
 On tente de se connecter au serveur nouvellement installé :
 
@@ -94,7 +94,7 @@ On essaie à nouveau de se connecter et cette fois ci, tout va bien :
 
 C'est parti !
 
-## Identification du CPU pour le choix du kernel
+=== Identification du CPU pour le choix du kernel
 
 OpenBSD propose deux kernel génériques :
 
@@ -113,7 +113,7 @@ Ici on voit que notre KS-2G n'a qu'un coeur (on a que `cpu0`, pas de `cpu1` ni d
 
 Si vous avez plus d'un processeur/coeur, il faudra s'assurer que c'est bien le kernel MP qui est actif ; mais on verra tout ça à l'étape 8 "finalisation de l'installation".
 
-## Identification du nom "FreeBSD" du disque dur
+=== Identification du nom "FreeBSD" du disque dur
 
 Le nom est différent de sous Linux
 
@@ -145,7 +145,7 @@ Et pour mon serveur, **ada0s1a** désigne :
 
 Bref, dans la rescue FreeBSD, on référencera le disque physique par **ada0**.
 
-## Identification du nom "FreeBSD" de la carte réseau"
+=== Identification du nom "FreeBSD" de la carte réseau"
 
 On affiche ensuite la configuration réseau :
 
@@ -192,7 +192,7 @@ Le reste des informations de topologie réseau sont les mêmes que sous Linux :-
 
 Pour finir, au cas où on en aurait besoin plus tard, on peut regagarder/archiver le `dmesg`, ça peut toujours servir.
 
-# Etape 3 - redémarrer sur une rescue FreeBSD
+== Etape 3 - redémarrer sur une rescue FreeBSD
 
 Dans le manager OVH, on change le mode de boot de notre serveur
 
@@ -273,7 +273,7 @@ On s'y reconnecte, cette fois ci avec succès
 
 Bon, maintenant on va commencer le "vrai" travail :-)
 
-# Etape 4 - récupérer et vérifier l'image iso OpenBSD
+== Etape 4 - récupérer et vérifier l'image iso OpenBSD
 
 Comme on va partitionner/formater le disque cible du serveur, on ne peut pas stocker l'image ISO de l'install OpenBSD sur un disque dur du serveur... Il faut donc travailler en ram !
 
@@ -300,7 +300,7 @@ On verifie l'intégrité l'image est bonne
 
 Les deux sont identiques, c'est tout est bon, on peut continuer.
 
-# Etape 5 - créer un espace en ram pour QEmu
+== Etape 5 - créer un espace en ram pour QEmu
 
 Quand on est en mode rescue, le filesystem principal de la rescue est monté via le réseau, et forcément, est surtout en "read-only"
 
@@ -334,7 +334,7 @@ Mais de toute façon dans notre cas, on a plus besoin de ce qu'il y avait dedans
 
 *Remarque : dans tous les cas, pas d'inquiétude à avoir car rien n'a été effacé, c'est juste "temporairement inaccessible" : il suffirait de démonter le ramdisk via `umount /usr/local` pour retrouver l'arborescence originelle.*
 
-# Etape 6 - installer QEmu "dans" la rescue FreeBSD
+== Etape 6 - installer QEmu "dans" la rescue FreeBSD
 
 Déjà, on va regarder quelle version de FreeBSD est utilisé pour cette rescue :
 
@@ -364,7 +364,7 @@ On verifie que tout fonctionne
 
 C'est bon, on peut continuer...
 
-# Etape 7 - utiliser QEmu et VNC pour installer à distance
+== Etape 7 - utiliser QEmu et VNC pour installer à distance
 
 Maintenant l'idée est d'utiliser QEmu pour faire tourner un nouveau "pc virtuel"
 
@@ -449,11 +449,11 @@ Ne reste plus qu'à configurer la timezone du serveur
 
 Et la copie des fichiers est terminée, l'installation standard est "finie". Mais **il ne faut surtout pas rebooter maintenant** ! On doit d'abord configurer les spécificités "serveur réel" KS-2G *vs* "pc virtuel" QEmu
 
-# Etape 8 - finaliser l'installation
+== Etape 8 - finaliser l'installation
 
 Il faut *absolument* finaliser deux points avant de quitter/rebooter.
 
-## Tout d'abord, la carte réseau
+=== Tout d'abord, la carte réseau
 
 Sous \*BSD le nom de la carté réseau dépend du driver qu'elle utilise. Dans QEmu, lors de l'install, quand on a configuré le réseau, elle s'appelait `em0`, car QEmu utilise un driver [em](https://www.freebsd.org/cgi/man.cgi?query=em) pour les cartes virtuelles.
 
@@ -466,7 +466,7 @@ Sinon le serveur sera injoignable même s'il boot correctement :-)
 
 Bon, le vital est fait, reste l'essentiel.
 
-## Ensuite, le kernel
+=== Ensuite, le kernel
 
 Comme on a vu au début grâce à la FreeBSD, mon serveur KS-2G avec Celeron 220 a un seul processeur/coeur, donc je pourrais  tranquilement booter sur le kernel SP choisi par QEmu.
 
@@ -545,7 +545,7 @@ Après reboot, on se connecte en ssh (après avoir encore demandé d'oublier l'a
 
 Tout est parfait, c'est gagné, notre Kimsufi 2G tourne sous OpenBSD.
 
-# Configuration IPv6 "propre"
+== Configuration IPv6 "propre"
 
 En fait, sous \*BSD, on ne peut pas configurer l'IPv6 comme on le faisait sous Linux, c'est à dire en trois partie (interface *publique* + route statique vers gateway *publique* + route par défaut via interface *physique*)
 
@@ -649,7 +649,7 @@ C'est tout bon ! On peut péréniser ça dans les deux fichiers de configuration
 
 Et redémarrer pour vérifier que est bien établi (tester le `ping6` ci-dessus à nouveau)
 
-# Rescue OpenBSD
+== Rescue OpenBSD
 
 Et bien il n'y a pas de rescue OpenBSD, juste la rescue FreeBSD qu'on a utilisé !
 
@@ -664,7 +664,7 @@ En conséquence, si un jour vous en avez besoin d'un rescue pour les autres part
 
 On se retrouve alors dans un environnement *OpenBSD*, qui lui vous permettra de monter toutes les partitions OpenBSD du système :-)
 
-# Et maintenant ?
+== Et maintenant ?
 
 Sinon, la première chose à faire pour ceux qui n'ont pas l'habitude d'un OpenBSD :
 

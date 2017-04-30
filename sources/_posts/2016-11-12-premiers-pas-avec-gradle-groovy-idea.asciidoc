@@ -14,7 +14,7 @@ Aujourd'hui, je vous parlerai de mes premiers pas avec [Groovy](http://groovy-la
 
 Prenez une boisson chaude, et des petits gateaux, et allons y relax...
 
-# Groovy, kezako ?
+== Groovy, kezako ?
 
 De quoi on parle :
 
@@ -70,7 +70,7 @@ Pour finir, un script groovy ça s'exécute de la manière suivante :
 
 Il a des tonnes d'autres trucs que je suis loin de maîtriser, mais la [documentation](http://groovy-lang.org/documentation.html) du langage est très bien faite et agréable à lire, il faut juste prendre le temps de l'ingurgiter et de la digérer.
 
-# Gradle, kezako ?
+== Gradle, kezako ?
 
 De quoi on parle :
 
@@ -106,7 +106,7 @@ Si vous avez déjà programmé un jour dans votre vie, vous avez sûrement du vo
 
 Ben voilà, ces trucs là, c'est sous une forme ou l'autre, des task-runners, qui utilisent un script d'une forme ou d'une autre pour définir leurs tâches et qui exécutent ensuite les tâches demandées, en plus de celles qui sont nécessaires
 
-## Gradle, quel intérêt ?
+=== Gradle, quel intérêt ?
 
 On peut se poser la question. La réponse ? La simplification, comme pour Groovy ! On parle ici de simplifier au minimum l'*écriture* du script de définition des tâches. Pour le reste, ça *fonctionne* comme les autres.
 
@@ -134,7 +134,7 @@ Ce qui est succinct, vous en conviendrez !
 
 Tout ça parce qu'on n'exprime dans le script que ce qui *dévie de la convention* (Gradle), au lieu de *répéter des choses qui doivent de toute façon suivre la convention* (Ant, Maven, make, ...)
 
-## Gradle, structure en plugins
+=== Gradle, structure en plugins
 
 La force de Gradle réside dans le fait que ces fameuses conventions que l'on a pas besoin de spécifier, résident dans des plugins, qu'il suffit d'appliquer au script.
 
@@ -154,7 +154,7 @@ Avoir des conventions, qui sont implicites (mais documentées !) plutôt qu'expl
 
 Tout ça en ayant toujours à l'idée, que *tout ce qui respecte les conventions prises n'a pas besoin d'être spécifié dans le script du task-runner*, ce qui économise du temps, des problèmes et des emmerdes au développeur.
 
-## Gradle, étape 1 : installation native
+=== Gradle, étape 1 : installation native
 
 Gradle gère les dépendances. Gradle est donc capable d'importer tout ce qui est nécessaire à son fonctionnement.
 
@@ -183,7 +183,7 @@ Vous avez une version gradle qui est "ce qu'elle est" (là sur ma version Ubuntu
 
 Ici, d'une part, j'ai gradle en version 2.10. Mais je vois aussi que j'ai un groovy en version 2.4.5... WTF ? Ben oui, gradle est écrit en groovy, donc il lui faut un groovy fonctionnel, et la version que ma distribution a installé est celle-là (on peut confirmer par un `roovy --version`)
 
-## Gradle, étape 2 : le wrapper, et les versions choisies pour votre projet
+=== Gradle, étape 2 : le wrapper, et les versions choisies pour votre projet
 
 Vous avez un nouveau projet tout beau. Vous voulez utiliser les dernières versions stables. Comme pour plein d'autres langages, on arrive à un point qui génère généralement des galères : installer d'autres versions que celles dont on dispose.
 
@@ -323,11 +323,11 @@ Puis d'inclure les fichiers regénérés dans le gestionnaire de code.
 
 Pour les plus affamés, vous pouvez allez lire la [documentation](https://docs.gradle.org/current/userguide/gradle_wrapper.html) de la tâche wrapper
 
-# Groovy, étape 1 : dépendances et installation
+== Groovy, étape 1 : dépendances et installation
 
 De la même manière qu'on peut choisir la version de gradle utilisée par le projet, on peut choisir la version de groovy utilisée par le projet.
 
-## Les fichiers utilisés par gradle
+=== Les fichiers utilisés par gradle
 
 On va commencer par générer un script de build "par défaut" via la tâche "init" de gradle :
 
@@ -351,7 +351,7 @@ Le fichier `settings.gradle`
 
 Ajoutez ces deux fichiers à votre gestionnaire de code source.
 
-## Dépôts et les dépendances du fichier `build.gradle`
+=== Dépôts et les dépendances du fichier `build.gradle`
 
 On va maintenant gérer les dépôts et les dépendances.
 
@@ -473,7 +473,7 @@ Il l'a d'ailleurs à nouveau installé *en dehors du répertoire du projet*, dan
 
 On a donc maintenant un environnement gradle qui permet d'importer des librairies issues de MavenCentral, dont groovy.
 
-## Plugin Groovy
+=== Plugin Groovy
 
 Mais vous me direz, on a ajouté un plugin 'java' ... alors qu'on veut faire du groovy.
 
@@ -510,7 +510,7 @@ C'est ce que nous allons faire ensuite !
 
 Sinon, vous pouvez allez lire la [documentation](https://docs.gradle.org/current/userguide/groovy_plugin.html) du plugin Groovy
 
-# Groovy, étape 2 : script, compilation et lancement
+== Groovy, étape 2 : script, compilation et lancement
 
 Nous venons de voir la convention qui définit l'arborescence de fichiers.
 
@@ -549,7 +549,7 @@ Le reste, je ne sais pas encore trop à quoi ça sert mais pour l'instant on s'e
 
 Lançons notre programme !
 
-## Packaging, installation et lancement de l'application
+=== Packaging, installation et lancement de l'application
 
 Pour lancer le programme, le plus simple est de passer par un plugin gradle, qui va packager notre application et permettre son lancement d'une manière simple et robuste.
 
@@ -660,11 +660,11 @@ Si vous avez suivi jusqu'ici, merci pour votre attention, et amusez vous bien po
 
 Cependant, je vais continuer avec quelques élements qui sont (à mon humble avis) tout aussi indispensables que le reste, mais qui peuvent rester facultatifs.
 
-# Aller plus loin !
+== Aller plus loin !
 
 Voici quelques points qui permettront d'aller plus loin, en ajoutant des éléments supplémentaires (version, test, logging) qui sont généralement nécessaires à chaque application
 
-## Versionning de l'application (optionnel)
+=== Versionning de l'application (optionnel)
 
 Le versionning de notre application est possible grâce au paramètre `version` du fichier `build.gradle` :
 
@@ -672,7 +672,7 @@ Le versionning de notre application est possible grâce au paramètre `version` 
 
 Une fois configuré, il sera utilisé pour les tâches de packaging (zip, tar, jar). Mais dans tous les cas, il est facultatif.
 
-## Logging
+=== Logging
 
 Dans un programme, généralement on log des trucs. Que ça soit du debug, que ça soit de l'info, un programme ça log, surtout si ça tourne pendant longtemps.
 
@@ -760,7 +760,7 @@ Quand on lance l'application avec le logger, ça donne ça :
 
 On voit qu'il y a bien un message de loggué, et que les informations de contexte (timestamp, thread, class, loglevel) ont été ajouté au message en plus du corps de celui-ci.
 
-## Utilisation d'IDEA
+=== Utilisation d'IDEA
 
 IDEA est une interface de développement intégrée (comme Eclipse, Visual Studio, etc) qui est directement compatible Groovy et Gradle, et qui est légère et rapide.
 
@@ -846,7 +846,7 @@ On y retrouve :
 
 La [documentation](https://www.jetbrains.com/help/idea/2016.2/gradle-tool-window.html) est disponible sur le site de l'éditeur.
 
-## Fichier `ignore` pour GIT/SVN/etc
+=== Fichier `ignore` pour GIT/SVN/etc
 
 Ces fichiers n'ont pas vocation à être intégrés au gestionnaire de code :
 

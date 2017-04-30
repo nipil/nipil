@@ -18,7 +18,7 @@ En effet, en général, les hébergeurs limitent le nombre de comptes et redirec
 
 A titre personnel, ça me permettra de créer des alias temporaires pour m'enregistrer avec des adresses différentes, de désactiver ces alias si un jour je reçois trop de spam, de  rediriger tous les couriers locaux du serveur vers une adresse perso, et donc de consulter tous ces comptes créés dans mon domaine via une seule adresse.
 
-# Mais mon hébergeur fourni déjà un service mail !
+== Mais mon hébergeur fourni déjà un service mail !
 
 Ca n'empêche pas d'avoir un serveur mail à domicile : celui-ci peut remplacer ou complémenter celui donné par votre fournisseur, rien n'est imposé ni interdit.
 
@@ -38,7 +38,7 @@ Pour ce faire, j'ai créé un seul compte mail auprès de mon fournisseur, et en
 
 Donc, comme vu auparavant, je vais quand même me monter un serveur mail à la maison, qui va gérer les mails d'un sous-domaine de ma zone de base, plutôt que de reprendre la gestion des mails de mon hébergeur. Pourquoi ? Parce que ça permet de monter qu'il est possible d'avoir plusieurs domaines de mail distincts par zone, contrairement à la majorité des exemples trouvés sur internet.
 
-# Spam et réputation : fais un effort, sinon hop indésirable
+== Spam et réputation : fais un effort, sinon hop indésirable
 
 Cependant, il va falloir faire avec le "problème" du spam : ne pas trop en recevoir, et ne pas passer pour un spammeur. Pouquoi doit on s'embêter avec ça ?
 
@@ -69,7 +69,7 @@ Restent au final les outils d'analyse fine du contenu de chaque email qui passe,
 
 *Bref, sans utiliser aucun de ces mécanismes, Hotmail et Google classait mes courriers en "indésirable". Une fois que j'ai configuré SPF, Google arrête de me mettre en indésirable, mais Hotmail continue. TODO: DKIM suffisant pour hotmail ?*
 
-# Ajout des enregistrements dans les DNS
+== Ajout des enregistrements dans les DNS
 
 Pour que la réception du courrier puisse fonctionner, il faut pouvoir indiquer au monde entier comment nous envoyer des mails. C'est l'utilité des champs `MX` des enregistrements DNS.
 
@@ -132,7 +132,7 @@ Dans les deux cas Google a vérifié qu'il y a correspondance entre les adresses
 
 *Si vous hébergez votre zone DNS sur votre propre serveur DNS, ne pas oublier de mettre à jour le `serial`, de faire un `named-checkzone`, et de redémarrer/recharger le daemon Bind pour que les informations soient prises en compte au niveau des serveurs DNS SOA de la zone. Rappel : la propagation de ces informations peut prendre du temps (quelques minutes à quelques heures).*
 
-# Un daemon SMTP pour l'envoi et la réception de mail
+== Un daemon SMTP pour l'envoi et la réception de mail
 
 Que ce soit pour l'envoi de mails vers internet, ou lorsque quelqu'un veut nous envoyer un mail, un daemon SMTP qui sera utilisé. Il en existe plusieurs (postfix, sendmail, exim), et sous Debian, le daemon "usuel" est Exim4 et c'est donc celui-là qu'on va utiliser.
 
@@ -146,7 +146,7 @@ Sachant qu'Exim est à la fois un "Mail Transport Agent" (MTA) qui permet d'envo
 
 Dans notre cas, on choisira le format `maildir`, qui est fiable et performant, mais aussi flexible ; de plus il est bien adapté pour les outils de consultation mail type IMAP.
 
-## Installation et configuration du daemon
+=== Installation et configuration du daemon
 
 La configuration "basique" se fait via via `dpkg-reconfigure exim4-config`, que vous pouvez lancer aussi souvent que vous le voulez. Une configuration plus fine est possible en éditant les fichiers de conf, mais il faut alors se rapporter au doc [spécifique Debian](http://pkg-exim4.alioth.debian.org/README/README.Debian.html), au [wiki](http://wiki.debian.org/Exim) debian, et à la [documentation](http://www.exim.org/docs.html) officielle de l'outil
 
@@ -173,7 +173,7 @@ On va finir par l'installation de deux outils :
 
 On est maintenant prêt à commencer.
 
-## Configuration pare-feux
+=== Configuration pare-feux
 
 Pour accepter les connexions entrantes en IPv4
 - ajouter la ligne `SMTP(ACCEPT) net $FW` à `/etc/shorewall/rules`
@@ -192,7 +192,7 @@ Pour débugger, on aura plusieurs sources d'information :
 
 On va maintenant tester l'envoi et la réception de mails.
 
-## Test unitaire d'envoi
+=== Test unitaire d'envoi
 
 Le second test sera d'envoyer un mail à une adresse extérieure depuis notre serveur. Pour ce faire, le plus simple est d'utiliser la commande suivante :
 
@@ -218,7 +218,7 @@ On voit dans cette transaction `1Ujq1s-0006il-Dl` que :
 
 L'envoi de mail depuis notre serveur est fonctionnel.
 
-## Test unitaire de réception
+=== Test unitaire de réception
 
 Le premier test consistera à se connecter à votre messagerie personnelle et vous envoyer un mail à votre compte local "toto" via l'adresse `toto@mail.nipil.org`. Le résultat, depuis une adresse gmail, est visible dans le log d'exim ci-dessous :
 
@@ -245,7 +245,7 @@ La réception de mail depuis notre serveur est fonctionnel.
 
 Attention, en IPv6 si votre fournisseur ne vous donne pas d'enregistrement DNS inverse (PTR) alors quand vous enverrez un mail à un serveur qui vérifie (gmail par exemple) au début ça passera puis avec le temps vous finirez par vous faire jeter. La seule solution que j'ai trouvée est de désactiver l'IPv6 pour Exim4, avec le paramètre `disable_ipv6 = true`en tête du fichier de configuration.
 
-## Restrictions, sécurisation et maintenance
+=== Restrictions, sécurisation et maintenance
 
 Un serveur SMTP doit relayer de 4 manières différentes :
 - de l'externe vers le domaine local
@@ -265,7 +265,7 @@ Pour information, il est impossible de faire la distribution locale pour le comp
 
 Côté maintenance et surveillance du système, il faut savoir que lorsqu'un message doit être relayé, il est placé dans une file. Et qu'en cas de problèmes, il peut soit être mis à la poubelle, soit être "gelé" (*frozen* en anglais). Les messages "frozen" ne seront pas re-traités de manière cycliques contrairement aux messages subissant un blocage temporaire (souvent des "unroutable address"). On peut investiguer en `root` via `exim4 -d -bt identifiant_du_mail` et après investigations, il est possible de forcer une nouvelle tentative en tant que `root` via la commande `exim -qff`.
 
-# Identification nécessaire pour envoi d'email
+== Identification nécessaire pour envoi d'email
 
 Une des conséquences logique du fait que notre serveur n'est pas un "open relay" est la suivante : seuls les emails envoyés depuis le serveur (c'est ce qu'on a fait jusqu'à maintenant) sont possibles car automatiquement authentifiés.
 
@@ -429,7 +429,7 @@ On refait la même chose avec la méthode `LOGIN` pour vérifier :
 
 Comme on peut le constater, les deux méthodes fonctionnent, et il n'y a strictement aucun lien entre l'identifiant d'authentification SMTP utilisé et l'adresse source du domaine qui est utilisée, car tout ce qu'on fait, c'est vérifier qu'un personne est habilitée à relayer un mail, quel qu'il soit, quels que soient les emetteurs et les destinataires, et même si l'adresse d'origine n'appartient pas à notre serveur. En résumé, pour les personnes authentifiés, notre serveur est un relais inconditionnel !
 
-# Consultation des emails en IMAP
+== Consultation des emails en IMAP
 
 Il existe plusieurs daemon IMAP sur la debian, `citadel-server`, `courier-imap`, `cyrus-imapd-2.2`, `dbmail`, `dovecot-imapd`, `kolab-cyrus-imapd`, `mailutils-imap4d`, `uw-imapd`. Ici nous allons utiliser "[Dovecot](http://www.dovecot.org/)", qui est un daemon rapide, léger, fiable et très simple à configurer. La documentation et les exemples sont disponibles sur le [wiki](http://wiki2.dovecot.org/).
 

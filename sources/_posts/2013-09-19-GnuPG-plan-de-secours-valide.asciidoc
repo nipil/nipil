@@ -27,7 +27,7 @@ Retour au 24 avril 2001, où je découvre le système GnuPG. Aussi sec, je me cr
 
 Remarque : On obtient les mêmes infos sans uploader sa clé via l'option `--list-keys --fingerprint`
 
-# La facture de l'échec, constat et nouveau départ
+== La facture de l'échec, constat et nouveau départ
 
 Le 27 octobre 2007, après de multiples réinstallations et changement de distribution, arrive ce qui devait arriver : j'ai perdu mon répertoire `.gnupg`, et je ne retrouve aucun backup de celui-ci sur les diverses clé usb que j'utilise... l'andouille. En plus comme je n'y connaissais pas grand'chose, je n'ai pas préparé de révocation, ce qui est logique vu que je savais même pas à quoi ça servait.
 
@@ -57,7 +57,7 @@ Puis je réfléchis à ce que j'aurais dû faire la première fois :
 
 Corrigeons ça pour que ça n'arrive plus.
 
-## Générer le bloc de révocation et exporter sa clé privée
+=== Générer le bloc de révocation et exporter sa clé privée
 
 Révoquer une clé ne la fera pas disparaître des serveurs de clé (rien ne disparaît jamais d'un serveur de clé), mais elle indiquera à tous ceux qui l'utiliseraient qu'elle ne doit plus être utilisée pour encrypter de nouvelles données, et qu'aucune signature ne peut être faite avec cette clé. Par contre, ça n'empêche pas de continuer de vérifier les signatures qui ont déjà été faites (c'est une des raisons pour laquelle les clés publiques révoquées restent sur les serveurs de clé). En résumé, révoquer une clé, c'est un peu comme laisser une clé expirer : elle cesse d'être utilisable pour de nouvelles choses, mais continue de fonctionner pour ce qui a été fait auparavant.
 
@@ -83,7 +83,7 @@ On génère un certificat de révocation avec l'option `--gen-revoke`, et on peu
 
 Et on la met de côté, bien à l'abri. Pour plus tard, si un jour (dans 1 mois, dans 1 an, dans 10 ans) on en a finalement besoin.
 
-## Exporter sa clé privée
+=== Exporter sa clé privée
 
 On exporte sa clé privée via `--armor --export-secret-key`
 
@@ -102,7 +102,7 @@ On exporte sa clé privée via `--armor --export-secret-key`
 
 A noter que lors de l'export **la clé privée celle-ci reste cryptée** on est en "sécurité" mais *il faudra aussi archiver le mot de passe pour pouvoir tout récupérer* le jour où on en a besoin !
 
-# L'impression papier, l'ultime backup
+== L'impression papier, l'ultime backup
 
 Pour la sauvegarde, j'ai choisi la solution la plus résiliente. Il aurait été possible de sauvegarder le tout sur CD, disque, disquette, clé, etc etc. Mais étant donné que tous peuvent perdre leurs données à plus ou moins long terme, ou décider de ne plus marcher, j'ai choisi la solution ... du papier.
 
@@ -167,7 +167,7 @@ Grâce à ça, on voit tout de suite si un caractère est un 'petit i' (69), un 
 
 Maintenant, plus d'excuses pour perdre sa clé privée !
 
-# Précaution additionnelle pour le mot de passe
+== Précaution additionnelle pour le mot de passe
 
 Comme le mot de passe peut être composé de pleins de caractères spéciaux (accents, etc) prenez bien garde à l'imprimmer en version "normale" mais aussi sous version  hexa (via `hd`). Ca serait dommage de récupérer tout sauf le mot de passe !
 

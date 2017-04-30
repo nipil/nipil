@@ -18,7 +18,7 @@ Qu'est ce que ça signifie ?
 
 En résumé, le pire du pire est arrivé, et il faut faire du "damage control" additionnel après avoir mis à jour la librairie OpenSSL de nos machines/VM : renouveler nos clés privées et nos certificats.
 
-# Qu'est ce qu'on doit vérifier
+== Qu'est ce qu'on doit vérifier
 
 Commençons déjà par regarder dans quelle mesure on est concernés. Il s'agit d'une faille qui permet d'extraire des données d'un serveur. En conséquence, on va commencer regarder ce qui utilise la librairie OpenSSL sur chaque hôte :
 
@@ -39,7 +39,7 @@ Tous ces serveurs utilisent donc la librairie OpenSSL. Trois d'entre eux ont ét
 
 A noter que je n'ai pas révoqué mes certificats car d'une part c'est payant, d'autre part les "clients" SSL ne vérifient souvent pas les listes de révocation de certificats (CRL) ce qui fait que l'utilité de la révocation est limitée.
 
-# Renouvellement des certificats auprès de StartSSL
+== Renouvellement des certificats auprès de StartSSL
 
 J'utilise les services gratuits de StartSSL, et comme beaucoup de services fournissant des certificats, il existe deux méthodes pour en créer un :
 1. générer la clé privée *sur notre propre serveur*, puis générer une requête de signature de certificat (CSR) puis faire signer cette CSR par le fournisseur, qui nous donne ensuite un certificat "nu" (ie sans clé privée)
@@ -51,7 +51,7 @@ La deuxième méthode est "moins bien" car c'est le fournisseur qui la génère,
 
 Je décrirai ci-après la méthode 1 (qui a aussi l'avantage de pas devoir s'embêter avec des mots de passe de certificats, et de conversion de fichiers `.p12` pour passer du format PKCS#12 au format PEM !)
 
-## Création d'une nouvelle clé privée
+=== Création d'une nouvelle clé privée
 
 On va commencer par se connecter sur le serveur, et générer une nouvelle clé privée (en tant que root). La sous-commande "date" permet de ne pas supprimer/écraser par erreur une clé déjà générée/utilisée... croyez moi, on se sent idiot quand ça arrive.
 
@@ -63,7 +63,7 @@ De plus on met les droits d'accès à 400 (ie lecture seule, et uniquement pour 
 
 Le plus important est fait.
 
-## Saisie de la requête de signature de certificat (CSR)
+=== Saisie de la requête de signature de certificat (CSR)
 
 Ensuite, on génère une "Certificate Signing Request" (CSR). Ca n'est qu'une sorte de "formulaire" contenant les informations du serveur (nom, localisation, email de contact).
 
@@ -120,7 +120,7 @@ Cette CSR a été signée par la clé privée qu'on vient de créer, ce qui perm
 
 On va maintenant envoyer ces informations au fournisseur de certificats
 
-## Génération du certificat
+=== Génération du certificat
 
 Se connecter au panneau de contrôle StartSSL, et d'abord valider le domaine si ça n'a pas encore été fait. Ensuite :
 - Cliquer dans "Certificates Wizard"
@@ -217,7 +217,7 @@ On termine en récupérant les certificats intermédiaires et racines utilisés 
 
 On est maintenant prêts à mettre en place les certificats.
 
-# Mise en place des certificats pour Dovecot
+== Mise en place des certificats pour Dovecot
 
 Ensuite on configure place les informations au bon endroit pour Dovecot, selon la config Debian par défaut (cf `/etc/dovecot/conf.d/10-ssl.conf`) 
 
@@ -253,7 +253,7 @@ Relativement au début de l'échange on devrait voir les informations suivantes 
 
 Tout est OK, On peut continuer avec le serveur Web.
 
-# Mise en place des certificats pour Lighttpd
+== Mise en place des certificats pour Lighttpd
 
 On place cette fois ci seulement 2 certificats (AC intermétiaire + AC racine) dans un seul fichier `/etc/dovecot/dovecot.pem`
 
@@ -276,7 +276,7 @@ On recharge la configuration de lighttpd (`/var/log/lighttpd/error.log` en cas d
 
 Pointer le navigateur vers votre site Web (en **https** bien sûr !) et vérifier qu'il n'affiche pas de d'avertissement de certificat.
 
-# Mise en place des certificats pour Exim4
+== Mise en place des certificats pour Exim4
 
 On place les 3 certificats (serveur + AC intermédiaire + AC racine) dans un seul fichier `/etc/exim4/exim.crt`
 

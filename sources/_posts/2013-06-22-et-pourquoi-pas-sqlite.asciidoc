@@ -10,7 +10,7 @@ Intéresons nous aujourd'hui à [SQLite](http://www.sqlite.org/). En effet, il s
 
 Il existe [pleins](http://en.wikipedia.org/wiki/Comparison_of_relational_database_management_systems) de protagonistes, mais sur Debian on retrouve : [MySQL](http://packages.debian.org/fr/wheezy/database/mysql-server), [PostgreSQL](http://packages.debian.org/fr/wheezy/database/postgresql), [Drizzle](http://packages.debian.org/fr/wheezy/database/drizzle) qui est plutôt orienté cloud, [MongoDB](http://packages.debian.org/fr/wheezy/database/mongodb) qui est orienté orientée objets, [SQLite](http://packages.debian.org/fr/wheezy/database/sqlite3) qui foncitonne sans daemon, [Tarantool](http://packages.debian.org/fr/wheezy/database/tarantool) qui est en [NoSQL](http://en.wikipedia.org/wiki/NoSQL) en ram, et [Virtuoso](http://packages.debian.org/fr/wheezy/database/virtuoso-minimal).
 
-# SQLite, pour et contre
+== SQLite, pour et contre
 
 Avantages
 - facile à installer, zéro configuration ou presque
@@ -32,7 +32,7 @@ Bref, pour tout ce qui consisterait à stocker et accéder à des données sans 
 
 C'est tellement parfait pour certaines choses, que même Google, Adobe, Mozilla, Opera l'ont choisi pour stocker les paramètres, et les données locales de leurs applications. Au final, c'est le système SQL le plus déployé au monde !
 
-# Installation
+== Installation
 
 Comme d'habitude, sous Debian, c'est simple :
 - installation `aptitude install sqlite3`
@@ -50,7 +50,7 @@ Tester que ça marche en créant une page PHP
 
 Accéder à cette page depuis votre navigateur devrait valider le bon foncitonnement. Accessoirement, le listing phpinfo montrerait que le PDO sqlite est chargé.
 
-# Utilisation
+== Utilisation
 
 Un tour dans la [documentation](http://www.sqlite.org/docs.html) et la page `man sqlite3`, et vous saurez sur l'outil en ligne de commande qui permet la gesiton des bases, leur création, modifications, et sauvegarde.
 

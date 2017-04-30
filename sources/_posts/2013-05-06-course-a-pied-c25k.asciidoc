@@ -5,7 +5,7 @@ title:  Course à pied et C25K
 
 <p><div style="color:red;text-align:right;">Ayé, c'est fini \o/, n'hésitez pas à aller voir le <a href="#update-2013-11-01--bilan-et-pause-hivernale-">bilan de cette épopée</a> !</div></p>
 
-# Kezako le C25K ?
+== Kezako le C25K ?
 
 C25K = "couch to 5km" = "du canapé jusqu'à cinq kilomètres". Le but ? Que quelqu'un qui n'a pas l'habitude de faire de sport travaille régulièrement (3x par semaine) et progressivement (effort qui augmente de semaine en semaine) pour être au final capable de courir 5km d'une traite au bout de 9 semaines (personnellement je table sur le double)
 
@@ -31,7 +31,7 @@ Accessoirement, y a plus de place là bas que sur les trottoirs de Paris, et pas
 
 *2013-10-02* **Update** - Aujourd'hui j'ai couru 5km d'une traite (détails plus bas) ! Donc bilan rétrospectif de mon entraînement jusqu'ici : W1 + W1 + W2 + W2 + W3 + W3' + W3" + W4 + W4 + W5 + W5 = 11 semaines de programme, étalées sur 5 mois calendaires dont 2 fois 1 mois de pause plus 1 semaine de vacances. En tout cas je continue le programme pour consolider, fiabiliser, et poursuivre la progression.
 
-# Update 2013-11-01 : Bilan et pause hivernale !
+== Update 2013-11-01 : Bilan et pause hivernale !
 
 Dehors il fait froid, et ça finit par faire mal à la gorge. Déjà que je toussotte depuis avant-hier (alors que j'ai toujours un col montant quand je sors) j'ai décidé que je refuse de tomber malade en allant courir dehors par ce temps.
 
@@ -45,7 +45,7 @@ Durant l'hiver je vais essayer de "nager" plutôt que de "courir", et ce même s
 
 Et qui sait, au printemps envisager de travailler l'objectif des 10km ? Wait'n'see :-)
 
-# Récapitulatif
+== Récapitulatif
 
 Sorties et impressions
 - 2013-05-06 **W1-1** : toute première séance, 8x( 60s course + 90s marche ) j'arrive au bout "juste juste" côté souffle

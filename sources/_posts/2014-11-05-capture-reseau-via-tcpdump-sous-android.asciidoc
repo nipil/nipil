@@ -14,7 +14,7 @@ Premier point, il faut que le téléphone soit rooté (ie "su" est disponible).
 
 Deuxième point, on va compiler nous même un tcpdump, car je préfère pas faire tourner en root un binaire téléchargé directement sur internet :-)
 
-# Installer une chaîne de compilation ARM
+== Installer une chaîne de compilation ARM
 
 Déjà, les binaires compilés sur PC (386/x64) ne sont pas exécutables sur un téléphone ARM. Il faut donc installer une chaîne de compilation ("toolchain") pour produire des exécutables pour les plateformes arm.
 
@@ -74,7 +74,7 @@ On installe deux packages nécessaires (pour info, [qui est qui](https://fr.wiki
 
 Yabon, let's go.
 
-# Récupérer et vérifier les sources de LIBPCAP et TCPDUMP
+== Récupérer et vérifier les sources de LIBPCAP et TCPDUMP
 
 On télécharge les tarballs les plus récents à ce jour
 
@@ -123,7 +123,7 @@ Et la vérification de la signature du programme TCPDUMP
 
 Les signatures sont bonnes ("Good signature"), on peut continuer
 
-# Compiler les sources
+== Compiler les sources
 
 On compile la librairie, ça générera une librairie dynamique `libpcap.so.1.6.2`, et une librairie statique `libpcap.a`. L'une ou l'autre sera utilisé, en fonction des paramètres de compilation *des programmes qui l'utiliseront*.
 
@@ -176,7 +176,7 @@ Déposez le par exemple à la racine de la carte SD de votre téléphone et c'es
 
 Certains préconisent de l'installer dans la partition system, mais perso je trouve ça débile : il faudra le réinstaller à chaque fois qu'on met à jour la rom... bref, je préfère aller le chercher sur la carte SD quand j'en ai besoin.
 
-# Vérifier que ça marche
+== Vérifier que ça marche
 
 J'insiste, il faut que votre téléphone soit rooté. De plus, il faut que l'accès "root" soit autorisé pour les applications dans les options développeur du téléphone. Sinon tout ça c'était pour rien :-)
 
@@ -197,7 +197,7 @@ Tentez de l'exécuter pour voir que tout va bien
 
 Yabon.
 
-# Choisir son interface
+== Choisir son interface
 
 Pour trouver les interfaces où il y a du trafic réseau, le plus simple est de lancer la commande, et de rechercher dans le listing les interfaces qui ont des adresses IP présentes : 
 
@@ -217,7 +217,7 @@ Ici, on peut comprendre que :
 
 Ca c'est sur mon téléphone, les noms seront peut-être (sûrement ?) différent chez d'autres.
 
-# Lancer une capture réseau
+== Lancer une capture réseau
 
 Pour capturer le traffic qui passe par la connexion mobile :
 

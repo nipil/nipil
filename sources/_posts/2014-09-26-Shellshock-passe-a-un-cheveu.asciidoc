@@ -14,7 +14,7 @@ C'est du lourd, et facile à déclencher : ça fait donc environ 10-12h que "c'e
 
 <!--more-->
 
-# Patch et re-patch
+== Patch et re-patch
 
 Je m'arrête de marcher, histoire de garder du réseau. Je dégaine [ConnectBot](https://play.google.com/store/apps/details?id=org.connectbot) pour me connecter sur mon serveur chez OVH, puis sur mon serveur de fichier à domicile.
 
@@ -47,7 +47,7 @@ Il est 9h39, et à nouveau, mes serveurs et VM sont à jour (à nouveau, je comm
 
 Bon, à nouveau, je me dis "ok, tout est sous contrôle". Mais je me dis aussi que c'est suffisement mauvais (et j'ai été suffisement lent hier) pour qu'il y ait un risque que j'aie été infecté... ça vaudrait la peine de regarder dans les logs.
 
-# C'est passé à un cheveu ?
+== C'est passé à un cheveu ?
 
 Après avoir lu dans le métro  les commentaires d'un article [slashdot](http://slashdot.org/story/14/09/25/1757208/flurry-of-scans-hint-that-bash-vulnerability-could-already-be-in-the-wild) sur le sujet, je décide de vérifier si mon/mes serveurs web ont été ciblés par les tentatives d'attaque du premier bug. 
 
@@ -100,7 +100,7 @@ Il s'agit d'un client IRC qui permet de
 
 Bref, simple mais efficace.
 
-# La morale de cette histoire ?
+== La morale de cette histoire ?
 
 J'ai eu de la chance... car il n'aura fallu que 13h après la publication d'une faille et que je voie de vraies tentatives arriver, et j'ai pu patcher entre temps.
 

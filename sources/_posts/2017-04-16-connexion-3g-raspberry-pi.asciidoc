@@ -6,7 +6,7 @@ tags: raspberry 3g modem
 
 **Ajout 2017-04-22** : ajout des remarques sur les déconnexions périodiques de l'opérateur, et sur les paramètres `persist` et `maxfail` de `pppd`
 
-# L'objectif
+== L'objectif
 
 J'aimerais pouvoir faire des trucs à distance, mais sans avoir sur place une connexion permanente (pas d'adsl) pour des questions de coût, de maintenance.
 
@@ -25,7 +25,7 @@ Ensuite on déclencherait la connexion 3G en envoyant un SMS au numéro de la ca
 
 Les autres points évoqués ci-dessus feront l'objet d'autres posts !
 
-# Modem
+== Modem
 
 J'ai une vieille clé 3G "Option ICON 225" de 2008 et une carte SIM Free-Mobile avec un forfait à 2€.
 
@@ -42,7 +42,7 @@ Pour savoir quel fichier sert à quoi, on regardera dans `/sys` :
 
 Le device pour le modem (3G/SMS) est `ttyHS3`.
 
-# Déconnexions automatiques
+== Déconnexions automatiques
 
 **Ajout 2017-04-22** : Pour information, j'ai constaté qu'on était périodiquement déconnecté du réseau de l'opérateur :
 
@@ -51,7 +51,7 @@ Le device pour le modem (3G/SMS) est `ttyHS3`.
 
 Pour cette raison, j'ai ajouté la remarque sur les options `persist` et `maxfail` de `pppd`.
 
-# Désactivation du code PIN
+== Désactivation du code PIN
 
 Pour être sûr qu'on ne soit pas embêtés par le code PIN de la carte SIM, on va le désactiver.
 
@@ -94,7 +94,7 @@ On quitte picocom en faisant `Ctrl+a` puis `Ctrl+q`.
 
 Maintenant, plus aucun code ne sera nécessaire lors des débranchements/redémarrage de la clé 3G.
 
-# Connexion avec NetworkManager
+== Connexion avec NetworkManager
 
 Quand on dispose d'une interface graphique, rien de plus simple avec NetworkManager :
 
@@ -118,7 +118,7 @@ Pour se connecter, cliquer sur l'option `Free Mobile Free-mobile` du menu de Net
 
 Pour se déconnecter, cliquer sur l'option `Se déconnecter` du menu de NetworkManager.
 
-# Connexion avec WVDIAL
+== Connexion avec WVDIAL
 
 Installer le package `wvdial`
 
@@ -219,7 +219,7 @@ Après quelques secondes, on constate que ça marche via `ppp0` :
 
 On désactive la connexion : `sudo ifdown ppp0`
 
-# Connexion avec PPPD
+== Connexion avec PPPD
 
 Installer le package `pppd`
 
@@ -333,7 +333,7 @@ Pour activer la connexion : `sudo pon freemobile`
 
 On désactive la connexion : `sudo poff`
 
-## Routage restreint
+=== Routage restreint
 
 Si on ne souhaite pas que la route par défaut soit utilisée via la connexion 3G, mais plutôt définir des routes spécifiques :
 

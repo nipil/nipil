@@ -14,7 +14,7 @@ Allez, en avant pour l'aventure.
 
 <!--more-->
 
-# Fournisseur de service .. qui gère la zone DNS ?
+== Fournisseur de service .. qui gère la zone DNS ?
 
 J'ai acheté auprès de lui un nom de domaine `nipil.org.` et maintenant quoi ? Plus précisément, je *loue* la zone `nipil` de la zone `org` de la zone racine `.`, c'est pour ça qu'on voit un `.` à la fin du nom de domaine ci-dessus.
 
@@ -38,7 +38,7 @@ A priori c'est strictement identique, car qu'on demande à Ma Dalton ou à Lucky
 
 En résumé, qu'on choisisse l'une ou l'autre méthode, le resultat sera donc le même, mais les acteurs concernés seront différents. Donc par soucis de fiabilité, et surtout de simplicité, la majorité du temps on utilise la méthode 1.
 
-# Méthode 1 : Déléguer sa zone DNS à son registrar
+== Méthode 1 : Déléguer sa zone DNS à son registrar
 
 C'est le comportement par défaut dans la majorité des cas :
 - je laisse les valeurs par défaut `ns0.online.net` et `ns1.online.net` dans le formulaire "Manage DNS Servers" de la console de gestion du registrar
@@ -47,7 +47,7 @@ C'est le comportement par défaut dans la majorité des cas :
 
 On a alors la chaine suivante : `.` sait où trouver ORG `org` qui sait où trouver `nipil.org` (*ie* sur les serveurs DNS du registrar) qui eux saura répondre aux requêtes du type `xyz.nipil.org`
 
-## Verification de la chaine de résolution
+=== Verification de la chaine de résolution
 
 On peut vérifier et visualiser ça facilement, par étape, comme indiqué ci-dessous
 
@@ -113,7 +113,7 @@ Ca nous permet de connaitre le contenu exaustif de ce qui est configuré, que ç
 
 En général, c'est une fonctionnalité désactivée, car ça aide l'attaquant à connaître la topologie DNS de l'entité cible, et donc de trouver plus facilement des ressources à attaquer. Mais rappelons que dans l'absolu, ce n'est pas parce que qu'une entité est cachée qu'elle est moins vulnérable : la sécurité par l'obscurité n'est jamais une bonne solution.
 
-## Chaîne de résolution inverse
+=== Chaîne de résolution inverse
 
 Pour terminer, on peut regarder la résolution inverse (ce qui fait correspondre un nom de domaine à une adresse ip) et ce pour une adresse IPv4 et IPv6. A noter que ces informations ne sont **pas** liées à votre nom de domaine, mais gérée *par votre FAI* ! C'est effectivement votre opérateur d'accès à internet qui fera (s'il l'autorise et que vous l'avez configuré) ce travail de référencement.
 
@@ -191,7 +191,7 @@ Et c'est logique, car en IPv4 mon FAI ne me donne une seule adresse, donc si je 
 
 On remarque aussi via les commentaires `; Received` que l'on interroge les serveurs DNS à la fois en IPv4 et IPv6, indépendamment du fait qu'on demande des informations relatives à des adresses IPv4 ou IPv6 : quand on parle DNS, le contenu *n'est pas lié* au moyen de transport.
 
-# Méthode 2 : Déléguer sa zone DNS à un serveur personnel
+== Méthode 2 : Déléguer sa zone DNS à un serveur personnel
 
 Un des principales contraintes n'est pas technique mais organisationnelle : les standards internet (appelées RFC) préconisent d'avoir deux serveurs dns distincts pour chaque zone. En conséquence, notre registrar me demande 2 serveurs minimum pour que je puisse gérer moi-même mon domaine, et bien évidemment refusera que je mette deux fois la même ... Ce qui va nous embêter vu qu'on a une seule adresse sur votre box !
 
@@ -235,7 +235,7 @@ Les étapes à réaliser seront les suivantes :
 
 Le registrar indiquera alors au gestionnaire de la zone `org` que les serveurs qui feront authorité pour la sous-zone `nipil` sera les deux serveurs que vous avez indiqué, dont un seul au final travaillera. Dorénavant, c'est votre serveur qui fera le travail de résolution de nom lors des demandes, pour tous les relais internet, et non plus ceux du registrar.
 
-## Etape 1 : préparation et installation des daemon DNS
+=== Etape 1 : préparation et installation des daemon DNS
 
 J'utilise actuellement le paquet `dnsmasq` comme serveur DHCP (pour fournir des adresses IPv4 aux machines du LAN) et il fait aussi office de **relais** DNS pour les machines du LAN. Celui-ci écoute donc déjà sur les ports `domain`. Et ça posera problème si on veut installer un autre serveur DNS qui va vouloir utiliser ces mêmes ports.
 
@@ -268,7 +268,7 @@ Maintenant, on peut installer le logiciel Bind9 via `aptitude install bind9 bind
 
 S'il n'y a aucune ligne indiquant un `nameserver`, c'est `localhost` qui sera utilisé par défaut, donc notre daemon qu'on va installer maintenant.
 
-## Etape 2 : configuration d'un daemon DNS Bind
+=== Etape 2 : configuration d'un daemon DNS Bind
 
 Tout d'abord, il faut protéger son serveur DNS vis à vis des attaques et des abus. Une règles les plus importantes est de ne pas permettre à quelqu'un venant d'internet d'interroger notre serveur en lui demandant de résoudre des adresses qui ne font pas partie de notre zone (qu'il ne soit pas un "open resolver"). 
 
@@ -319,7 +319,7 @@ Les informations importantes sont les suivantes :
 
 Pour `ns0.nipil.org`, j'ai mis un enregistrement `A` et un `AAAA`, ce qui permettrait donc que notre serveur soit interrogé en IPv4 et en IPv6. Cependant, l'enregistrement IPv6 ne sert à rien dans la mesure où le formulaire de mon registrar ne permet que des "glue-record" en IPv4. Mais ça ne coûte rien de l'avoir, et ça sera déjà prêt pour le jour où le registrar prendra en compte l'IPv6.
 
-## Etape 3 : configuration du pare-feux et premier test
+=== Etape 3 : configuration du pare-feux et premier test
 
 Pour accepter les connexions entrantes en IPv4
 - ajouter la ligne `DNS(ACCEPT) net $FW` à `/etc/shorewall/rules`
@@ -340,7 +340,7 @@ Une capture réseau `tcpdump -i interface_internet port domain` permet de voir l
 
 On verra aussi, si le logging a été activé, les requêtes entrantes dans les logs du firewall, mais on verra aussi quelques infos de logs du daemon dans le fichier `/var/log/daemon.log` (y compris les requêtes 'denied') en cas de problèmes, ou pour voir qui tente d'utiliser notre serveur comme "open resolver".
 
-## Etape 4 : mise en place de la délégation de zone
+=== Etape 4 : mise en place de la délégation de zone
 
 On se rend dans la console de notre registrar, et on configure dans "Edit DNS Zone" les deux enregistrements `ns0` et `ns1` qui pointent sur nos serveurs. Ca permet à l'outil de configuration du registrar de vérifier, lors de l'étape suivante, de retrouver et de vérifier les données de l'étape suivante.
 
@@ -408,7 +408,7 @@ Pour finir, profitez de votre passage sur une autre connexion que la vôtre pour
 
 Tout est alors bon, on gère bien notre domaine.
 
-# Modification de la zone et propagation des enregistrements
+== Modification de la zone et propagation des enregistrements
 
 Maintenant qu'on a un serveur dns qui tourne et qui gère notre zone, il est possible d'ajouter des enregistrements de tous type, par exemple `xyz.nipil.org` pour permettre à une connaissance de ne plus devoir retenir son adresse ip pour quand il veut se connecter à la maison, ou pour son serveur web, serveur vocal, etc etc.
 
@@ -428,7 +428,7 @@ Puis recharger la configuration du daemon via `/etc/init.d/bind9 reload` (ou res
 
 Pour toute configuration additionnelle, le mieux est de se référer au [wiki](http://wiki.debian.org/fr/Bind9) Debian, mais surtout sur le [site](http://www.bind9.net/) officiel de Bind, et le `man named.conf` est bien sûr le meilleur ami pendant la configuration.
 
-# Et notre registrar, alors ?
+== Et notre registrar, alors ?
 
 Notre registrar ne sert plus à rien maintenant. Il fallait que ça soit dit clairment, car à part si vous déménagez votre serveur et que vous devez mettre à jour le formulaire "Manage DNS servers", votre registrar est totalement inutile (sauf pour le renouvellement annuel).
 

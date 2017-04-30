@@ -13,7 +13,7 @@ Pour se connecter au réseau TOR :
 
 Ensuite, il suffit de se rendre à l'adresse [http://v43wxiogkhnflac6.onion](http://v43wxiogkhnflac6.onion).
 
-# Introduction
+== Introduction
 
 Ça fait plusieurs années que j'utilise TOR de temps en temps en tant qu'utilisateur, mais je n'avais jamais été plus loin. Aujourd'hui, je vais vous montrer comment créer un site acessible par TOR (ce qui est appelé un "TOR Hidden Site").
 
@@ -31,7 +31,7 @@ Remarques techniques :
 
 * il est même possible de publier un site via la connexion 3G d'un smartphone, avec l'application Android "Orbot" ... la classe non ?
 
-# Test en local sur des VM
+== Test en local sur des VM
 
 Avant de faire ça "en vrai", on va tester en bac à sable, en créant deux VM de test. Vous pouvez utiliser n'importe quel environnement de gestion de machines virtuelles.
 
@@ -75,7 +75,7 @@ Le logiciel `tor` fonctionne comme un daemon en arrière-plan, il est automatiqu
 * pour le lancer manuellement : `sudo systemctl start tor`
 * pour voir s'il est lancé : `sudo systemctl status tor` ou `pgrep tor`
 
-# Fonctionnement
+== Fonctionnement
 
 Le logiciel `tor` créé un tunnel vers le réseau TOR, et en gros c'est tout.  Fonctionnellement, il réalise la même chose qu'un tunnel OpenVPN, IPSEC ou L2TP : il prend un point de sortie, il crée un tunnel sécurisé vers celui ci, et fait transiter le trafic qu'on lui donne jusqu'au point de sortie.
 
@@ -110,7 +110,7 @@ En résumé :
 
 * par contre, il n'est possible d'accéder aux sites `.onion` **uniquement via TOR** via le wrapper `torsocks` qiu force l'utilisation du proxy TOR.
 
-# Créer un site caché "Tor-only" sur la VM "serveur"
+== Créer un site caché "Tor-only" sur la VM "serveur"
 
 On va suivre la [documentation officielle](https://www.torproject.org/docs/tor-hidden-service.html.en) et j'ajouterai des éléments d'infos au fur et à mesure.
 
@@ -228,7 +228,7 @@ Après quelques secondes d'attente lors de la première requête, on obtient :
 
 Bref, ça marche, et on a mis un site sur TOR. Maintenant, faisons ça en vrai pour ce blog.
 
-# Mise en ligne réel de ce blog sur TOR
+== Mise en ligne réel de ce blog sur TOR
 
 On va refaire grosso modo là même chose que ce qu'on a fait sur la VM "serveur".
 

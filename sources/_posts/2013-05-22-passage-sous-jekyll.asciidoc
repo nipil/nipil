@@ -4,7 +4,7 @@ title:  "Passage sous Jekyll"
 tags: blog jekyll
 ---
 
-# Site web, énième tentative
+== Site web, énième tentative
 
 Depuis 1997 et ma première page publiée sur internet, j'ai eu le temps de tergiverser entre plusieurs formats de site web : forum, site statique, partiellement dynamique ou entièrement généré, blog, collaboratif ou mono-utilisateur.
 
@@ -18,7 +18,7 @@ Aujourd'hui, je reprends une fois de plus ma copie pour l'adapter au mieux à me
 
 Ensuite, j'importerai un par un tous les anciens contenus issus de mes anciens sites.
 
-## Les fonctionnalités souhaitées
+=== Les fonctionnalités souhaitées
 
 Comme d'habitude, conservera la maitrise complète en gérant en interne, et on commence d'abord par l'habituelle liste des fonctionnalités souhaitées
 
@@ -36,7 +36,7 @@ Ca tombe bien, car suite aux problématiques de sécurité rencontrés par les p
 
 L'intérêt est que des pages html statiques sont infiniment plus rapides à servir, et donc garantissent les performances même en cas de pic de charge.
 
-## Le coeur d'un site doit être le contenu
+=== Le coeur d'un site doit être le contenu
 
 Dans le contexte de la publication informatique, chaque minute qui n'est pas passée à produire du contenu est une minute de perdue. Chaque moment passé à penser à autre chose qu'à ce qu'on veut dire est un moment de perdu.
 
@@ -48,7 +48,7 @@ Le convertisseur n'entoure le contenu généré d'aucune balise, ce qui fait qu'
 
 Et comme pour nous faire plaisir, il existe un [package debian stable](http://packages.debian.org/stable/main/markdown), ce qui évite les complications d'installation et de maintenance. Et ça s'arrête là si la partie "structure" est gérée par une solution codée personnellement 
 
-## Générateur de site "clé en mains"
+=== Générateur de site "clé en mains"
 
 J'ai choisir Jekyll pour aggréger le tout. C'est un outil en [Ruby](http://www.ruby-lang.org/) et c'est le moteur qui gère les pages github. De plus il est compatible markdown, en utilisant l'une ou l'autre version complétée, comme [kramdown](http://kramdown.rubyforge.org/) ou une des [nombreuses](https://github.com/markdown/markdown.github.com/wiki/Implementations) autres, [Liquid](http://wiki.shopify.com/Liquid)...
 
@@ -66,7 +66,7 @@ Pour publier "reelement" votre site, il suffit d'exécuter un `jekyll build`, d'
 
 Pour plus de détails au cas où ça vous tenterait, vous pouvez [lire ce tutorial](http://www.andrewmunsell.com/tutorials/jekyll-by-example/) en anglais sur Jekyll.
 
-## Alimentation du contenu
+=== Alimentation du contenu
 
 Point de vue du contenu éditorial, je voulais quelque chose de simple et de facile à appréhender, et je suis servi. Pour créer une nouvelle entrée, il suffit de placer un fichier nommé `YYYY-MM-DD-titre-du-post.markdown` dans le répertoire `_posts`.
 
@@ -104,7 +104,7 @@ Comme vous pouvez le voir, c'est extrêmement lisible, et facile à lire et à �
 
 Un prochain billet concernera la mise en place des commentaires.
 
-# Edition Jekyll sous windows
+== Edition Jekyll sous windows
 
 Si vous éditez souvent sous windows, ou que vous éditez beaucoup de contenu, ça peut être appréciable d'avoir la visualisation du contenu "en temps réel". Pour ce faire, il faut installer Rubys, puis installer les gems, puis installer Jekyll.
 
@@ -148,7 +148,7 @@ l'auto-découverte des flux RSS
 
 Let's go.
 
-# Installation RSS
+== Installation RSS
 
 La mise en place d'un flux RSS commence par la dépose du fichier `feed.xml`
 issu du dépôt git sus-cité à la racine du répertoire du blog, avec l'icône
@@ -192,7 +192,7 @@ Ca se fait en ajoutant dans le bloc `--` au début du post :
 C'est tout, c'est simple, et ça marche. Le fichier feeds.xml sera généré
 *statiquement* comme le reste du site, à chaque re-génération et publication.
 
-# Tuning des résumés
+== Tuning des résumés
 
 Ajouter un `excerpt` par article, ça ne me plait pas trop (je suis fainéant,
 alors pourquoi ajouter un résumé, alors que mes articles commencent tous déjà
@@ -231,7 +231,7 @@ post et le `<!--more-->` et utiliser ça comme résumé.
 De cette manière, pas besoin de dupliquer les infos, mais on peut toujours
 choisir de conserver un résumé défini manuellement, ou de tout prendre.
 
-# Limiter le nombre de posts présents dans le RSS ?
+== Limiter le nombre de posts présents dans le RSS ?
 
 Pour finir, comme je publie peu d'articles, **et** que j'ai mis un résumé pour
 chaque, je peux me permettre de lister *tous* les articles existants dans le
@@ -273,7 +273,7 @@ Ca peut faire beaucoup, et même si on se souvient de tout ça, ça fait du temp
 
 Pour se convaincre, regardons le graphe issu de [xkcd](http://www.xkcd.com) image ci-dessus. Est ce que ça vaut la peine d'automatiser ? En considérant qu'on postera 1 billet par semaine, et qu'on économise 5 minutes à chaque fois, alors oui ça vaut le coup car on économisera 21h de temps utile. Par utilisateur et par post. *C'est énorme*.
 
-# Automatisons un peu tout ça
+== Automatisons un peu tout ça
 
 Plutôt que de faire un truc *user-friendly* qui prenne tout en charge de A à Z, on va se contenter de factoriser le tout en deux actions effectuées à distance : `blog-new` (actions 1 à 3) et `blog-publish` (action 5 à 10), afin de masquer la complexité et de rendre ça plus efficace.
 
@@ -288,7 +288,7 @@ Le process devient alors
 
 Et au pire on peut toujours caser quatre alias pour que les utilisateurs n'aient que des commandes intelligibles et mémorisables à taper. Ou faire un script qui prendrait quatre paramètres. Mais comme quatre commandes ça reste quatre commandes, j'ai préféré ne rien changer et conserver les commandes ci-dessus.
 
-# Détail des scripts
+== Détail des scripts
 
 Le script `blog-new` pour l'action 1 :
 
@@ -358,7 +358,7 @@ Le fichier `_credential.txt` sera situé à la racine du blog, et doit avoir les
 
 Idem, les informations de host `ftp.online.net` et le chemin local pour les virtualhosts `/www` pourraient être placés dans des variables pour rendre ça multi-utilisateur, mais là honnêtement j'en ai pas besoin, alors on verra plus tard si Cécile veut un blog :)
 
-# Inconvénient restant à règler
+== Inconvénient restant à règler
 
 Dans la version ci-dessus, la fonction de mirroring proposée par LFTP effectue la synchronisation à la volée, et efface le fichier distant pour le remplacer par le fichier local de manière inconditionnelle.
 

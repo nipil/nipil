@@ -47,7 +47,7 @@ Mais autant pour mon plaisir personnel de monter un nouveau jouet, que de satisf
 
 Idéalement, un équipement qui soit petit, discret, et silencieux.
 
-# La perle rare
+== La perle rare
 
 Après avoir découvert l'existance de cartes mères au format mini-ITX, et des boitiers qui vont avec, je suis tombé sur ce qui l'a semblé être la solution parfaite, l'Alix 2d3, créé par [PCEngines](http://www.pcengines.ch)
 
@@ -79,7 +79,7 @@ A noter que la primo-installation du système doît être fait avant l'assemblag
 
 Comme on le verra plus tard, ce dernier point n'est pas un problème, car la carte CF n'est utilisée que jusqu'à ce qu'on ait vérifié que le système boot, et qu'on a bien la main via la liaison série RS 232.
 
-# Recyclage ultérieur possible
+== Recyclage ultérieur possible
 
 La faible capacité mémoire, et le CPU sans comparaison avec un PC de bureau récent, montre clairement que cette machine ne sera plus un "serveur" dans 10 ou 15 ans, ou alors très limité.
 
@@ -97,7 +97,7 @@ Quelle distribution j'ai choisi ? Debian stable.
 
 Je ne précise pas la version, car on maintiendra évidement le système à jour. **Update 2013-05-04:** Debian stable vient de passer en version 7, nom de code Wheezy, et le serveur a été mis à jour sans problème.
 
-# Installation pour un serveur "normal"
+== Installation pour un serveur "normal"
 
 Il y a des tonnes de documents expliquant comment installer une Debian, notemment le [wiki](http://www.debian.org/releases/wheezy/i386/index.html.fr) officiel. Mais bon en quelques lignes ça donne ça sur un serveur normal :
 - télécharger une iso d'installation Debian *i386* (attention *pas* une amd64)
@@ -112,7 +112,7 @@ Il y a des tonnes de documents expliquant comment installer une Debian, notemmen
 
 Bref, c'est simple, et rapide, et y a plein d'aide sur internet.
 
-# Installation pour mon serveur utilisant la liaison série
+== Installation pour mon serveur utilisant la liaison série
 
 La primo installation du système se fait en 4 étapes
 - préparation de l'installation

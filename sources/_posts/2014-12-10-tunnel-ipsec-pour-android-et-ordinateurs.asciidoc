@@ -77,7 +77,7 @@ Quelques détails supplémentaires
 
 On va commencer par configurer le serveur
 
-# Configuration du serveur
+== Configuration du serveur
 
 Installer les paquets nécessaires
 
@@ -220,7 +220,7 @@ On surveille le syslog (arrêt par Ctrl-C)
 
 Le serveur est prêt, on peut passer au smartphone
 
-# Configuration android
+== Configuration android
 
 Sur mon téléphone android kitkat (4.4.4) on configure le vpn via ces écrans
 
@@ -230,7 +230,7 @@ Normalement, en allant sur [monip.org](http://monip.org) on devrait avoir
 affiché l'adresse IP de notre serveur plutôt que celui de l'accès qu'on
 utilise.
 
-# Configuration laptop Debian
+== Configuration laptop Debian
 
 Sur les client linux, les fichiers suivants sont identiques à ceux du serveur :
 

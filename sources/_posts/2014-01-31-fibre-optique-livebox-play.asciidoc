@@ -20,7 +20,7 @@ A titre d'exemple, avec 1mbit/s : envoyer 10 go dans le cloud ou récupérer la 
 
 Mais pour ce faire, j'ai dû vendre mon âme au diable, et aller chez Orange (j'étais freenaute extrêmement satisfait en depuis 10 ans) sachant qu'ils ont été les premiers à fibrer chez nous, et qu'on a strictement aucune certitude que les autres (Free/SFR) proposent la fibre un jour dans notre appartement. Je ne parles pas de Bouygues, pour cause, il est hors de question d'être sur un réseau Numéricâble.
 
-# Ce que j'ai GAGNE en passant de Free/ADSL à Orange/FO
+== Ce que j'ai GAGNE en passant de Free/ADSL à Orange/FO
 
 Internet
 - download upgradé de 16 mbits (en ip) à 285 mbits (**x17**)
@@ -42,7 +42,7 @@ Support
 
 Pour les débits, j'ai testé et vérifié pour des serveurs dans plusieurs backbone (Orange, Bouygues, Free, OVH, etc) : il n'y a pas à dire, pour la capacité de transit pure, c'est fantastique. Reste à voir si ces capacités restent les mêmes avec plus de personnes raccordées dans l'immeuble (10 appartements seulement dans l'immeuble, ça va, mais je suis le seul raccordé pour l'instant)
 
-# Ce que j'ai PERDU en passant de Free/ADSL à Orange/FO
+== Ce que j'ai PERDU en passant de Free/ADSL à Orange/FO
 
 Internet
 - encapsulation PPPoE en sortie de la livebox, qui mange 8 octets de la MTU "pour rien" (~0.5% de bande passante perdue)
@@ -73,7 +73,7 @@ Tarifs
 
 La liste est plus longue que ce à quoi je m'attendais...
 
-# Mon impression ?
+== Mon impression ?
 
 Le débit internet et le peering avec les différents opérateurs de transit est génial, il n'y a rien à dire là dessus ; reste à voir si ça restera valable quand plus de clients seront raccordés dans l'immeuble.
 
