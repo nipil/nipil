@@ -82,7 +82,7 @@ On essaie à nouveau de se connecter et cette fois ci, tout va bien :
 	ECDSA key fingerprint is 3e:70:c2:f6:17:39:4c:f0:e6:87:db:27:4d:6e:b0:98.
 	Are you sure you want to continue connecting (yes/no)? yes
 	Warning: Permanently added '91.121.167.150' (ECDSA) to the list of known hosts.
-	root@91.121.167.150's password: 
+	root@91.121.167.150's password:
 	Last login: Mon Nov 10 12:16:07 2014 from cache.ovh.net
 	FreeBSD 9.3-RELEASE-p2
 
@@ -90,7 +90,7 @@ On essaie à nouveau de se connecter et cette fois ci, tout va bien :
 	ip        : 91.121.167.150
 	hostname  : ks361272.kimsufi.com
 
-	root@ks361272:~ # 
+	root@ks361272:~ #
 
 C'est parti !
 
@@ -108,7 +108,7 @@ Selon qu'on ait un/plusieurs CPU/coeurs on utilisera l'un ou l'autre.
 	CPU: Intel(R) Celeron(R) CPU 220  @ 1.20GHz (1200.07-MHz K8-class CPU)
 	cpu0: <ACPI CPU> on acpi0
 	p4tcc0: <CPU Frequency Thermal Control> on cpu0
-	
+
 Ici on voit que notre KS-2G n'a qu'un coeur (on a que `cpu0`, pas de `cpu1` ni de `cpu2` etc...), en conséquence on pourra conserver le kernel SP.
 
 Si vous avez plus d'un processeur/coeur, il faudra s'assurer que c'est bien le kernel MP qui est actif ; mais on verra tout ça à l'étape 8 "finalisation de l'installation".
@@ -155,16 +155,16 @@ On affiche ensuite la configuration réseau :
 		options=82008<VLAN_MTU,WOL_MAGIC,LINKSTATE>
 		ether 00:1c:c0:65:21:6e
 		inet 91.121.167.150 netmask 0xffffff00 broadcast 91.121.167.255
-		inet6 fe80::21c:c0ff:fe65:216e%sis0 prefixlen 64 scopeid 0x5 
-		inet6 2001:41d0:1:e896::1 prefixlen 128 
+		inet6 fe80::21c:c0ff:fe65:216e%sis0 prefixlen 64 scopeid 0x5
+		inet6 2001:41d0:1:e896::1 prefixlen 128
 		nd6 options=23<PERFORMNUD,ACCEPT_RTADV,AUTO_LINKLOCAL>
 		media: Ethernet autoselect (100baseTX <full-duplex>)
 		status: active
 	lo0: flags=8049<UP,LOOPBACK,RUNNING,MULTICAST> metric 0 mtu 16384
 		options=600003<RXCSUM,TXCSUM,RXCSUM_IPV6,TXCSUM_IPV6>
-		inet6 ::1 prefixlen 128 
-		inet6 fe80::1%lo0 prefixlen 64 scopeid 0x6 
-		inet 127.0.0.1 netmask 0xff000000 
+		inet6 ::1 prefixlen 128
+		inet6 fe80::1%lo0 prefixlen 64 scopeid 0x6
+		inet 127.0.0.1 netmask 0xff000000
 		nd6 options=23<PERFORMNUD,ACCEPT_RTADV,AUTO_LINKLOCAL>
 
 Le plus important, c'est le nom de l'interface réseau :
@@ -238,7 +238,7 @@ On s'y reconnecte, cette fois ci avec succès
 	ECDSA key fingerprint is 48:d9:ce:46:99:ed:1c:b9:84:1f:61:37:c0:9a:f2:9d.
 	Are you sure you want to continue connecting (yes/no)? yes
 	Warning: Permanently added '91.121.167.150' (ECDSA) to the list of known hosts.
-	root@91.121.167.150's password: 
+	root@91.121.167.150's password:
 	FreeBSD 9.2-RELEASE (GENERIC) #0 r255898: Thu Sep 26 22:50:31 UTC 2013
 
 	Welcome to FreeBSD!
@@ -265,11 +265,11 @@ On s'y reconnecte, cette fois ci avec succès
 	Edit /etc/motd to change this login announcement.
 
 
-	server    : 
+	server    :
 	ip        : 91.121.167.150
 	hostname  : rescue-bsd.ovh.net
 
-	rescue-bsd# 
+	rescue-bsd#
 
 Bon, maintenant on va commencer le "vrai" travail :-)
 
@@ -328,7 +328,7 @@ Ca aura pour effet :
 
 Et comme `/usr/local` est l'endroit par défaut d'install pour `pkg_add`, on va pouvoir installer des logiciels "dans" la rescue.
 
-L'incovénient, c'est qu'on a plus accès à ce qui s'y trouvait initialement dans `/usr/local` (tous les outils habituels non-root du système). 
+L'incovénient, c'est qu'on a plus accès à ce qui s'y trouvait initialement dans `/usr/local` (tous les outils habituels non-root du système).
 
 Mais de toute façon dans notre cas, on a plus besoin de ce qu'il y avait dedans vu qu'on a déjà vérifié et fait ce qu'on avait à faire :-)
 
@@ -346,7 +346,7 @@ On va créer un répertoire temporaire dans notre disque ram, pour stocker les f
 
 	mkdir /usr/local/tmp
 	setenv TMPDIR /usr/local/tmp
-	
+
 On sélectionne le mirroir FreeBSD d'où on récupérera QEmu (même version 9.2 amd64 que la rescue !)
 
 	setenv PACKAGESITE \
@@ -507,7 +507,7 @@ On va retourner dans le manager OVH pour dire au serveur de booter sur le disque
 <img src="/files/openbsd-boot-hd-02.png" />
 <img src="/files/openbsd-boot-hd-03.png" />
 
-On a tout fini, on redémarre le serveur KS-2G via le SSH, et on suit attends la fin du reboot 
+On a tout fini, on redémarre le serveur KS-2G via le SSH, et on suit attends la fin du reboot
 
 	rescue-bsd# reboot
 	Connection to 91.121.167.150 closed by remote host.
@@ -529,7 +529,7 @@ Après reboot, on se connecte en ssh (après avoir encore demandé d'oublier l'a
 	ECDSA key fingerprint is f5:4c:7b:cf:3c:04:85:60:d8:ad:28:99:19:e6:e9:c7.
 	Are you sure you want to continue connecting (yes/no)? yes
 	Warning: Permanently added '91.121.167.150' (ECDSA) to the list of known hosts.
-	root@91.121.167.150's password: 
+	root@91.121.167.150's password:
 	OpenBSD 5.6 (GENERIC.MP) #333: Fri Aug  8 00:20:21 MDT 2014
 
 	Welcome to OpenBSD: The proactively secure Unix-like operating system.
@@ -564,7 +564,7 @@ L'énorme avantage, c'est que ça marche nickel, et ce *sans bidouiller ni chang
 
 On va déjà faire la configuration "à la volée" pour voir si ça marche, ensuite on pérénisera ces infos dans les fichiers de configuration.
 
-On commence par configurer l'adresse IPv6 sur l'interface, en conservant bien le masque /128 qui nous a été donné 
+On commence par configurer l'adresse IPv6 sur l'interface, en conservant bien le masque /128 qui nous a été donné
 
 	ifconfig sis0 inet6 2001:41D0:1:E896::1/128
 
@@ -587,7 +587,7 @@ On constate que l'interface a été configurée correctement :
 - d'une part on a notre adresse IPv6 globale fournie par OVH (2001:41d0:1:e896::1/128)
 - d'autre part on voit qu'on a bien autoconfiguré une adresse link-local
 
-Pour information, l'adresse link-local 
+Pour information, l'adresse link-local
 
 - a été autoconfigurée lorsqu'on a affecté une adresse "globale" car elle est nécessaire pour dialoguer en IPv6
 - sa valeur "fe80::2**1c:c0**ff:fe**65:216e**%sis0" link:http://en.wikipedia.org/wiki/IPv6_address#Modified_EUI-64[se base sur l'adresse mac] de notre interface sis0 00:**1c:c0**:**65:21:6e** et sera donc invariante
@@ -608,7 +608,7 @@ On va récupérer les instructions de routage grâce aux *router-advertisements*
 On regarde la table de routage (je ne donne ici que les lignes IPv6 et qui concernent sis0)
 
 	netstat -rn
-	
+
 	Internet6:
 	Destination                        Gateway                        Flags   Refs      Use   Mtu  Prio Iface
 	default                            fe80::205:73ff:fea0:1%sis0     UG         0        0     -    56 sis0
@@ -623,7 +623,7 @@ On retrouve dans la table de routage ce qu'on a vu dans le debug de `rtsol` : fe
 
 Ca signifie qu'un routeur nous a envoyé un *router-advertisement* IPv6 et qu'on peut donc définir une route par défaut qui passe par lui. Pour info, de cette adresse *link-local* on peut extraire la mac adress du routeur 00:05:73:a0:00:01 qui montre que c'link:http://www.coffer.com/mac_find/?string=00%3A05%3A73[est un équipement Cisco]
 
-L'inconvénient de cette méthode est qu'on 
+L'inconvénient de cette méthode est qu'on
 
 On test que IPv6 fonctionne :
 
@@ -634,16 +634,16 @@ On test que IPv6 fonctionne :
 	16 bytes from 2a00:1450:4007:806::1012, icmp_seq=4 hlim=57 time=4.639 ms
 	^C
 
-C'est tout bon ! On peut péréniser ça dans les deux fichiers de configurations concernés 
+C'est tout bon ! On peut péréniser ça dans les deux fichiers de configurations concernés
 
 	cat /etc/hostname.sis0
-	
+
 	inet 91.121.167.150 255.255.255.0
 	inet6 2001:41D0:1:E896::1 128
 	up
 
 	cat /etc/mygate
-	
+
 	91.121.167.254
 	fe80::205:73ff:fea0:1%sis0
 

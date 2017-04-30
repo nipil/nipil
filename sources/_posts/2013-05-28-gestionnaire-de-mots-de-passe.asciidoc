@@ -34,9 +34,9 @@ Sinon, le jour où vous vous ferez avoir, la déception sera link:http://www.wir
 
 == Un point sur la réalité des choses
 
-Chaque internaute link:https://research.microsoft.com/pubs/74164/www2007.pdf[possède] en moyenne *25 comptes en ligne*, mais on utilise en moyenne que *6.5 mots de passe* pour ces 25 comptes. Pourquoi ? Parce qu'on a tendance à choisir des mots de passe mémorisables et qu'on réutilise souvent tout ou partie des password utilisés ailleurs.
+Chaque internaute link:https://www.microsoft.com/en-us/research/publication/a-large-scale-study-of-web-password-habits/[possède] en moyenne *25 comptes en ligne*, mais on utilise en moyenne que *6.5 mots de passe* pour ces 25 comptes. Pourquoi ? Parce qu'on a tendance à choisir des mots de passe mémorisables et qu'on réutilise souvent tout ou partie des password utilisés ailleurs.
 
-D'autre part, la réalité du terrain montre que les sites web se font régulièrement hacker et des millions de mots de passe sont publiés à chaque fois : 
+D'autre part, la réalité du terrain montre que les sites web se font régulièrement hacker et des millions de mots de passe sont publiés à chaque fois :
 - link:http://en.wikipedia.org/wiki/PlayStation_Network_outage[Sony PSN] : 77 millions de comptes
 - link:http://arstechnica.com/security/2013/04/why-livingsocials-50-million-password-breach-is-graver-than-you-may-think/[LivingSocial] : 50 millions de comptes
 - link:http://arstechnica.com/security/2013/03/evernote-resets-all-user-passwords-after-coordinated-breach-attempt/[Evernote] : 50 millions de comptes
@@ -89,7 +89,7 @@ Il sera vous, mais il fera ce qu'il veut.
 == Réagissons !
 
 Sécuriser sa vie numérique tient en 5 points :
-1. utiliser un gestionnaire de mot de passe sécurisés 
+1. utiliser un gestionnaire de mot de passe sécurisés
 2. protéger sa messagerie, car c'est la clé de voute de votre vie numérique
 3. faire l'inventaire de tous vos comptes en ligne
 4. modifer le mots de passe sur chaque site pour qu'ils soient tous différents

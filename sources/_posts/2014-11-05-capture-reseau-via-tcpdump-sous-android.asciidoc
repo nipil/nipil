@@ -86,7 +86,7 @@ On télécharge les tarballs les plus récents à ce jour
 On vérifie que les signatures
 
 	gpg --verify tcpdump-4.6.2.tar.gz.sig
-	
+
 	gpg: Signature made Wed 03 Sep 2014 03:27:15 CEST using RSA key ID D9C15D0D
 	gpg: Can't check signature: public key not found
 
@@ -103,7 +103,7 @@ Ah... on a pas encore la clé publique dans le keyring, on la récupère :
 
 On relance la vérification des signatures de la librairie PCAP
 
-	gpg --verify libpcap-1.6.2.tar.gz.sig 
+	gpg --verify libpcap-1.6.2.tar.gz.sig
 
 	gpg: Signature made Wed 03 Sep 2014 02:06:25 CEST using RSA key ID D9C15D0D
 	gpg: Good signature from "The Tcpdump Group (Package signing key) <release@tcpdump.org>"
@@ -152,7 +152,7 @@ On configure les flags pour que tout soit compilé/linké en static :
 
 Et on compile TCPDUMP
 
-	tar xf tcpdump-4.6.2.tar.gz 
+	tar xf tcpdump-4.6.2.tar.gz
 	cd tcpdump-4.6.2/
 	./configure --host=arm-linux --disable-ipv6
 	make
@@ -168,7 +168,7 @@ On obtient alors le précieux exécutable, à la fois compatible ARM **et** stan
 
 Vous pouvez le télécharger link:/files/tcpdump[ici]
 
-Après l'avoir téléchargé, Pour vérifier l'empreinte MD5 donnée ci-dessus, il suffit de 
+Après l'avoir téléchargé, Pour vérifier l'empreinte MD5 donnée ci-dessus, il suffit de
 
 	md5sum tcpdump
 
@@ -199,7 +199,7 @@ Yabon.
 
 == Choisir son interface
 
-Pour trouver les interfaces où il y a du trafic réseau, le plus simple est de lancer la commande, et de rechercher dans le listing les interfaces qui ont des adresses IP présentes : 
+Pour trouver les interfaces où il y a du trafic réseau, le plus simple est de lancer la commande, et de rechercher dans le listing les interfaces qui ont des adresses IP présentes :
 
 	ip addr
 

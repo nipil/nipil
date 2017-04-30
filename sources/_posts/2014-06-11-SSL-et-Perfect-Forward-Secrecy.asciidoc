@@ -14,7 +14,7 @@ Dans le cas 1, c'est possible car la clé privée est utilisée à la fois pour 
 
 == Inventaire des ciphers souhaités
 
-Un "cipher" est une combinaison de 4 séries de paramètres : 
+Un "cipher" est une combinaison de 4 séries de paramètres :
 - Kx = échange de clés (pour échanger les informations nécessaires aux méthodes suivantes)
 - Au = authentification (pour vérifier à qui on cause et prouver qui on est)
 - Enc = chiffrement (pour rendre les données confidentielles)

@@ -24,7 +24,7 @@ Pour ce faire, on va utiliser :
 - Racoon + ipsec-tools pour l'ISAKMP/IPSec de la gateway
 - xl2tpd + pppd pour le tunnel L2TP/ppp
 
-A noter qu'il existe 3 solutions pour faire de l'IPSec sous Debian (racoon + 
+A noter qu'il existe 3 solutions pour faire de l'IPSec sous Debian (racoon +
 ipsec-tools, OpenSwan, StrongSwan). On pourrait utiliser l'une ou l'autre,
 les trois ont vocation à être reconduites dans Jessie.
 
@@ -45,7 +45,7 @@ Raspberry Pi, Alix, vieux pentium 100 ou aute tromblon à faible consommation)
 mais que ce même équipement dispose d'une accélération matérielle (Alix,
 Soekris) alors vous avez tout intérêt à le faire en IPSec plutôt qu'en OpenVPN.
 
-Cela dit, si votre serveur/gateway/pc/smartphone a un gros processeur, 
+Cela dit, si votre serveur/gateway/pc/smartphone a un gros processeur,
 préférez OpenVPN, c'est plus simple.
 Et idem, si vous êtes limités par votre débit internet (connexion 3G, ADSL)
 alors ça ne sert à rien de vous compliquer la vie avec de l'IPSec, préférez
@@ -107,7 +107,7 @@ Maintenant on peut reconfigurer les différents fichiers
 	spdadd 0.0.0.0/0[1701] 0.0.0.0/0[0] udp -P out ipsec
 		esp/transport//require;
 
-/etc/racoon/racoon.conf 
+/etc/racoon/racoon.conf
 
 	log notify;
 	path pre_shared_key "/etc/racoon/psk.txt";
@@ -132,15 +132,15 @@ Maintenant on peut reconfigurer les différents fichiers
 		compression_algorithm deflate;
 	}
 
-/etc/racoon/psk.txt 
+/etc/racoon/psk.txt
 
 	* mypresharedkey
 
-/etc/ppp/chap-secrets 
+/etc/ppp/chap-secrets
 
 	myusername l2tpd mypassword *
 
-/etc/ppp/xl2tpd-options 
+/etc/ppp/xl2tpd-options
 
 	mtu 1372
 	mru 1372
@@ -171,33 +171,33 @@ Maintenant on peut reconfigurer les différents fichiers
 	net eth0 tcpflags,logmartians,nosmurfs,sourceroute=0,routefilter
 	mobil ppp+ tcpflags,nosmurfs
 
-/etc/shorewall/zones 
+/etc/shorewall/zones
 
 	fw firewall
 	net ipv4
 	l2tp ipv4
 	mobil ipv4
 
-/etc/shorewall/tunnels 
+/etc/shorewall/tunnels
 
 	ipsecnat net 0.0.0.0/0
 
-/etc/shorewall/hosts 
+/etc/shorewall/hosts
 
 	l2tp eth0:0.0.0.0/0 ipsec
 
-/etc/shorewall/masq 
+/etc/shorewall/masq
 
 	eth0 192.168.0.0/16
 
-/etc/shorewall/policy 
+/etc/shorewall/policy
 
 	net all DROP info
 	$FW net ACCEPT
 	mobil net ACCEPT
 	all all REJECT info
 
-/etc/shorewall/rules 
+/etc/shorewall/rules
 
 	SECTION NEW
 
@@ -235,14 +235,14 @@ utilise.
 Sur les client linux, les fichiers suivants sont identiques à ceux du serveur :
 
 - /etc/ipsec-tools.conf
-- /etc/racoon/racoon.conf 
-- /etc/racoon/psk.txt 
-- /etc/ppp/chap-secrets 
+- /etc/racoon/racoon.conf
+- /etc/racoon/psk.txt
+- /etc/ppp/chap-secrets
 - /etc/shorewall/zones
-- /etc/shorewall/tunnels 
-- /etc/shorewall/masq 
+- /etc/shorewall/tunnels
+- /etc/shorewall/masq
 - /etc/shorewall/interfaces
-- /etc/shorewall/hosts 
+- /etc/shorewall/hosts
 
 Par contre les fichiers suivants diffèrent pour le client :
 
@@ -270,14 +270,14 @@ Par contre les fichiers suivants diffèrent pour le client :
 	length bit = yes
 	;ppp debug = yes
 
-/etc/shorewall/policy 
+/etc/shorewall/policy
 
 	net all DROP info
 	$FW net ACCEPT
 	$FW mobil ACCEPT
 	all all REJECT info
 
-/etc/shorewall/rules 
+/etc/shorewall/rules
 
 	SECTION NEW
 
@@ -313,11 +313,11 @@ Quand le tunnel est monté correctement, une interface **pppX** est créée
 	...
 	128: ppp0: <POINTOPOINT,MULTICAST,NOARP,UP,LOWER_UP> mtu 1372
 		       qdisc pfifo_fast state UNKNOWN qlen 3
-	link/ppp 
+	link/ppp
 	inet 192.168.34.100 peer 192.168.34.1/32 scope global ppp0
 	...
 
-On a vu passer dans le syslog un message 
+On a vu passer dans le syslog un message
 
 	pppd: not replacing existing default route via 192.168.111.1
 
@@ -330,10 +330,10 @@ Et la table de routage est mise à jour
 
 	ip route
 
-	0.0.0.0/1 dev ppp0  scope link 
-	default via 192.168.111.1 dev eth0 
-	128.0.0.0/1 dev ppp0  scope link 
-	192.168.34.1 dev ppp0  proto kernel  scope link  src 192.168.34.100 
+	0.0.0.0/1 dev ppp0  scope link
+	default via 192.168.111.1 dev eth0
+	128.0.0.0/1 dev ppp0  scope link
+	192.168.34.1 dev ppp0  proto kernel  scope link  src 192.168.34.100
 	192.168.111.0/24 dev eth0  proto kernel  scope link  src 192.168.111.3
 
 Normalement, en allant sur link:http://monip.org[monip.org] on devrait avoir

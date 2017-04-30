@@ -160,20 +160,20 @@ Ci après un exemple du résultat de la commande
 	34:97:7b
 	Exponent: 65537 (0x10001)
 	X509v3 extensions:
-	X509v3 Basic Constraints: 
+	X509v3 Basic Constraints:
 	CA:FALSE
-	X509v3 Key Usage: 
+	X509v3 Key Usage:
 	Digital Signature, Key Encipherment, Key Agreement
-	X509v3 Extended Key Usage: 
+	X509v3 Extended Key Usage:
 	TLS Web Server Authentication
-	X509v3 Subject Key Identifier: 
+	X509v3 Subject Key Identifier:
 	E7:D3:28:C7:84:E8:37:5A:7D:14:D1:4B:71:1F:CA:D9:7E:F8:D7:6D
-	X509v3 Authority Key Identifier: 
+	X509v3 Authority Key Identifier:
 	keyid:EB:42:34:D0:98:B0:AB:9F:F4:1B:6B:08:F7:CC:64:2E:EF:0E:2C:45
 
-	X509v3 Subject Alternative Name: 
+	X509v3 Subject Alternative Name:
 	DNS:fantasio.nipil.org, DNS:nipil.org
-	X509v3 Certificate Policies: 
+	X509v3 Certificate Policies:
 	Policy: 2.23.140.1.2.1
 	Policy: 1.3.6.1.4.1.23223.1.2.3
 	CPS: http://www.startssl.com/policy.pdf
@@ -182,16 +182,16 @@ Ci après un exemple du résultat de la commande
 	Number: 1
 	Explicit Text: This certificate was issued according to the Class 1 Validation requirements of the StartCom CA policy, reliance only for the intended purpose in compliance of the relying party obligations.
 
-	X509v3 CRL Distribution Points: 
+	X509v3 CRL Distribution Points:
 
 	Full Name:
 	URI:http://crl.startssl.com/crt1-crl.crl
 
-	Authority Information Access: 
+	Authority Information Access:
 	OCSP - URI:http://ocsp.startssl.com/sub/class1/server/ca
 	CA Issuers - URI:http://aia.startssl.com/certs/sub.class1.server.ca.crt
 
-	X509v3 Issuer Alternative Name: 
+	X509v3 Issuer Alternative Name:
 	URI:http://www.startssl.com/
 	Signature Algorithm: sha1WithRSAEncryption
 	55:48:c6:19:42:dc:fb:ef:a2:a4:e7:17:e5:ba:ba:4a:dc:86:
@@ -219,7 +219,7 @@ On est maintenant prêts à mettre en place les certificats.
 
 == Mise en place des certificats pour Dovecot
 
-Ensuite on configure place les informations au bon endroit pour Dovecot, selon la config Debian par défaut (cf `/etc/dovecot/conf.d/10-ssl.conf`) 
+Ensuite on configure place les informations au bon endroit pour Dovecot, selon la config Debian par défaut (cf `/etc/dovecot/conf.d/10-ssl.conf`)
 
 On place les 3 certificats (serveur + AC intermédiaire + AC racine) dans un seul fichier `/etc/dovecot/dovecot.pem`
 

@@ -53,7 +53,7 @@ Pour ce faire, différents outils ont été créé au fil du temps :
 - DMARC
 - les outils d'analyse du contenu de chaque email
 
-Les listes noires sont constituées en temps réel, par exemple par link:http://www.spamhaus.org/lookup/[SpamHaus], link:http://cbl.abuseat.org/lookup.cgi[CBL], link:http://www.sorbs.net/lookup.shtml[SORBS], ou link:http://www.njabl.org/cgi-bin/lookup.cgi[njabl]. Le forumlaire link:http://www.senderbase.org/[SenderBase] permet de toutes les tester à la fois pour voir si votre IP est inclus dans l'une ou l'autres des listes. Pour information, chaque liste donne une procédure à suivre si on a été inclus dans l'une ou l'autre liste "à tort", mais si ça n'est pas instantané. Par exemple, si on a du mal à envoyer des mails à des destinataires AOL, on peut aller voir link:http://postmaster.aol.com/SupportRequest.php[ici], pour Hotmail ça serait link:https://support.msn.com/eform.aspx?productKey=edfsmsbl2&ct=eformts[ici] etc.
+Les listes noires sont constituées en temps réel, par exemple par link:http://www.spamhaus.org/lookup/[SpamHaus], link:http://cbl.abuseat.org/lookup.cgi[CBL], link:http://www.sorbs.net/lookup.shtml[SORBS]. Pour info, (update 2017-04-30: suppression du lien njabl.org pour cause d'link:http://www.dnsbl.info/dnsbl-njabl-org.php[arrêt de service]). Le forumlaire link:http://www.senderbase.org/[SenderBase] permet de toutes les tester à la fois pour voir si votre IP est inclus dans l'une ou l'autres des listes. Pour information, chaque liste donne une procédure à suivre si on a été inclus dans l'une ou l'autre liste "à tort", mais si ça n'est pas instantané. Par exemple, si on a du mal à envoyer des mails à des destinataires AOL, on peut aller voir link:http://postmaster.aol.com/SupportRequest.php[ici], pour Hotmail ça serait link:https://support.msn.com/eform.aspx?productKey=edfsmsbl2&ct=eformts[ici] etc.
 
 Les listes blanches consistent à dire, "ce serveur n'est pas un mauvais serveur". Ca vaut ce que ça vaut, mais elles sont souvent utilisées par des outils comme SpamAssassin, et comme ça ne coûte rien d'autre qu'une inscription gratuie (par exemple sur link:http://dnswl.org/[DnsWL] autant en profiter si besoin.
 
@@ -63,7 +63,7 @@ L'enregistrement "Sender Policy Framework" (link:http://fr.wikipedia.org/wiki/Se
 
 TODO: DKIM
 
-TODO: DMARC http://www.returnpath.com/solution-content/dmarc-support/
+TODO: DMARC
 
 Restent au final les outils d'analyse fine du contenu de chaque email qui passe, comme SpamAssassin. Ils analysent la structure, les pièces jointes, le contenu, et comparent ça à des modèles, et des variables heuristiques pour détecter si c'est un spam ou pas. C'est un sujet en soi, qui mériterait son propre article. Tant qu'on a pas trop de spam reçu sur notre serveur, on va s'en passer.
 
@@ -251,7 +251,7 @@ Un serveur SMTP doit relayer de 4 manières différentes :
 - de l'externe vers le domaine local
 - du domaine local vers l'externe
 - du domaine local vers le domaine local
-- de l'externe vers l'externe doit être interdit (link:htts://en.wikipedia.org/wiki/Open_mail_relay[Open Relay])
+- de l'externe vers l'externe doit être interdit (link:https://en.wikipedia.org/wiki/Open_mail_relay[Open Relay])
 
 Il est *absolument vital* que votre serveur ne soit pas un "open relay" pour deux raisons :
 - la première est que n'importe qui pourrait utiliser votre serveur et votre connexion pour envoyer du spam, ce qui bouffe vos ressources et vous fait passer pour un spammeur, vous exposant à des poursuites
@@ -323,7 +323,7 @@ On créé un petit script que j'appelerai `exim-auth-add-user` et qu'on pourra p
 
 La méthode de sécurisation de mots de passe choisie est issue de la liste récupérée à partir de la commande `mkpasswd -m help`, et on évitera comme la peste les méthodes `md5` et `des`, c'est pourquoi on a choisi le `sha-512`, qui est la même méthode que celle utilisée pour les comptes du systèmes (c'est pas pour rien !)
 
-Je créé alors un compte de test `toto-test-smtp` via `exim-auth-add-user toto-test-smtp` en tant que root, avec mot de passe `blahblahblahblahblah`. On va tester avec l'outil SWAKS que le relais fonctionne bien quand on est authentifié, en emettant un email dont la source est une des adresses de notre nom de courrier, vers une notre boite aux lettres. 
+Je créé alors un compte de test `toto-test-smtp` via `exim-auth-add-user toto-test-smtp` en tant que root, avec mot de passe `blahblahblahblahblah`. On va tester avec l'outil SWAKS que le relais fonctionne bien quand on est authentifié, en emettant un email dont la source est une des adresses de notre nom de courrier, vers une notre boite aux lettres.
 
 	$ swaks --to xxxxxxxxxxx@gmail.com --from yyyyyyyyy@mail.nipil.org \
 	    --auth PLAIN -tls --auth-user toto-test-smtp -s home.nipil.org
@@ -363,9 +363,9 @@ Je créé alors un compte de test `toto-test-smtp` via `exim-auth-add-user toto-
 	 ~> From: yyyyyyyyy@mail.nipil.org
 	 ~> Subject: test Fri, 07 Jun 2013 10:29:25 +0200
 	 ~> X-Mailer: swaks v20120320.0 jetmore.org/john/code/swaks/
-	 ~> 
+	 ~>
 	 ~> This is a test mailing
-	 ~> 
+	 ~>
 	 ~> .
 	<~  250 OK id=1Uks3Q-0001Tm-UZ
 	 ~> QUIT
@@ -418,9 +418,9 @@ On refait la même chose avec la méthode `LOGIN` pour vérifier :
 	 ~> From: yyyyyyyyyyyyyyyyyyy@mail.nipil.org
 	 ~> Subject: test Fri, 07 Jun 2013 10:52:57 +0200
 	 ~> X-Mailer: swaks v20120320.0 jetmore.org/john/code/swaks/
-	 ~> 
+	 ~>
 	 ~> This is a test mailing
-	 ~> 
+	 ~>
 	 ~> .
 	<~  250 OK id=1UksQ9-0001UL-AH
 	 ~> QUIT
@@ -547,7 +547,7 @@ Ne reste plus qu'à recharger la configuration via `/etc/init.d/dovecot reload`,
 	    Protocol  : TLSv1.1
 	    Cipher    : DHE-RSA-AES256-SHA
 	    Session-ID: E86D0ADA803ABC39C6...F817EEE93091ECAF5D
-	    Session-ID-ctx: 
+	    Session-ID-ctx:
 	    Master-Key: 1208A337D4C446BAC2B1887CA23D98632AE0524763...11023819C
 	    Key-Arg   : None
 	    PSK identity: None
@@ -591,19 +591,19 @@ Dans le syslog ça donne ça (j'ai viré une dizaine de ligne liées au TLS)
 	    location=maildir:~/Maildir
 	Jun 10 16:33:03 home dovecot: imap(toto): Debug: maildir++: root=/home/toto//Maildir,
 	    index=, control=, inbox=/home/toto//Maildir, alt=
-	Jun 10 16:33:03 home dovecot: imap(toto): Debug: Namespace : /home/toto//Maildir 
+	Jun 10 16:33:03 home dovecot: imap(toto): Debug: Namespace : /home/toto//Maildir
 	    doesn't exist yet, using default permissions
 	Jun 10 16:33:03 home dovecot: imap(toto): Debug: Namespace : Using permissions
 	    from /home/toto//Maildir: mode=0700 gid=-1
 	Jun 10 16:33:29 home dovecot: imap(toto): Disconnected: Logged out in=22 out=399
 
-Comme ça fonctionne, ne reste plus qu'à configurer le pare-feux IPv4 et IPv6. 
+Comme ça fonctionne, ne reste plus qu'à configurer le pare-feux IPv4 et IPv6.
 - ajouter la ligne `IMAPS(ACCEPT) net $FW` à `/etc/shorewall/rules`
 - recharger le pare feu IPv4 via `/etc/init.d/shorewall force-reload`
 - ajouter la ligne `IMAPS(ACCEPT) net $FW` à `/etc/shorewall6/rules`
 - recharger le pare feu IPv6 via `/etc/init.d/shorewall6 force-reload`
 
-Pour vérifier ou suivre la propagation des accès, on peut ajouter le logging des connexions en utilisant `IMAPS(ACCEPT):info` à la place. On pourra enlever le logging après coup quand on sera satisfaits. 
+Pour vérifier ou suivre la propagation des accès, on peut ajouter le logging des connexions en utilisant `IMAPS(ACCEPT):info` à la place. On pourra enlever le logging après coup quand on sera satisfaits.
 
 Pour débugger, on aura plusieurs sources d'information :
 - les logs du firewall

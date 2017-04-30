@@ -197,7 +197,7 @@ Un des principales contraintes n'est pas technique mais organisationnelle : les 
 
 Il serait techniquement possible de mettre 1x fois notre adresse personnelle, et 1x celui d'un dns secondaire quelconque d'internet, mais ça ne foncitonnerait pas car le registrar vérifie que chacun des dns rentré est `SOA` sur la zone demandée avant d'accepter la modification, ce qui n'est pas le cas pour le dns choisi au pif.
 
-Resterait la solution de mettre 1x notre adresse, et 1x l'adresse d'un des serveurs DNS du registrar. Résultat ? le registrar accepte la modification. Cool ? Non. Car on aurait alors un problème de cohérence. En effet, pour résoudre les informations de notre zone `nipil.org`, les résolveurs commencent par demander à `org` qui gère `nipil`, et en faisant ça ils obtiendrait à chaque fois l'une ou l'autre des réponses suivantes : 
+Resterait la solution de mettre 1x notre adresse, et 1x l'adresse d'un des serveurs DNS du registrar. Résultat ? le registrar accepte la modification. Cool ? Non. Car on aurait alors un problème de cohérence. En effet, pour résoudre les informations de notre zone `nipil.org`, les résolveurs commencent par demander à `org` qui gère `nipil`, et en faisant ça ils obtiendrait à chaque fois l'une ou l'autre des réponses suivantes :
 
 	;; AUTHORITY SECTION:
 	nipil.org.		86400	IN	NS	ns0.nipil.org.
@@ -270,7 +270,7 @@ S'il n'y a aucune ligne indiquant un `nameserver`, c'est `localhost` qui sera ut
 
 === Etape 2 : configuration d'un daemon DNS Bind
 
-Tout d'abord, il faut protéger son serveur DNS vis à vis des attaques et des abus. Une règles les plus importantes est de ne pas permettre à quelqu'un venant d'internet d'interroger notre serveur en lui demandant de résoudre des adresses qui ne font pas partie de notre zone (qu'il ne soit pas un "open resolver"). 
+Tout d'abord, il faut protéger son serveur DNS vis à vis des attaques et des abus. Une règles les plus importantes est de ne pas permettre à quelqu'un venant d'internet d'interroger notre serveur en lui demandant de résoudre des adresses qui ne font pas partie de notre zone (qu'il ne soit pas un "open resolver").
 
 De plus, pour éviter que notre serveur contacte systématiquement les racines d'internet (qui ne sont pas faits pour ça !), il faut que l'on configure quelques forwarders, à qui on relaiera toutes nos requêtes DNS en provenance de nos machines LAN. J'utiliserai les deux DNS de mon FAI (Free), mais on peut utiliser d'autres serveurs.
 
@@ -303,7 +303,7 @@ Pour finir, on a indique que les informations relatives à cette zone `nipil.org
 	15M        ; retry
 	4W         ; expire
 	10M        ; failed lookup cache
-	) 
+	)
 
 	; Nameserver stuff
 	@          IN      NS      ns0.nipil.org.
@@ -331,7 +331,7 @@ Pour accepter les connexions entrantes en IPv6
 
 Pour vérifier ou suivre la propagation des requêtes, on peut ajouter le logging des connexions en utilisant `DNS(ACCEPT):info` à la place. On pourra enlever le logging après coup quand on sera satisfaits. Vérifier aussi que l'on accepte pas de spoofing avec des adresses sources locales sur l'interface côté internet, c'est à dire qu'il y a l'option `norfc1918` pour la ligne de l'interface de la zone `net` dans le fichier `/etc/shorewall/interface`.
 
-Tester via ce premier formulaire link:http://www.afnic.fr/fr/produits-et-services/services/zonecheck/formulaire-complet/[Afnic Zonecheck], où il faut remplir la zone, et mettre dans la case "primaire" l'adresse de votre serveur, que votre zone est bien configurée (cocher la case "continue après fatal"). Puis tester via secondle formulaire link:http://dns.measurement-factory.com/cgi-bin/openresolvercheck.pl[open resolver] en rentrant l'adresse IP de votre serveur, que votre daemon n'est pas un "open resolver" (ça doit marquer "closed").
+Tester via ce premier formulaire link:https://www.zonemaster.fr[Zonemaster] (update 2017-04-30: remplacement de zonecheck par zonemaster suite à ce link:https://www.afnic.fr/fr/l-afnic-en-bref/actualites/actualites-operationnelles/8981/showOperational/annonce-de-la-migration-zonecheck-vers-zonemaster.html[communiqué]) où il faut remplir la zone, et mettre dans la case "primaire" l'adresse de votre serveur, que votre zone est bien configurée (cocher la case "continue après fatal"). Puis tester via secondle formulaire link:http://dns.measurement-factory.com/cgi-bin/openresolvercheck.pl[open resolver] en rentrant l'adresse IP de votre serveur, que votre daemon n'est pas un "open resolver" (ça doit marquer "closed").
 
 Une capture réseau `tcpdump -i interface_internet port domain` permet de voir les requêtes entrantes et sortantes, dans le tas on trouve celle du test de l'open resolver, qui est satisfaisant car la réponse fournie par Bind est "Refused".
 
@@ -349,7 +349,7 @@ On va ensuite dans l'onglet "Manage DNS servers", et on remplace les valeurs par
 Ca donnera quelque chose comme ça,pour mon registrar Online.net :
 
 	DNS Server       |     IPv4 (optional)
-	-----------------+--------------------	
+	-----------------+--------------------
 	ns0.nipil.org    |     88.189.158.57
 	ns1.nipil.org    |     78.251.94.78
 

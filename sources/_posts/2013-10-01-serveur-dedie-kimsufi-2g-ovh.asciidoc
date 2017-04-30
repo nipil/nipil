@@ -64,7 +64,7 @@ Concernant la RAM, on a 2Go de DDR2-533Mhz, mais sur une seule barette donc pas 
 
 Pour le reste du hardware on a un chipset graphique intégré, ce qui permettra de faire tourner un serveur X, et pas de disque externe connecté en USB (une option OVH payante pour ceux qui en auraient besoin).
 
-	# lspci 
+	# lspci
 	00:00.0 Host bridge: Silicon Integrated Systems [SiS] 662 Host (rev 01)
 	00:01.0 PCI bridge: Silicon Integrated Systems [SiS] AGP Port (virtual PCI-to-PCI bridge)
 	00:02.0 ISA bridge: Silicon Integrated Systems [SiS] SiS964 [MuTIOL Media IO] LPC Controller (rev 36)
@@ -78,7 +78,7 @@ Pour le reste du hardware on a un chipset graphique intégré, ce qui permettra 
 	00:1f.0 PCI bridge: Silicon Integrated Systems [SiS] PCI-to-PCI bridge
 	01:00.0 VGA compatible controller: Silicon Integrated Systems [SiS] 661/741/760 PCI/AGP or 662/761Gx PCIE VGA Display Adapter (rev 04)
 
-	# lsusb 
+	# lsusb
 	Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
 	Bus 002 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
 	Bus 003 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
@@ -86,7 +86,7 @@ Pour le reste du hardware on a un chipset graphique intégré, ce qui permettra 
 
 Seul truc surprenant, `lsmod` ne retourne rien et remonte une erreur, mais bon on verra plus tard si c'est réellement un problème.
 
-	# lsmod   
+	# lsmod
 	libkmod: ERROR ../libkmod/libkmod-module.c:1567 kmod_module_new_from_loaded: could not open /proc/modules: No such file or directory
 	Error: could not get list of modules: No such file or directory
 
@@ -115,20 +115,20 @@ On a une connectivité IPv4 et IPv6 native, une MTU de 1500. On remarquera que l
 	link/ether 00:1c:c0:ab:cd:ef brd ff:ff:ff:ff:ff:ff
 	inet 91.121.CCC.DDD/24 brd 91.121.CCC.255 scope global eth0
 	valid_lft forever preferred_lft forever
-	inet6 2001:abcd:1:abcd::1/64 scope global 
+	inet6 2001:abcd:1:abcd::1/64 scope global
 	valid_lft forever preferred_lft forever
-	inet6 fe80::21c:c0ff:feab:cdef/64 scope link 
+	inet6 fe80::21c:c0ff:feab:cdef/64 scope link
 	valid_lft forever preferred_lft forever
 
-	# ip route              
-	default via 91.121.CCC.254 dev eth0 
-	91.121.CCC.0/24 dev eth0  proto kernel  scope link  src 91.121.CCC.DDD 
+	# ip route
+	default via 91.121.CCC.254 dev eth0
+	91.121.CCC.0/24 dev eth0  proto kernel  scope link  src 91.121.CCC.DDD
 
 	# ip -6 route
-	2001:abcd:1:abcd::/64 dev eth0  proto kernel  metric 256 
-	2001:abcd:1:abff:ff:ff:ff:ff dev eth0  metric 1024 
-	fe80::/64 dev eth0  proto kernel  metric 256 
-	default via 2001:abcd:1:abff:ff:ff:ff:ff dev eth0  metric 1024 
+	2001:abcd:1:abcd::/64 dev eth0  proto kernel  metric 256
+	2001:abcd:1:abff:ff:ff:ff:ff dev eth0  metric 1024
+	fe80::/64 dev eth0  proto kernel  metric 256
+	default via 2001:abcd:1:abff:ff:ff:ff:ff dev eth0  metric 1024
 
 On va regarder comment on communique avec le reste du monde. Ci-dessous la partie intéressante des traceroute IPv4 et IPv6 :
 
@@ -162,26 +162,26 @@ Côté services lancés par défaut, on trouve SSH sur toutes les addresses disp
 	# netstat -lp
 	Connexions Internet actives (seulement serveurs)
 	Proto Recv-Q Send-Q Adresse locale          Adresse distante        Etat        PID/Program name
-	tcp        0      0 localhost.locald:domain *:*                     LISTEN      3849/named      
-	tcp        0      0 *:ssh                   *:*                     LISTEN      3992/sshd       
-	tcp        0      0 localhost.localdoma:953 *:*                     LISTEN      3849/named      
-	tcp6       0      0 ip6-localhost:domain    [::]:*                  LISTEN      3849/named      
-	tcp6       0      0 [::]:ssh                [::]:*                  LISTEN      3992/sshd       
-	tcp6       0      0 ip6-localhost:953       [::]:*                  LISTEN      3849/named      
-	udp        0      0 localhost.locald:domain *:*                                 3849/named      
-	udp6       0      0 ip6-localhost:domain    [::]:*                              3849/named      
+	tcp        0      0 localhost.locald:domain *:*                     LISTEN      3849/named
+	tcp        0      0 *:ssh                   *:*                     LISTEN      3992/sshd
+	tcp        0      0 localhost.localdoma:953 *:*                     LISTEN      3849/named
+	tcp6       0      0 ip6-localhost:domain    [::]:*                  LISTEN      3849/named
+	tcp6       0      0 [::]:ssh                [::]:*                  LISTEN      3992/sshd
+	tcp6       0      0 ip6-localhost:953       [::]:*                  LISTEN      3849/named
+	udp        0      0 localhost.locald:domain *:*                                 3849/named
+	udp6       0      0 ip6-localhost:domain    [::]:*                              3849/named
 
 Concernant la sécurisation réseau, la configuration initiale du firewall est vide (aucun filtrage entrant ou sortant) ce qui est logique, car après tout seul le serice SSH est actuellement disponible, et pour que le client puisse s'y connecter depuis n'importe où, aucune sécurisation additionnelle n'était possible.
 
 	# iptables -L
 	Chain INPUT (policy ACCEPT)
-	target     prot opt source               destination         
+	target     prot opt source               destination
 
 	Chain FORWARD (policy ACCEPT)
-	target     prot opt source               destination         
+	target     prot opt source               destination
 
 	Chain OUTPUT (policy ACCEPT)
-	target     prot opt source               destination  
+	target     prot opt source               destination
 
 Pour ce qui est de la bande passante allouée au serveur, on est connecté au LAN OVH en 100 méga full duplex, et la bande passante effective est **SLA best effort** (Service Level Agreement) c'est à dire qu'elle n'est pas garantie.
 
@@ -211,9 +211,9 @@ Lors de la commande, on a pas demandé de partitionnement spécifique, ni de LVM
 
 Ce qu'il faut retenir, c'est qu'avec le partitionnement par défaut les data volumineuses **doivent** être stockées dans la partition `home` (de 460go) car la partition racine ne fait "que" 20Go. Par défaut, les deux partitions sont en EXT4 (système de fichier journalisé donc plus résilient aux pannes).
 
-	# lsblk 
+	# lsblk
 	NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
-	sda      8:0    0 465,8G  0 disk 
+	sda      8:0    0 465,8G  0 disk
 	|-sda1   8:1    0    20G  0 part /
 	|-sda2   8:2    0 445,3G  0 part /home
 	`-sda3   8:3    0   513M  0 part [SWAP]
@@ -265,7 +265,7 @@ Le fichier `.ovhrc` contient les infos suivantes
 
 Dans les tâches cron on retrouve l'appel à l'outil OVH de supervision, RTM. Il s'agit d'un ensemble de scripts perl/bash, séparé du reste du système de base, et rangé proprement dans /usr/local/rtm
 
-	# cat /etc/crontab 
+	# cat /etc/crontab
 	*/1 * * * * root /usr/local/rtm/bin/rtm 9 > /dev/null 2> /dev/null
 
 Cette Debian "OVH" est donc une Debian standard, si ce n'est:

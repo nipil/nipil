@@ -46,7 +46,7 @@ Chaque article, page, entrée de blog, sera donc écrite en markdown. Au moment 
 
 Le convertisseur n'entoure le contenu généré d'aucune balise, ce qui fait qu'il est facile d'assembler une page en partant d'une structure de site, en insérant le contenu, et en y ajoutant la partie commentaires, bref la structure du site.
 
-Et comme pour nous faire plaisir, il existe un link:http://packages.debian.org/stable/main/markdown[package debian stable], ce qui évite les complications d'installation et de maintenance. Et ça s'arrête là si la partie "structure" est gérée par une solution codée personnellement 
+Et comme pour nous faire plaisir, il existe un link:http://packages.debian.org/stable/main/markdown[package debian stable], ce qui évite les complications d'installation et de maintenance. Et ça s'arrête là si la partie "structure" est gérée par une solution codée personnellement
 
 === Générateur de site "clé en mains"
 
@@ -79,25 +79,25 @@ Exemple :
 	title:  "Passage sous Jekyll"
 	tags: blog jekyll
 	---
-	
+
 	# titre de niveau 1
-	
+
 	paragraphe
-	
+
 	## titre de niveau 2
-	
+
 	liste a puce
 	- aze
 	- qsd
-	
+
 	liste ordonnée
 	1. aze
 	2. qsd
 
 	link:http://lien[texte du lien]
-	
+
 	texte en *italique*
-	
+
 	texte en **gras**
 
 Comme vous pouvez le voir, c'est extrêmement lisible, et facile à lire et à écrire. Alors hop hop, on va écrire pleins de billets et d'articles, car après tout, c'est ça qui compte, non ?

@@ -24,7 +24,7 @@ On voit ça sur le diagramme ci-dessous :
 
 <img src="/files/hubic002.png" />
 
-Dans tous les cas, c'est "juste un protocole". *N'importe quelle application* qui respecte ce protocole *peut accéder à toutes les resources accessibles* offerte via ce protocole. 
+Dans tous les cas, c'est "juste un protocole". *N'importe quelle application* qui respecte ce protocole *peut accéder à toutes les resources accessibles* offerte via ce protocole.
 
 == Pourquoi OVH a décidé de faire autrement ?!
 

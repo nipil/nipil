@@ -49,7 +49,7 @@ Bon, à nouveau, je me dis "ok, tout est sous contrôle". Mais je me dis aussi q
 
 == C'est passé à un cheveu ?
 
-Après avoir lu dans le métro  les commentaires d'un article link:http://slashdot.org/story/14/09/25/1757208/flurry-of-scans-hint-that-bash-vulnerability-could-already-be-in-the-wild[slashdot] sur le sujet, je décide de vérifier si mon/mes serveurs web ont été ciblés par les tentatives d'attaque du premier bug. 
+Après avoir lu dans le métro  les commentaires d'un article link:http://slashdot.org/story/14/09/25/1757208/flurry-of-scans-hint-that-bash-vulnerability-could-already-be-in-the-wild[slashdot] sur le sujet, je décide de vérifier si mon/mes serveurs web ont été ciblés par les tentatives d'attaque du premier bug.
 
 A noter que mon serveur est un serveur personnel à très petit traffic, et donc il n'y a donc que peu de chance que je sois une cible "privilégiée", mais par contre il y a toutes les chances que je me prenne des tentatives.
 
@@ -91,7 +91,7 @@ Le troisième attaquant est arrivé ce matin, et était bien plus évolué et of
 
 Alors là : d'une part il essaie plusieurs URL afin de déclencher un process CGI, et d'autre part il essaie d'infecter sans phase de recensement : en effet, il upload un script perl, l'exécute et nettoie derrière lui. Pour information, le script Perl en question est visible sur link:http://pastebin.com/wZb9L2CW[PasteBin].
 
-Il s'agit d'un client IRC qui permet de 
+Il s'agit d'un client IRC qui permet de
 - récupérer des infos système de la cible
 - flooder/scanner les réseaux voisins
 - de récupérer des fichiers du serveur
@@ -104,7 +104,7 @@ Bref, simple mais efficace.
 
 J'ai eu de la chance... car il n'aura fallu que 13h après la publication d'une faille et que je voie de vraies tentatives arriver, et j'ai pu patcher entre temps.
 
-Mon conseil ? 
+Mon conseil ?
 - Même si on y comprend rien, se tenir informé permet de gagner du temps
 - Toujours patcher son système *rapidement*, car "quelques heures" c'est déjà long !
 

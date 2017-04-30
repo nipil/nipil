@@ -49,7 +49,7 @@ Idéalement, un équipement qui soit petit, discret, et silencieux.
 
 == La perle rare
 
-Après avoir découvert l'existance de cartes mères au format mini-ITX, et des boitiers qui vont avec, je suis tombé sur ce qui l'a semblé être la solution parfaite, l'Alix 2d3, créé par link:http://www.pcengines.ch[PCEngines]
+Après avoir découvert l'existance de cartes mères au format mini-ITX, et des boitiers qui vont avec, je suis tombé sur ce qui l'a semblé être la solution parfaite, l'Alix 2d3, créé par link:http://pcengines.ch/[PCEngines].
 
 <a href="/files/alix2d3.jpg"><img src="/files/alix2d3_small.jpg" /></a>
 
@@ -65,13 +65,13 @@ En détails, il s'agit
 - une prise série RS232 (pas d'écran)
 - une alimentation externe
 
-Ca m'aura coûté 250 euros (carte mère + carte CF + carte wifi + boitier + antennes + alimentation + adaptateur RS 232, mais hors disque dur que j'avais déjà) sur le site link:http://www.think-itx.com[Think-ITX] (**Update 2013-05-22:** ce site en particulier a disparu depuis, mais il existe un grand nombre de link:http://pcengines.ch/order.php[revendeurs]).
+Ca m'aura coûté 250 euros (carte mère + carte CF + carte wifi + boitier + antennes + alimentation + adaptateur RS 232, mais hors disque dur que j'avais déjà) sur le site Think-ITX.com (**Update 2013-05-22:** ce site en particulier a disparu depuis, mais il existe un grand nombre de link:http://pcengines.ch/order.htm[revendeurs]).
 
 Certes ça pouvait paraître cher, mais faut quand même réaliser qu'on parle d'un truc totalement fanless, et microscopique comparé à une tour traditionnelle.
 
 Avec ce modèle, impossible d'y connecter un écran, et y connecter un clavier serait inutile, car tout se fait via le port série RS 232. Il vous faudra donc un adaptateur USB-Série pour communiquer avec le boitier au tout début de l'installation, avant qu'on puisse s'y connecter en SSH.
 
-A noter qu'il existe d'autres versions, notemment avec une prise VGA, mais moins de prises réseaux, selon vos besoins chacun voit midi à sa porte. 
+A noter qu'il existe d'autres versions, notemment avec une prise VGA, mais moins de prises réseaux, selon vos besoins chacun voit midi à sa porte.
 
 **Update 2013-05-22:** Même si depuis, beaucoup de choses ont évolué dans le monde des ordinateurs de faible dimension, notemment avec Raspberry, Anduino, et autres types de clé-PC, je reste serein sur l'aspect "performance vs taille vs prix des mini-ITX versus les ordinateurs plus petits.
 
@@ -138,7 +138,7 @@ En imaginant que la carte CF soir le device `/dev/sde`
 - `mount /dev/sde1 /mnt/cfroot/boot`
 
 Installer le système
-- `debootstrap --arch i386 squeeze /mnt/cfroot http://ftp.debian.org/debian`
+- `debootstrap --arch i386 squeeze /mnt/cfroot http://ftp.debian.org/debian/`
 - documentation annexe sur le link:http://wiki.debian.org/fr/Debootstrap[wiki] officiel
 
 Passer du système "hôte" au système "cible"
@@ -169,6 +169,6 @@ Insérer la carte CF dans la carte Alix, l'alimenter après avoir connecté le p
 Redémarrer encore une fois, et on a un serveur autonome qui fonctionne.
 
 Quelques autres liens d'installation debian pour alix2d3
-- link:http://ericbosdure.com/2012/01/16/debian-6-sur-alix-2d13/[ericbosdure.com]
+- *update 2017-04-30*: page ericbosdure.com/2012/01/16/debian-6-sur-alix-2d13 introuvable, même sur archive.org
 - link:http://www.bitprocessor.be/2011/11/13/alix-2d13-debian-squeeze/[bitprocessor.be]
 
