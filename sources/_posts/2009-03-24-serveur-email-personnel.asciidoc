@@ -22,17 +22,17 @@ A titre personnel, ça me permettra de créer des alias temporaires pour m'enreg
 
 Ca n'empêche pas d'avoir un serveur mail à domicile : celui-ci peut remplacer ou complémenter celui donné par votre fournisseur, rien n'est imposé ni interdit.
 
-Je dispose déjà d'un service de mail fourni par mon hébergeur, [online.net](http://www.online.net) en offre Basique, qui donne entre autres les services email suivants :
+Je dispose déjà d'un service de mail fourni par mon hébergeur, link:http://www.online.net[online.net] en offre Basique, qui donne entre autres les services email suivants :
 - 3 comptes mails possibles
 - 1 go de stockage pour chacun
 - chaque mail fait un maximum de 50 mo
 - un nombre de redirections illimitées
 - possibilité de "catch-all" pour récupérer tous les emails envoyés au domaine.
 - consultation par POP/IMAP (avec sécurisation TLS)
-- envoi par SMTP [authentifié](http://documentation.online.net/fr/hebergement-mutualise/gestion-email/envoi-emails) (avec sécurisation TLS)
+- envoi par SMTP link:http://documentation.online.net/fr/hebergement-mutualise/gestion-email/envoi-emails[authentifié] (avec sécurisation TLS)
 - envoi de mail limité à 100 mails envoyés par heure (spammer-unfriendly)
 
-Comme les best-practices soulignent que pour chaque nom de domaine, un certain nombre d'adresses doivent exister, ou au moins, être capables de recevoir du courrier. La [RFC 2142](http://tools.ietf.org/html/rfc2142) donne la liste suivante : info, marketing, sales, support, abuse, trouble, noc, security, postmaster, hostmaster, usenet, news, webmaster, www, uucp, ftp, list, list-request et root.
+Comme les best-practices soulignent que pour chaque nom de domaine, un certain nombre d'adresses doivent exister, ou au moins, être capables de recevoir du courrier. La link:http://tools.ietf.org/html/rfc2142[RFC 2142] donne la liste suivante : info, marketing, sales, support, abuse, trouble, noc, security, postmaster, hostmaster, usenet, news, webmaster, www, uucp, ftp, list, list-request et root.
 
 Pour ce faire, j'ai créé un seul compte mail auprès de mon fournisseur, et ensuite une foule d'alias pour chacun des noms ci-dessus, qui renvoient sur le compte créé précédemment. J'aurais pu configurer une redirection "catch-all", aussi appelé *"email collecteur"*, mais tous le spam aléatoirement généré, genre (`john@`, etc) aurait été reçu, traité et stocké ... et ça ferait beaucoup. Je consulte ensuite cette boîte mail de manière autonome comme n'importe quel autre compte mail, mais je pourrais aussi rediriger tout ce qui y aterrirait vers ma boite personnelle.
 
@@ -53,13 +53,13 @@ Pour ce faire, différents outils ont été créé au fil du temps :
 - DMARC
 - les outils d'analyse du contenu de chaque email
 
-Les listes noires sont constituées en temps réel, par exemple par [SpamHaus](http://www.spamhaus.org/lookup/), [CBL](http://cbl.abuseat.org/lookup.cgi), [SORBS](http://www.sorbs.net/lookup.shtml), ou [njabl](http://www.njabl.org/cgi-bin/lookup.cgi). Le forumlaire [SenderBase](http://www.senderbase.org/) permet de toutes les tester à la fois pour voir si votre IP est inclus dans l'une ou l'autres des listes. Pour information, chaque liste donne une procédure à suivre si on a été inclus dans l'une ou l'autre liste "à tort", mais si ça n'est pas instantané. Par exemple, si on a du mal à envoyer des mails à des destinataires AOL, on peut aller voir [ici](http://postmaster.aol.com/SupportRequest.php), pour Hotmail ça serait [ici](https://support.msn.com/eform.aspx?productKey=edfsmsbl2&ct=eformts) etc.
+Les listes noires sont constituées en temps réel, par exemple par link:http://www.spamhaus.org/lookup/[SpamHaus], link:http://cbl.abuseat.org/lookup.cgi[CBL], link:http://www.sorbs.net/lookup.shtml[SORBS], ou link:http://www.njabl.org/cgi-bin/lookup.cgi[njabl]. Le forumlaire link:http://www.senderbase.org/[SenderBase] permet de toutes les tester à la fois pour voir si votre IP est inclus dans l'une ou l'autres des listes. Pour information, chaque liste donne une procédure à suivre si on a été inclus dans l'une ou l'autre liste "à tort", mais si ça n'est pas instantané. Par exemple, si on a du mal à envoyer des mails à des destinataires AOL, on peut aller voir link:http://postmaster.aol.com/SupportRequest.php[ici], pour Hotmail ça serait link:https://support.msn.com/eform.aspx?productKey=edfsmsbl2&ct=eformts[ici] etc.
 
-Les listes blanches consistent à dire, "ce serveur n'est pas un mauvais serveur". Ca vaut ce que ça vaut, mais elles sont souvent utilisées par des outils comme SpamAssassin, et comme ça ne coûte rien d'autre qu'une inscription gratuie (par exemple sur [DnsWL](http://dnswl.org/) autant en profiter si besoin.
+Les listes blanches consistent à dire, "ce serveur n'est pas un mauvais serveur". Ca vaut ce que ça vaut, mais elles sont souvent utilisées par des outils comme SpamAssassin, et comme ça ne coûte rien d'autre qu'une inscription gratuie (par exemple sur link:http://dnswl.org/[DnsWL] autant en profiter si besoin.
 
-Le SenderScore est un indicateur temps-réel, évalué sur 30 jours glissants, qui représente de manière agrégée la réputation de votre IP et de votre nom de courrier. Il est basé à la fois sur le comportement et les retours des utilisateurs recevant vos emails, mais aussi sur votre comportement lors de l'envoi de messages. Plus en détails dans cet [article](http://blog.hubspot.com/blog/tabid/6307/bid/31446/Everything-Email-Marketers-Need-to-Know-About-Sender-Score.aspx).
+Le SenderScore est un indicateur temps-réel, évalué sur 30 jours glissants, qui représente de manière agrégée la réputation de votre IP et de votre nom de courrier. Il est basé à la fois sur le comportement et les retours des utilisateurs recevant vos emails, mais aussi sur votre comportement lors de l'envoi de messages. Plus en détails dans cet link:http://blog.hubspot.com/blog/tabid/6307/bid/31446/Everything-Email-Marketers-Need-to-Know-About-Sender-Score.aspx[article].
 
-L'enregistrement "Sender Policy Framework" ([SPF](http://fr.wikipedia.org/wiki/Sender_Policy_Framework)) est un champs texte stocké dans les enregistrements DNS, comme vu plus haut et Il sert à indiquer les serveurs autorisés à envoyer des mails en notre nom. Le serveur récepteur regardera ce champs et comparera avec l'adresse du serveur mail qui lui envoie ce courrier : si ça ne colle pas, c'est qu'on a essayé d'envoyer du spam en se faisant passer pour nous. Et ça ne "valide" que l'enveloppe du message (le "return-path"), pas le contenu du message (le "From:"). En gros, ce sont des [reverse-MX](http://www.openspf.org/FAQ/Examples).
+L'enregistrement "Sender Policy Framework" (link:http://fr.wikipedia.org/wiki/Sender_Policy_Framework[SPF]) est un champs texte stocké dans les enregistrements DNS, comme vu plus haut et Il sert à indiquer les serveurs autorisés à envoyer des mails en notre nom. Le serveur récepteur regardera ce champs et comparera avec l'adresse du serveur mail qui lui envoie ce courrier : si ça ne colle pas, c'est qu'on a essayé d'envoyer du spam en se faisant passer pour nous. Et ça ne "valide" que l'enveloppe du message (le "return-path"), pas le contenu du message (le "From:"). En gros, ce sont des link:http://www.openspf.org/FAQ/Examples[reverse-MX].
 
 TODO: DKIM
 
@@ -141,14 +141,14 @@ En général il est installé par défaut (dans sa configuration "courrier local
 A noter qu'il existe deux versions du package exim : `light` et `heavy`. Light est suffisant, car il fait le job et permet l'utilisation de TLS pour les mails sortants (et *a priori* rentrant aussi). Cependant la version `heavy` permet l'utilisation d'annuaires LDAP, de base de données SQL, l'authentification SMTP, etc. On restera sur la version par défaut (light) pour l'instant.
 
 Sachant qu'Exim est à la fois un "Mail Transport Agent" (MTA) qui permet d'envoyer et de recevoir des emails, c'est aussi un "Mail Delivery Agent" (MDA) qui permet de déposer les emails dans les boites de réception des comptes locaux. Il existe deux types de boîtes de réception :
-- les [mbox](http://fr.wikipedia.org/wiki/Mbox) où tous les messages sont stockés dans un seul fichier, sans autre ordre que celui chronologique d'arrivée
-- les [maildir](http://fr.wikipedia.org/wiki/Maildir) où chaque message est un fichier, dans un répertoire décrivant une catégorie.
+- les link:http://fr.wikipedia.org/wiki/Mbox[mbox] où tous les messages sont stockés dans un seul fichier, sans autre ordre que celui chronologique d'arrivée
+- les link:http://fr.wikipedia.org/wiki/Maildir[maildir] où chaque message est un fichier, dans un répertoire décrivant une catégorie.
 
 Dans notre cas, on choisira le format `maildir`, qui est fiable et performant, mais aussi flexible ; de plus il est bien adapté pour les outils de consultation mail type IMAP.
 
 === Installation et configuration du daemon
 
-La configuration "basique" se fait via via `dpkg-reconfigure exim4-config`, que vous pouvez lancer aussi souvent que vous le voulez. Une configuration plus fine est possible en éditant les fichiers de conf, mais il faut alors se rapporter au doc [spécifique Debian](http://pkg-exim4.alioth.debian.org/README/README.Debian.html), au [wiki](http://wiki.debian.org/Exim) debian, et à la [documentation](http://www.exim.org/docs.html) officielle de l'outil
+La configuration "basique" se fait via via `dpkg-reconfigure exim4-config`, que vous pouvez lancer aussi souvent que vous le voulez. Une configuration plus fine est possible en éditant les fichiers de conf, mais il faut alors se rapporter au doc link:http://pkg-exim4.alioth.debian.org/README/README.Debian.html[spécifique Debian], au link:http://wiki.debian.org/Exim[wiki] debian, et à la link:http://www.exim.org/docs.html[documentation] officielle de l'outil
 
 Le reconfiguration se fait en quelques fenêtres :
 1. sélectionner "distribution directe par SMTP (site internet)"
@@ -251,13 +251,13 @@ Un serveur SMTP doit relayer de 4 manières différentes :
 - de l'externe vers le domaine local
 - du domaine local vers l'externe
 - du domaine local vers le domaine local
-- de l'externe vers l'externe doit être interdit ([Open Relay](htts://en.wikipedia.org/wiki/Open_mail_relay))
+- de l'externe vers l'externe doit être interdit (link:htts://en.wikipedia.org/wiki/Open_mail_relay[Open Relay])
 
 Il est *absolument vital* que votre serveur ne soit pas un "open relay" pour deux raisons :
 - la première est que n'importe qui pourrait utiliser votre serveur et votre connexion pour envoyer du spam, ce qui bouffe vos ressources et vous fait passer pour un spammeur, vous exposant à des poursuites
 - la deuxième est que dès que vous seriez détecté comme un relais smtp ouvert, vous seriez ajouté progressivement mais automatiquement aux listes anti-spam, et il deviendrait bien difficile d'envoyer du courrier à n'importe qui
 
-Pour vérifier qu'on est pas un "open relay", il suffit d'utiliser un formulaires dédié à cette tâche : [MailRadar](http://www.mailradar.com/openrelay/) où on rentre l'adresse IPv4 de notre serveur, et qui fait une foule de tests avant de donner le résultat. A noter qu'avec la configuration de base de Debian (tel qu'indiqué dans cet article) on est normalement pas un open relay.
+Pour vérifier qu'on est pas un "open relay", il suffit d'utiliser un formulaires dédié à cette tâche : link:http://www.mailradar.com/openrelay/[MailRadar] où on rentre l'adresse IPv4 de notre serveur, et qui fait une foule de tests avant de donner le résultat. A noter qu'avec la configuration de base de Debian (tel qu'indiqué dans cet article) on est normalement pas un open relay.
 
 Ce qui suit est un détail, mais qui a son importance : la distribution locale est impossible vers des comptes contenant des majuscules, tout bêtement car une adresse email est insensible à la casse, et que s'il existait deux comptes `John` et `JOHN` sur le serveur, on ne saurait pas où déposer le courrier à destination de `john@example.com`. *Donc tous les comptes locaux doivent être en minuscule pour pouvoir recevoir des emails.*
 
@@ -283,7 +283,7 @@ De même, la clé privée du certificat doit être stockée sans mot de passe de
 
 Créez un fichier `/etc/exim4/exim4.conf.localmacros` pour y mettre `MAIN_TLS_ENABLE = 1`, et recharger ensuite le daemon SMPT via `/etc/init.d/exim reload`. Mettre simplement cette ligne permet déjà de s'assurer que nos mails arrivent chiffrés : on constaterait dans une capture réseau que notre serveur annonce `STARTTLS`, et que la suite du dialogue est chiffré.
 
-Il existe plusieurs drivers d'[authentification](http://www.exim.org/exim-html-current/doc/html/spec_html/ch-smtp_authentication.html) (et chapitres individuels suivants) : `CRAM-MD5` (RFC 2195), `CYRUS_SASL`, `DOVECOT` (serveur IMAP/POP), `GSASL`, `HEIMDAL_GSSAPI`, `PLAINTEXT` (en version PLAIN et LOGIN), `SPA` (Microsoft). Cependant, on ne va autoriser que les deux methodes du driver `PLAINTEXT`, qui n'est disponible que lorsque le client a effectivement activé le chiffrement au début de la transaction via `STARTTLS`.
+Il existe plusieurs drivers d'link:http://www.exim.org/exim-html-current/doc/html/spec_html/ch-smtp_authentication.html[authentification] (et chapitres individuels suivants) : `CRAM-MD5` (RFC 2195), `CYRUS_SASL`, `DOVECOT` (serveur IMAP/POP), `GSASL`, `HEIMDAL_GSSAPI`, `PLAINTEXT` (en version PLAIN et LOGIN), `SPA` (Microsoft). Cependant, on ne va autoriser que les deux methodes du driver `PLAINTEXT`, qui n'est disponible que lorsque le client a effectivement activé le chiffrement au début de la transaction via `STARTTLS`.
 
 Pour activer l'authentification :
 - éditer le fichier `/etc/exim4/exim4.conf.template`
@@ -295,7 +295,7 @@ Pour activer l'authentification :
 
 On a un serveur qui chiffre, on lui a dit d'accepter une authentification, il ne nous reste plus qu'à définir les login/password autorisés à relayer envoyer du courrier. Il en faut **jamais** lier l'authentification aux mots de passe du compte utilisateur local sur le serveur, car la compromission d'un seul d'entre eux entrainerait l'accès direct serveur.
 
-On voit dans les lignes `server_condition` du texte qui vient d'être décommenté, que la base de mots de passe local est de type "[lsearch](http://www.exim.org/exim-html-current/doc/html/spec_html/ch-file_and_database_lookups.html)", que le fichier est dans le répertoire `/etc/exim4`, et que le fichier lui-même doit s'appeler `passwd` : un `man exim4_passwd` donne plus d'informations.
+On voit dans les lignes `server_condition` du texte qui vient d'être décommenté, que la base de mots de passe local est de type "link:http://www.exim.org/exim-html-current/doc/html/spec_html/ch-file_and_database_lookups.html[lsearch]", que le fichier est dans le répertoire `/etc/exim4`, et que le fichier lui-même doit s'appeler `passwd` : un `man exim4_passwd` donne plus d'informations.
 
 Pour initialiser le fichier de mot de passe :
 - Créer le fichier `echo "# Exim server passwords" > /etc/exim4/passwd`
@@ -431,7 +431,7 @@ Comme on peut le constater, les deux méthodes fonctionnent, et il n'y a stricte
 
 == Consultation des emails en IMAP
 
-Il existe plusieurs daemon IMAP sur la debian, `citadel-server`, `courier-imap`, `cyrus-imapd-2.2`, `dbmail`, `dovecot-imapd`, `kolab-cyrus-imapd`, `mailutils-imap4d`, `uw-imapd`. Ici nous allons utiliser "[Dovecot](http://www.dovecot.org/)", qui est un daemon rapide, léger, fiable et très simple à configurer. La documentation et les exemples sont disponibles sur le [wiki](http://wiki2.dovecot.org/).
+Il existe plusieurs daemon IMAP sur la debian, `citadel-server`, `courier-imap`, `cyrus-imapd-2.2`, `dbmail`, `dovecot-imapd`, `kolab-cyrus-imapd`, `mailutils-imap4d`, `uw-imapd`. Ici nous allons utiliser "link:http://www.dovecot.org/[Dovecot]", qui est un daemon rapide, léger, fiable et très simple à configurer. La documentation et les exemples sont disponibles sur le link:http://wiki2.dovecot.org/[wiki].
 
 On commencera par installer le daemon via `aptitude install dovecot-imapd`. Lors de l'installation, un certificat autosigné valable 10 ans est généré, ce qui garanti la confidentialité des données échangées ainsi que des informations d'authentification.
 
@@ -492,7 +492,7 @@ Par exemple, pour un utilisateur du système `toto` qu'on souhaite identifier pa
 	# (gecos) et (shell) ne sont pas utilisés par Dovecot, donc vides.
 	Mr Toto:{SHA512-CRYPT}$6$EmE...RL$T8x...n97GxwRqi1:1017:100::/home/toto/.dovecot/::userdb_mail=Maildir:~/../Maildir
 
-Ici, `extra_fields` est en fait une liste de paramètres "key=value" qui permet de préciser les infos liées à la partie [userdb](http://wiki2.dovecot.org/UserDatabase/ExtraFields) soit à la partie [passdb](http://wiki2.dovecot.org/PasswordDatabase/ExtraFields). Idem, le [wiki](http://wiki2.dovecot.org/Variables) liste aussi une série de variables qui facilite la configuration et les valeurs du fichier `/etc/dovecot/users` si on veut réutiliser certaines infos.
+Ici, `extra_fields` est en fait une liste de paramètres "key=value" qui permet de préciser les infos liées à la partie link:http://wiki2.dovecot.org/UserDatabase/ExtraFields[userdb] soit à la partie link:http://wiki2.dovecot.org/PasswordDatabase/ExtraFields[passdb]. Idem, le link:http://wiki2.dovecot.org/Variables[wiki] liste aussi une série de variables qui facilite la configuration et les valeurs du fichier `/etc/dovecot/users` si on veut réutiliser certaines infos.
 
 On créé un petit script que j'appelerai `dovecot-auth-add-user` et qu'on pourra placer dans `/usr/local/bin` (ne pas oublier le chmod +x du script après l'avoir enregistré) pour ajouter facilement des identités virtuelles à dovecot :
 

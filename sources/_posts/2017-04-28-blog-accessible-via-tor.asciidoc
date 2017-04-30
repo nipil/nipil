@@ -8,10 +8,10 @@ Ce blog est maintenant disponible **aussi** via le réseau TOR !
 
 Pour se connecter au réseau TOR :
 
-* sur android, installez [Or](https://play.google.com/store/apps/details?id=org.torproject.android) et [Orfox](https://play.google.com/store/apps/details?id=info.guardianproject.orfox)
-* sur PC, installer le [TorBrowser](https://www.torproject.org/projects/torbrowser.html.en).
+* sur android, installez link:https://play.google.com/store/apps/details?id=org.torproject.android[Orbot] et link:https://play.google.com/store/apps/details?id=info.guardianproject.orfox[Orfox]
+* sur PC, installer le link:https://www.torproject.org/projects/torbrowser.html.en[TorBrowser].
 
-Ensuite, il suffit de se rendre à l'adresse [http://v43wxiogkhnflac6.onion](http://v43wxiogkhnflac6.onion).
+Ensuite, il suffit de se rendre à l'adresse link:http://v43wxiogkhnflac6.onion[http://v43wxiogkhnflac6.onion].
 
 == Introduction
 
@@ -37,11 +37,11 @@ Avant de faire ça "en vrai", on va tester en bac à sable, en créant deux VM d
 
 Tout d'abord :
 
-* télécharger une [iso live debian](https://www.debian.org/CD/live/)
+* télécharger une link:https://www.debian.org/CD/live/[iso live debian]
 * créer une VM "navigateur" utilisant cette iso LIVE
 * créer une VM "serveur" utilisant cette iso LIVE
 
-Ensuite on va installer le logiciel sur chaque VM en suivant les [instructions](https://www.torproject.org/docs/debian.html.en)
+Ensuite on va installer le logiciel sur chaque VM en suivant les link:https://www.torproject.org/docs/debian.html.en[instructions]
 
 On commence par ajouter les clés GnuPG du projet Tor, qui servent à signer les listes de package qui seront récupérées par `apt-get update`)
 
@@ -83,7 +83,7 @@ La différence principale avec les tunnels que je viens de citer, c'est qu'au li
 
 En ce sens, il foncitonne plus comme un tunnel SSH, qui écoute sur un port donné et ne transmet par le tunnel que ce qu'on envoie explicitement sur ce port.
 
-Et TOR, lui attend qu'on le nourrisse sur le port `TCP 9050` de l'adresse locale `127.0.0.1`, où il offre un service de relai [SOCKS](https://fr.wikipedia.org/wiki/SOCKS) ... exactement comme le fait un `ssh -D` pour un tunnel SSH !
+Et TOR, lui attend qu'on le nourrisse sur le port `TCP 9050` de l'adresse locale `127.0.0.1`, où il offre un service de relai link:https://fr.wikipedia.org/wiki/SOCKS[SOCKS] ... exactement comme le fait un `ssh -D` pour un tunnel SSH !
 
 En résumé, il faut explicitement forcer chaque application à envoyer son traffic au proxy. Sinon le traffic sort directement, en clair.
 
@@ -112,7 +112,7 @@ En résumé :
 
 == Créer un site caché "Tor-only" sur la VM "serveur"
 
-On va suivre la [documentation officielle](https://www.torproject.org/docs/tor-hidden-service.html.en) et j'ajouterai des éléments d'infos au fur et à mesure.
+On va suivre la link:https://www.torproject.org/docs/tor-hidden-service.html.en[documentation officielle] et j'ajouterai des éléments d'infos au fur et à mesure.
 
 On commencer par installer un serveur web :
 
@@ -265,7 +265,7 @@ D'abord l'install et la configuration TOR :
     sudo cat /var/lib/tor/hidden_services/nipil_blog/hostname
     v43wxiogkhnflac6.onion
 
-*L'adresse de ce blog sur TOR sera donc [v43wxiogkhnflac6.onion](http://v43wxiogkhnflac6.onion/) !*
+*L'adresse de ce blog sur TOR sera donc link:http://v43wxiogkhnflac6.onion/[v43wxiogkhnflac6.onion] !*
 
 On vérifie que tout est OK au niveau réseau :
 

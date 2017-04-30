@@ -40,19 +40,19 @@ L'intérêt est que des pages html statiques sont infiniment plus rapides à ser
 
 Dans le contexte de la publication informatique, chaque minute qui n'est pas passée à produire du contenu est une minute de perdue. Chaque moment passé à penser à autre chose qu'à ce qu'on veut dire est un moment de perdu.
 
-Fort de cette constatation, de nouveaux types de *formatages légers* sont apparus, créés pour compenser les balises à ralonge. L'un d'entre eux s'appelle [Markdown](http://daringfireball.net/projects/markdown/), en opposition au markup html/xml.
+Fort de cette constatation, de nouveaux types de *formatages légers* sont apparus, créés pour compenser les balises à ralonge. L'un d'entre eux s'appelle link:http://daringfireball.net/projects/markdown/[Markdown], en opposition au markup html/xml.
 
 Chaque article, page, entrée de blog, sera donc écrite en markdown. Au moment de la publication, le contenu sera passé par cette moulinette PERL pour produire le contenu formaté en html.
 
 Le convertisseur n'entoure le contenu généré d'aucune balise, ce qui fait qu'il est facile d'assembler une page en partant d'une structure de site, en insérant le contenu, et en y ajoutant la partie commentaires, bref la structure du site.
 
-Et comme pour nous faire plaisir, il existe un [package debian stable](http://packages.debian.org/stable/main/markdown), ce qui évite les complications d'installation et de maintenance. Et ça s'arrête là si la partie "structure" est gérée par une solution codée personnellement 
+Et comme pour nous faire plaisir, il existe un link:http://packages.debian.org/stable/main/markdown[package debian stable], ce qui évite les complications d'installation et de maintenance. Et ça s'arrête là si la partie "structure" est gérée par une solution codée personnellement 
 
 === Générateur de site "clé en mains"
 
-J'ai choisir Jekyll pour aggréger le tout. C'est un outil en [Ruby](http://www.ruby-lang.org/) et c'est le moteur qui gère les pages github. De plus il est compatible markdown, en utilisant l'une ou l'autre version complétée, comme [kramdown](http://kramdown.rubyforge.org/) ou une des [nombreuses](https://github.com/markdown/markdown.github.com/wiki/Implementations) autres, [Liquid](http://wiki.shopify.com/Liquid)...
+J'ai choisir Jekyll pour aggréger le tout. C'est un outil en link:http://www.ruby-lang.org/[Ruby] et c'est le moteur qui gère les pages github. De plus il est compatible markdown, en utilisant l'une ou l'autre version complétée, comme link:http://kramdown.rubyforge.org/[kramdown] ou une des link:https://github.com/markdown/markdown.github.com/wiki/Implementations[nombreuses] autres, link:http://wiki.shopify.com/Liquid[Liquid]...
 
-Il a l'immense bon goût d'être [présent dans debian stable](http://packages.debian.org/stable/main/jekyll), ce qui rend l'installation et la maintenance triviale : un simple `apt-get install jekyll` fera tout le boulot.
+Il a l'immense bon goût d'être link:http://packages.debian.org/stable/main/jekyll[présent dans debian stable], ce qui rend l'installation et la maintenance triviale : un simple `apt-get install jekyll` fera tout le boulot.
 
 Pour les utilisateurs Ubuntu, notemment la 12.04 LTS de ma moitié, la commande `sudo aptitude install ruby rubygems ruby-liquid libmysql-ruby1.9.1 libhtmlentities-ruby1.9.1 python-pygments && sudo gem install rdoc && sudo gem install jekyll` fait l'affaire, et ça permet de visualiser ses articles avant publication définitive sur le serveur.
 
@@ -64,7 +64,7 @@ Pour finir, executez `jekyll serve` dans le répertoire de votre site, et pointe
 
 Pour publier "reelement" votre site, il suffit d'exécuter un `jekyll build`, d'attendre que ça soit fini, et de pousser le contenu du répertoire produit (`build` sous Debian 7 Wheezy ou `_site` sous Ubuntu 12.04) sur le serveur de votre hébergeur préféré ... *et c'est fini !*
 
-Pour plus de détails au cas où ça vous tenterait, vous pouvez [lire ce tutorial](http://www.andrewmunsell.com/tutorials/jekyll-by-example/) en anglais sur Jekyll.
+Pour plus de détails au cas où ça vous tenterait, vous pouvez link:http://www.andrewmunsell.com/tutorials/jekyll-by-example/[lire ce tutorial] en anglais sur Jekyll.
 
 === Alimentation du contenu
 
@@ -94,7 +94,7 @@ Exemple :
 	1. aze
 	2. qsd
 
-	[texte du lien](http://lien)
+	link:http://lien[texte du lien]
 	
 	texte en *italique*
 	
@@ -109,7 +109,7 @@ Un prochain billet concernera la mise en place des commentaires.
 Si vous éditez souvent sous windows, ou que vous éditez beaucoup de contenu, ça peut être appréciable d'avoir la visualisation du contenu "en temps réel". Pour ce faire, il faut installer Rubys, puis installer les gems, puis installer Jekyll.
 
 Installer Ruby et les RubyGems
-- aller sur la [page de téléchargement de Ruby](http://rubyinstaller.org/downloads/)
+- aller sur la link:http://rubyinstaller.org/downloads/[page de téléchargement de Ruby]
 - télécharger le fichier `Ruby 1.9.3-p...`
 - télécharger le fichier `DevKit-tdm...`
 - installer ruby dans `C:\Ruby193` en cochant les options tcl/path/associate
@@ -128,7 +128,7 @@ Lancer la génération en temps réel
 - ouvrez une ligne de commande `Win+R, cmd, entrée`
 - aller dans le répertoire de base de votre blog
 - exécuter la commande `jekyll serve --watch`
-- ouvrir votre navigateur et aller à la page [localhost:4000](http://localhost:4000)
+- ouvrir votre navigateur et aller à la page link:http://localhost:4000[localhost:4000]
 
 Maintenant, à chaque fois que vous enregistrez un de vos posts, le programme le détecte et génère une copie **locale** de votre blog. Attention, ça ne publie pas votre blog sur internet, ça ne permet que de visualiser le contenu pendant l'édition.
 
@@ -140,9 +140,9 @@ avec le système de template utilisé par Jekyll, ça a vraiment été simple.
 
 Tout d'abord, je n'ai rien inventé, mais j'ai utilisé ce qui existait :
 
-- [jekyll-rss-feeds](https://github.com/snaptortoise/jekyll-rss-feeds) par
+- link:https://github.com/snaptortoise/jekyll-rss-feeds[jekyll-rss-feeds] par
 snaptortoise, pour le template RSS automatisé
-- et cette [documentation](http://www.rssboard.org/rss-autodiscovery) pour
+- et cette link:http://www.rssboard.org/rss-autodiscovery[documentation] pour
 l'auto-découverte des flux RSS
 - une icône RSS avec transparence trouvée via google image
 
@@ -252,7 +252,7 @@ Mais en temps normal, mieux vaut laisser cette limite...
 Hier je vous ai montré comment se faire un blog basique mais très efficace, performant et sécurisé, et j'ai conclus succinctement par *"... pousser le contenu du répertoire produit sur le serveur de votre hébergeur préféré"*. Certes.
 
 La méthode *"à la main"* a deux principaux avantages
-- des prérequis logiciels ridicules : chaque personne voulant publier quelque chose n'a besoin en tout et pour tout que d'un [éditeur de texte brut](http://en.wikipedia.org/wiki/Text_editor), et de clients [Subversion](http://en.wikipedia.org/wiki/Apache_Subversion) et [SSH](http://en.wikipedia.org/wiki/Secure_Shell). Chaque système d'exploitation dispose de ces outils, soit en standard, soit via des applications gratuites.
+- des prérequis logiciels ridicules : chaque personne voulant publier quelque chose n'a besoin en tout et pour tout que d'un link:http://en.wikipedia.org/wiki/Text_editor[éditeur de texte brut], et de clients link:http://en.wikipedia.org/wiki/Apache_Subversion[Subversion] et link:http://en.wikipedia.org/wiki/Secure_Shell[SSH]. Chaque système d'exploitation dispose de ces outils, soit en standard, soit via des applications gratuites.
 - on peut très bien travailler pendant des heures et des jours sans aucune connexion à internet, et profiter d'une poignée de minutes d'accès et du minimum de donnée transférées pour effectivement publier ses mises à jour, ce qui permet de minimaliser les frais de data en 3G ou pire, les tarifs du roaming à l'étranger.
 
 Par contre, avec cette méthode, l'utilisateur doit :
@@ -271,7 +271,7 @@ Ca peut faire beaucoup, et même si on se souvient de tout ça, ça fait du temp
 
 <a href="http://www.xkcd.com/1205/"><img src="http://imgs.xkcd.com/comics/is_it_worth_the_time.png" /></a>
 
-Pour se convaincre, regardons le graphe issu de [xkcd](http://www.xkcd.com) image ci-dessus. Est ce que ça vaut la peine d'automatiser ? En considérant qu'on postera 1 billet par semaine, et qu'on économise 5 minutes à chaque fois, alors oui ça vaut le coup car on économisera 21h de temps utile. Par utilisateur et par post. *C'est énorme*.
+Pour se convaincre, regardons le graphe issu de link:http://www.xkcd.com[xkcd] image ci-dessus. Est ce que ça vaut la peine d'automatiser ? En considérant qu'on postera 1 billet par semaine, et qu'on économise 5 minutes à chaque fois, alors oui ça vaut le coup car on économisera 21h de temps utile. Par utilisateur et par post. *C'est énorme*.
 
 == Automatisons un peu tout ça
 
@@ -350,9 +350,9 @@ Le script `blog-publish` pour l'action 5 :
 	cd /www
 	mirror --reverse -vvv $DELETE;"
 
-A noter que le deuxième script nécessite [LFTP](http://lftp.yar.ru/) qu'on installera via un simple `apt-get install lftp`. Ce logiciel permet de se connecter à des serveurs FTP**ES** (FTP + explicite TLS pour l'encryption des login/password) ce qui m'intéresse car c'est supporté par le serveur FTP d'upload de mon hébergeur [Online.net](http://www.online.net).
+A noter que le deuxième script nécessite link:http://lftp.yar.ru/[LFTP] qu'on installera via un simple `apt-get install lftp`. Ce logiciel permet de se connecter à des serveurs FTP**ES** (FTP + explicite TLS pour l'encryption des login/password) ce qui m'intéresse car c'est supporté par le serveur FTP d'upload de mon hébergeur link:http://www.online.net[Online.net].
 
-LFTP propose aussi une fonction `mirror` qui facilitera le transfert de fichiers multiples, car sinon avec [cURL](http://curl.haxx.se/) par exemple il faudrait faire un script qui upload les fichiers 1-par-1 et qui créé les répertoires au fur et à mesure.
+LFTP propose aussi une fonction `mirror` qui facilitera le transfert de fichiers multiples, car sinon avec link:http://curl.haxx.se/[cURL] par exemple il faudrait faire un script qui upload les fichiers 1-par-1 et qui créé les répertoires au fur et à mesure.
 
 Le fichier `_credential.txt` sera situé à la racine du blog, et doit avoir les permissions `400` afin d'être sûr que personne ne vous vole vos infos de connexion en cas de partage du serveur (celui qui est à domicile, pas le serveur d'hébergement dédié).
 

@@ -49,7 +49,7 @@ Idéalement, un équipement qui soit petit, discret, et silencieux.
 
 == La perle rare
 
-Après avoir découvert l'existance de cartes mères au format mini-ITX, et des boitiers qui vont avec, je suis tombé sur ce qui l'a semblé être la solution parfaite, l'Alix 2d3, créé par [PCEngines](http://www.pcengines.ch)
+Après avoir découvert l'existance de cartes mères au format mini-ITX, et des boitiers qui vont avec, je suis tombé sur ce qui l'a semblé être la solution parfaite, l'Alix 2d3, créé par link:http://www.pcengines.ch[PCEngines]
 
 <a href="/files/alix2d3.jpg"><img src="/files/alix2d3_small.jpg" /></a>
 
@@ -65,7 +65,7 @@ En détails, il s'agit
 - une prise série RS232 (pas d'écran)
 - une alimentation externe
 
-Ca m'aura coûté 250 euros (carte mère + carte CF + carte wifi + boitier + antennes + alimentation + adaptateur RS 232, mais hors disque dur que j'avais déjà) sur le site [Think-ITX](http://www.think-itx.com) (**Update 2013-05-22:** ce site en particulier a disparu depuis, mais il existe un grand nombre de [revendeurs](http://pcengines.ch/order.php)).
+Ca m'aura coûté 250 euros (carte mère + carte CF + carte wifi + boitier + antennes + alimentation + adaptateur RS 232, mais hors disque dur que j'avais déjà) sur le site link:http://www.think-itx.com[Think-ITX] (**Update 2013-05-22:** ce site en particulier a disparu depuis, mais il existe un grand nombre de link:http://pcengines.ch/order.php[revendeurs]).
 
 Certes ça pouvait paraître cher, mais faut quand même réaliser qu'on parle d'un truc totalement fanless, et microscopique comparé à une tour traditionnelle.
 
@@ -99,9 +99,9 @@ Je ne précise pas la version, car on maintiendra évidement le système à jour
 
 == Installation pour un serveur "normal"
 
-Il y a des tonnes de documents expliquant comment installer une Debian, notemment le [wiki](http://www.debian.org/releases/wheezy/i386/index.html.fr) officiel. Mais bon en quelques lignes ça donne ça sur un serveur normal :
+Il y a des tonnes de documents expliquant comment installer une Debian, notemment le link:http://www.debian.org/releases/wheezy/i386/index.html.fr[wiki] officiel. Mais bon en quelques lignes ça donne ça sur un serveur normal :
 - télécharger une iso d'installation Debian *i386* (attention *pas* une amd64)
-- graver sur un RW, ou sur une clé USB avec [unetbootin](http://unetbootin.sourceforge.net/)
+- graver sur un RW, ou sur une clé USB avec link:http://unetbootin.sourceforge.net/[unetbootin]
 - déconnecter les interfaces réseau de la machine
 - installer le système normalement pour tout sauf le "tasksel"
 - faut *tout décocher* au moment du choix de la "Sélection de logiciels"
@@ -139,7 +139,7 @@ En imaginant que la carte CF soir le device `/dev/sde`
 
 Installer le système
 - `debootstrap --arch i386 squeeze /mnt/cfroot http://ftp.debian.org/debian`
-- documentation annexe sur le [wiki](http://wiki.debian.org/fr/Debootstrap) officiel
+- documentation annexe sur le link:http://wiki.debian.org/fr/Debootstrap[wiki] officiel
 
 Passer du système "hôte" au système "cible"
 - `mount –bind /dev/ /mnt/cfroot/dev`
@@ -169,6 +169,6 @@ Insérer la carte CF dans la carte Alix, l'alimenter après avoir connecté le p
 Redémarrer encore une fois, et on a un serveur autonome qui fonctionne.
 
 Quelques autres liens d'installation debian pour alix2d3
-- [ericbosdure.com](http://ericbosdure.com/2012/01/16/debian-6-sur-alix-2d13/)
-- [bitprocessor.be](http://www.bitprocessor.be/2011/11/13/alix-2d13-debian-squeeze/)
+- link:http://ericbosdure.com/2012/01/16/debian-6-sur-alix-2d13/[ericbosdure.com]
+- link:http://www.bitprocessor.be/2011/11/13/alix-2d13-debian-squeeze/[bitprocessor.be]
 

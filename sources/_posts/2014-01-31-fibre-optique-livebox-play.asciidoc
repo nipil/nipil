@@ -28,12 +28,12 @@ Internet
 - ping qui passe de 20ms à 1ms pour un serveur "proche"
 - les 2+2 premiers mois d'abonnement sont offerts (soit 160 euros)
 - le remboursement des frais de résiliations Free sont remboursés par Orange (50 euros)
-- heureusement, pas de limitation de débit par connexion TCP/UDP qu'avait vu [philpep](http://philpep.org/blog/lets-gre)
+- heureusement, pas de limitation de débit par connexion TCP/UDP qu'avait vu link:http://philpep.org/blog/lets-gre[philpep]
 - une offre cloud de 100go
 
 Télévision
 - un pass TV Livebox Play inclus (c'est l'avantage que j'ai chois) avec des films et série à la demande, ok peu de choix et choix un peu moisi, mais c'est gratuit alors on a pas le droit de se plaindre !
-- la liste des codecs lus par la livebox est clairement [documentée](http://liveboxplay.orange.fr/fiche_tech_play_tv.html) contrairement à la freebox où c'est plutôt "teste et tu verras si ça marche"
+- la liste des codecs lus par la livebox est clairement link:http://liveboxplay.orange.fr/fiche_tech_play_tv.html[documentée] contrairement à la freebox où c'est plutôt "teste et tu verras si ça marche"
 - on peut surfer via la télévision, avec la télécommande qui fonctionne comme un pointeur, c'est plutôt pas mal (même si ça me terrifie de voir que je suis automatiquement loggué sur mon compte Orange ... bonjour la sécurité)
 
 Support
@@ -46,13 +46,13 @@ Pour les débits, j'ai testé et vérifié pour des serveurs dans plusieurs back
 
 Internet
 - encapsulation PPPoE en sortie de la livebox, qui mange 8 octets de la MTU "pour rien" (~0.5% de bande passante perdue)
-- pas d'adresse IP fixe (uniquement sur offre orange pro) mais livebox permet de mettre à jour un enregistrement gratuit chez [no-ip](http://www.noip.com/) qui peut être utilisé comme `CNAME` comme cible d'un enregistrmement de votre propre zone DNS
-- impossibilité de mettre la livebox en mode "bridge" et de "récupérer" l'adresse IP publique sur une seule machine du lan qui ferait routeur/firewall ; cependant la possibilité de [remplacer la livebox par un linux](http://www.forum-orange.com/forums/viewtopic.php?id=17933) existe, mais le téléphone ne fonctionne pas, car Orange ne donne pas les infos SIP. La livebox permet une IP DMZ, histoire d'avoir un pseudo-bridge et de recevoir tous les flux entrants sur une machine personnelle ([sauf](http://livebox.asso.fr/forum/index.php/topic,20928.msg177985.html#msg177985) le port tcp 50805 [dont l'utilisation est inconnue](http://www.forum-orange.com/forums/viewtopic.php?pid=182457#p182457) ...!)
-- pas d'ipv6 (uniquement sur offre orange pro), donc il faudra soit se rabattre sur un [tunnel en mode sit](http://www.tldp.org/HOWTO/Linux%2BIPv6-HOWTO/conf-ipv6-in-ipv4-point-to-point-tunnels.html) entre un serveur linux à la maison qui fait routeur et un serveur loué sur internet (ce que je fais) ou bien utiliser les services d'un [tunnel broker](https://www.sixxs.net/faq/sixxs/?faq=enduser) ce que je n'ai pas encore essayé mais qui est dans ma todo-list.
+- pas d'adresse IP fixe (uniquement sur offre orange pro) mais livebox permet de mettre à jour un enregistrement gratuit chez link:http://www.noip.com/[no-ip] qui peut être utilisé comme `CNAME` comme cible d'un enregistrmement de votre propre zone DNS
+- impossibilité de mettre la livebox en mode "bridge" et de "récupérer" l'adresse IP publique sur une seule machine du lan qui ferait routeur/firewall ; cependant la possibilité de link:http://www.forum-orange.com/forums/viewtopic.php?id=17933[remplacer la livebox par un linux] existe, mais le téléphone ne fonctionne pas, car Orange ne donne pas les infos SIP. La livebox permet une IP DMZ, histoire d'avoir un pseudo-bridge et de recevoir tous les flux entrants sur une machine personnelle (link:http://livebox.asso.fr/forum/index.php/topic,20928.msg177985.html#msg177985[sauf] le port tcp 50805 link:http://www.forum-orange.com/forums/viewtopic.php?pid=182457#p182457[dont l'utilisation est inconnue] ...!)
+- pas d'ipv6 (uniquement sur offre orange pro), donc il faudra soit se rabattre sur un link:http://www.tldp.org/HOWTO/Linux%2BIPv6-HOWTO/conf-ipv6-in-ipv4-point-to-point-tunnels.html[tunnel en mode sit] entre un serveur linux à la maison qui fait routeur et un serveur loué sur internet (ce que je fais) ou bien utiliser les services d'un link:https://www.sixxs.net/faq/sixxs/?faq=enduser[tunnel broker] ce que je n'ai pas encore essayé mais qui est dans ma todo-list.
 - un boitier Alcatel en plus à caser, cabler et alimenter, qui sert de convertisseur FO/Cuivre et de terminaison GPON
 
 Téléphonie
-- plus de compte SIP utilisable hors du domicile ! (Heureusement qu'il existe des lignes [SIP chez OVH pour 1euros/mois](http://www.ovhtelecom.fr/telephonie/forfaits/ligne_sip_individuelle.xml))
+- plus de compte SIP utilisable hors du domicile ! (Heureusement qu'il existe des lignes link:http://www.ovhtelecom.fr/telephonie/forfaits/ligne_sip_individuelle.xml[SIP chez OVH pour 1euros/mois])
 - si on a pas la version "Play", les appels vers les mobiles fraçais ne sont pas incluses !
 - le tarif des appels vers l'étranger sont peut-être plus chers (mais je n'ai pas regardé, je ne téléphone pas à l'étranger)
 

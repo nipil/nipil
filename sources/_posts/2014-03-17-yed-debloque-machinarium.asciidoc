@@ -4,7 +4,7 @@ title: Backlog ... et yEd débloque Machinarium !
 tags: jeux
 ---
 
-J'ai un backlog assez conséquent. Pour préciser, un *backlog* est une liste de choses à faire, qui est aux loisirs ce que la *todo-list* est aux corvées. Donc ça n'est pas coercitif, même si ça peut illustrer le "*tant de choses à faire, et si peu de temps*" de [Cecil Rhodes](https://fr.wikipedia.org/wiki/Cecil_Rhodes).
+J'ai un backlog assez conséquent. Pour préciser, un *backlog* est une liste de choses à faire, qui est aux loisirs ce que la *todo-list* est aux corvées. Donc ça n'est pas coercitif, même si ça peut illustrer le "*tant de choses à faire, et si peu de temps*" de link:https://fr.wikipedia.org/wiki/Cecil_Rhodes[Cecil Rhodes].
 
 <!--more-->
 
@@ -25,7 +25,7 @@ C'est un concept qui peut paraître un peu dérangeant, mais de toute façon je 
 
 == Revenons à nos moutons
 
-[Machinarium](http://machinarium.net/demo/) est un jeu d'aventure type *point & click* en flash, que j'ai acheté il y acheté 6$ en août 2010, et auquel je joue seulement maintenant. A priori rien de spécial, mais un de ses puzzle m'a fait découvrir un logiciel plutôt cool, du coup je suis content et je partage.
+link:http://machinarium.net/demo/[Machinarium] est un jeu d'aventure type *point & click* en flash, que j'ai acheté il y acheté 6$ en août 2010, et auquel je joue seulement maintenant. A priori rien de spécial, mais un de ses puzzle m'a fait découvrir un logiciel plutôt cool, du coup je suis content et je partage.
 
 Ci-dessous le puzzle en question, et c'est une histoire de plomberie : l'eau entre par en bas à gauche, elle parcourt les tuyaux selon les jonctions et les vannes, et elle sort par les 6 sorties différentes en haut. Le but du jeu, ici c'est d'empêcher l'eau de sortir par la 3ème en partant de la guache, en utilisant les clés rouges qui ferment la vanne où elles sont mises.
 
@@ -39,13 +39,13 @@ Le seul problème, c'est de démêler le tout pour se faire une vision nette des
 
 De rattures en re-dessinage, j'en suis arrivé à la conclusion que je mettais plus de temps à dessiner pour déplacer qu'à réfléchir. Et là je me dis, "t'es trop con, tu joues sur pc, et de la plomberie c'est un graph, on est en 2014, y a des logiciels pour faire des graphes".
 
-Trente secondes et un "google open source graph" plus tard, je tombe sur [yEd](http://www.yworks.com/yed).
+Trente secondes et un "google open source graph" plus tard, je tombe sur link:http://www.yworks.com/yed[yEd].
 
-Cinq minutes plus tard, j'ai le graph ci-dessous, copie de la plomberie du jeu (les octogones sont les valves, les ronds les jonctions, et les carrés les sorties). Le fichier est disponible [ici](/files/yed-machinarium.graphml) si vous voulez jouer avec.
+Cinq minutes plus tard, j'ai le graph ci-dessous, copie de la plomberie du jeu (les octogones sont les valves, les ronds les jonctions, et les carrés les sorties). Le fichier est disponible link:/files/yed-machinarium.graphml[ici] si vous voulez jouer avec.
 
 <img src="/files/yed-machinarium-2.png" />
 
-Du coup, je peux déplacer, bouger, jouer avec sans perdre mon temps à dessiner, c'est top. Je pourrais démêler ça à la main. Mais c'est sans compter sur ce que le logiciel a dans le ventre, et qui me fait encore gagner du temps. Via les fonctions du menu *Layout*, on peut demander au logiciel de refaire la mise en page du graph, selon un mode [hiérarchique](/files/yed-machinarium-4.png), [organique](/files/yed-machinarium-5.png),  [orthogonal](/files/yed-machinarium-3.png), [circulaire](/files/yed-machinarium-6.png), arbre ou [radial](/files/yed-machinarium-7.png).
+Du coup, je peux déplacer, bouger, jouer avec sans perdre mon temps à dessiner, c'est top. Je pourrais démêler ça à la main. Mais c'est sans compter sur ce que le logiciel a dans le ventre, et qui me fait encore gagner du temps. Via les fonctions du menu *Layout*, on peut demander au logiciel de refaire la mise en page du graph, selon un mode link:/files/yed-machinarium-4.png[hiérarchique], link:/files/yed-machinarium-5.png[organique],  link:/files/yed-machinarium-3.png[orthogonal], link:/files/yed-machinarium-6.png[circulaire], arbre ou link:/files/yed-machinarium-7.png[radial].
 
 Chacun a le cerveau câblé différemment, moi je préfère l'orthogonal, qui a ici l'avantage d'avoir décroisé tous les liens, et ça donne ça :
 

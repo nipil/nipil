@@ -3,7 +3,7 @@ layout: post
 title:  GnuPG, plan de secours validé, ouf !
 ---
 
-Aujourd'hui, l'impensable est arrivé : j'ai perdu ma clé privée [GnuPG](http://www.gnupg.org/). Mais ça n'a été que temporaire, car j'avais tout prévu... Sauf que je n'avais pas testé ce plan de secours. On dit que "fail to plan = plan to fail", mais le billet d'aujourd'hui est là pour montrer que même si on a une solution de secours, si on la teste pas on risque pas d'en voir les écueils et d'être sûr que ça fonctionnera.
+Aujourd'hui, l'impensable est arrivé : j'ai perdu ma clé privée link:http://www.gnupg.org/[GnuPG]. Mais ça n'a été que temporaire, car j'avais tout prévu... Sauf que je n'avais pas testé ce plan de secours. On dit que "fail to plan = plan to fail", mais le billet d'aujourd'hui est là pour montrer que même si on a une solution de secours, si on la teste pas on risque pas d'en voir les écueils et d'être sûr que ça fonctionnera.
 
 <!--more-->
 
@@ -14,7 +14,7 @@ Une clé GnuPG/PGP ça permet :
 
 Ca permet aussi de construire un réseau de confiance en signant les clés que tu as vérifié (en personne, par téléphone, etc). Ce principe de signature est similaire à ce que font les autorités de certifications lorsqu'ils donnent des certificats, sauf que là c'est d'humain à humain, et qu'il n'y a pas de certificats "racine" : c'est donc une toile de confiance, et non pas une "pyramide de confiance".
 
-Retour au 24 avril 2001, où je découvre le système GnuPG. Aussi sec, je me créé une clé, et sans trop comprendre les implications ni savoir comment ça se gère, je créé une clé qui n'expire pas (d'où les deux colonnes vides ci-dessous), et je publie la partie publique sur un [serveur de clé](http://pgp.mit.edu/) (peu importe lequel, ils se répliquent les uns les autres).
+Retour au 24 avril 2001, où je découvre le système GnuPG. Aussi sec, je me créé une clé, et sans trop comprendre les implications ni savoir comment ça se gère, je créé une clé qui n'expire pas (d'où les deux colonnes vides ci-dessous), et je publie la partie publique sur un link:http://pgp.mit.edu/[serveur de clé] (peu importe lequel, ils se répliquent les uns les autres).
 
 	pub  1024D/26A2F0AE 2001-04-24
 		 Fingerprint=8A6D 48BB 5DB9 2BDE 6065  3F39 0CC2 128E 26A2 F0AE
@@ -117,13 +117,13 @@ On prendra soin de sauvegarder
 
 Le papier c'est simple et fiable, ça brûle/fond pas à moins de 250°C, l'impression laser noire haute qualité résiste très bien au temps. En plus, c'est plus simple car ça prend pas de place, et on en ayant une copie chez soi et chez un proche, on est tranquille contre les problèmes de dégats des eaux et/ou d'incendie ... et si jamais une des copies avait un problème, on l'apprendrait forcément (c'est la famille !) donc on pourrait redonner une copie si l'une ou l'autre avait été détruite.
 
-Reste que comme c'est du papier, et non un format numérique, il va falloir lors de la récupération, retransformer ce qui a été imprimé en deux ou trois fichiers sur un PC. Pour ce faire, on passera par un coup de scan (ou photo numérique), puis un coup de "reconnaissance de caractères" (OCR en anglais) disponible [hors ligne](http://packages.debian.org/search?keywords=tesseract-ocr) ou [en ligne](http://www.onlineocr.net/) sur ces images, et une inévitable étape de correction manuelle du texte.
+Reste que comme c'est du papier, et non un format numérique, il va falloir lors de la récupération, retransformer ce qui a été imprimé en deux ou trois fichiers sur un PC. Pour ce faire, on passera par un coup de scan (ou photo numérique), puis un coup de "reconnaissance de caractères" (OCR en anglais) disponible link:http://packages.debian.org/search?keywords=tesseract-ocr[hors ligne] ou link:http://www.onlineocr.net/[en ligne] sur ces images, et une inévitable étape de correction manuelle du texte.
 
 La phase la plus essentielle une fois qu'on a décidé d'imprimer le tout, c'est de faire plusieurs copies, **avec des polices de caractère bien différentes**, qui permettent de fiabiliser la reconnaissance par OCR, *et surtout* la relecture manuelle (correction des 'numéro un / petit L / grand L', des 'petit o, grand O, et zéro', des 'trois / grand B / huit', etc. Le top est de choisir une première police où tous ces caractères sont bien distincts, puis une/deux/trois autres polices d'aspect différent où ces caractères sont toujours bien différenciables. Et au moins une copie en 'Courier-new', histoire d'avoir une police "simple" de départ pour la reconstruction OCR.
 
 Et après avoir passé 5 heures à vérifier, revérifier à la main les différentes copies pour corriger les typos de l'OCR jusqu'à ce que le checksum (de l'ensemble!) soit bon et que la clé puisse être réimportée, je peux vous garantir que ces précautions sont nécessaires... Si je n'avais pas eu 4 polices de caractères, il y a certains morceaux que je n'aurais pas pu retrouver à l'identique.
 
-Après avoir galéré, je suis tombé sur un [conseil tout bête](http://lists.gnupg.org/pipermail/gnupg-users/2006-January/027750.html) qui m'aurait permis de gagner quelques heures : ajouter avant l'impression, un checksum par ligne. Comme ça, on peut se focaliser sur une ligne jusqu'à ce que le checksum soit bon, et voir beaucoup plus vite si une ligne sur papier est identique à la version OCR. Ceci est possible crâge à un script tout simple :
+Après avoir galéré, je suis tombé sur un link:http://lists.gnupg.org/pipermail/gnupg-users/2006-January/027750.html[conseil tout bête] qui m'aurait permis de gagner quelques heures : ajouter avant l'impression, un checksum par ligne. Comme ça, on peut se focaliser sur une ligne jusqu'à ce que le checksum soit bon, et voir beaucoup plus vite si une ligne sur papier est identique à la version OCR. Ceci est possible crâge à un script tout simple :
 
 `cat bloc-a-imprimer.txt | while read n; do echo -en "${n}\t"; echo "${n}" | cksum; done`
 
@@ -163,7 +163,7 @@ Ca permettra au prix d'un peu plus de papier de faciliter encore la récupérati
 	00000db0  56 7a 42 6a 76 6c 5a 72  63 30 48 34 6f 5a 0a 45  |VzBjvlZrc0H4oZ.E|
 	00000dc0  4f 42 35 34 44 4c 4f 39  69 47 35 54 67 3d 3d 0a  |OB54DLO9iG5Tg==.|
 
-Grâce à ça, on voit tout de suite si un caractère est un 'petit i' (69), un 'un' (31), un 'L minuscule' (6C), ou un 'L majuscule' (4C). Pareil avec les autres caractères (B,3,8,o,0,O,w,W,etc) pour tous ceux-là il suffit de lire le code hexa et d'aller voir la [table ASCII](http://fr.wikipedia.org/wiki/American_Standard_Code_for_Information_Interchange).
+Grâce à ça, on voit tout de suite si un caractère est un 'petit i' (69), un 'un' (31), un 'L minuscule' (6C), ou un 'L majuscule' (4C). Pareil avec les autres caractères (B,3,8,o,0,O,w,W,etc) pour tous ceux-là il suffit de lire le code hexa et d'aller voir la link:http://fr.wikipedia.org/wiki/American_Standard_Code_for_Information_Interchange[table ASCII].
 
 Maintenant, plus d'excuses pour perdre sa clé privée !
 

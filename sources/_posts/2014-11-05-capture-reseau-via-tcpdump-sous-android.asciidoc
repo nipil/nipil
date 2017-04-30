@@ -30,7 +30,7 @@ On vérifie que l'intégrité de l'image téléchargée
 
 Les deux empreintes sont identiques, on peut continuer.
 
-On configure une machine dans [VirtualBox](https://www.virtualbox.org/), on la boot, on installe tout par défaut, en choisissant n'importe quel mirroir réseau comme source d'installation. Je passe les détails, il y a trois tonnes de tutoriaux sur internet, google est notre ami.
+On configure une machine dans link:https://www.virtualbox.org/[VirtualBox], on la boot, on installe tout par défaut, en choisissant n'importe quel mirroir réseau comme source d'installation. Je passe les détails, il y a trois tonnes de tutoriaux sur internet, google est notre ami.
 
 Ensuite on installe le keyring des gestionnaires de la toolchain
 
@@ -68,7 +68,7 @@ On vérifie que ça fonctionne correctement
 	Thread model: posix
 	gcc version 4.4.5 (Debian 4.4.5-8)
 
-On installe deux packages nécessaires (pour info, [qui est qui](https://fr.wikipedia.org/wiki/Yacc_%28logiciel%29))
+On installe deux packages nécessaires (pour info, link:https://fr.wikipedia.org/wiki/Yacc_%28logiciel%29[qui est qui])
 
 	sudo apt-get install flex bison
 
@@ -166,7 +166,7 @@ On obtient alors le précieux exécutable, à la fois compatible ARM **et** stan
 
 	c18b779ebbbce63a6304a22863c66fa8  tcpdump
 
-Vous pouvez le télécharger [ici](/files/tcpdump)
+Vous pouvez le télécharger link:/files/tcpdump[ici]
 
 Après l'avoir téléchargé, Pour vérifier l'empreinte MD5 donnée ci-dessus, il suffit de 
 
@@ -229,7 +229,7 @@ Pour capturer le traffic qui passe par le wifi :
 
 Pour arrêter la capture, faire un Control-C (maintenir le bouton "volume bas", et appuyer sur la touche C), ou voir le menu "Paramètres" de l'application "Terminal Emulator" pour voir la combinaison de touche chez vous.
 
-Tout ce qui est capturé est stocké dans un fichier avec extension `.pcap`. Il vous suffit de copier les fichiers `.pcap` sur votre PC depuis la carte SD, et de l'ouvrir avec l'analyseur réseau [Wireshark](https://www.wireshark.org/)
+Tout ce qui est capturé est stocké dans un fichier avec extension `.pcap`. Il vous suffit de copier les fichiers `.pcap` sur votre PC depuis la carte SD, et de l'ouvrir avec l'analyseur réseau link:https://www.wireshark.org/[Wireshark]
 
 Maintenant, c'est à vous de jouer :-)
 

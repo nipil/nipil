@@ -4,13 +4,13 @@ title: Premiers pas avec Gradle, Groovy et IDEA
 tags: programmation groovy gradle idea
 ---
 
-Depuis que j'ai changé de job il y a un an et demi, je fais beaucoup de "catch-up" (rattrapage) technologique, cf [article précédent](/2016/10/17/velib-stats-consultation-des-statistiques-velib.html).
+Depuis que j'ai changé de job il y a un an et demi, je fais beaucoup de "catch-up" (rattrapage) technologique, cf link:/2016/10/17/velib-stats-consultation-des-statistiques-velib.html[article précédent].
 
 Depuis septembre, j'ai aussi repris un autre projet (qui est encore à l'état de prototype) dont je ne connais ni les technos, ni la génèse ; il n'est pas documenté, et les docs de conception sont de type "fil rouge" (ie très succintes).
 
 Bref tout est à faire, mais la base techno est déjà posée et ne changera pas (il y a de bonnes raisons pour ça, qui sont hors sujet ici). Pas grave, ça me dérange pas, je maîtris le "saut dans la piscine en mode éponge" !
 
-Aujourd'hui, je vous parlerai de mes premiers pas avec [Groovy](http://groovy-lang.org/). Et donc avec [Gradle](https://gradle.org/). En utilisant [IDEA](https://www.jetbrains.com/idea/).
+Aujourd'hui, je vous parlerai de mes premiers pas avec link:http://groovy-lang.org/[Groovy]. Et donc avec link:https://gradle.org/[Gradle]. En utilisant link:https://www.jetbrains.com/idea/[IDEA].
 
 Prenez une boisson chaude, et des petits gateaux, et allons y relax...
 
@@ -68,7 +68,7 @@ Pour finir, un script groovy ça s'exécute de la manière suivante :
 	# puis on exécute le bytecode java en incluant les librairies
 	java -jar /usr/share/groovy2/embeddable/groovy-all-2.4.5.jar -cp . a
 
-Il a des tonnes d'autres trucs que je suis loin de maîtriser, mais la [documentation](http://groovy-lang.org/documentation.html) du langage est très bien faite et agréable à lire, il faut juste prendre le temps de l'ingurgiter et de la digérer.
+Il a des tonnes d'autres trucs que je suis loin de maîtriser, mais la link:http://groovy-lang.org/documentation.html[documentation] du langage est très bien faite et agréable à lire, il faut juste prendre le temps de l'ingurgiter et de la digérer.
 
 == Gradle, kezako ?
 
@@ -112,9 +112,9 @@ On peut se poser la question. La réponse ? La simplification, comme pour Groovy
 
 L'idée derrière Gradle, part du constat que :
 
-- un script Makefile ([exemple](https://www.gnu.org/software/make/manual/html_node/Simple-Makefile.html)) décrit explicitement toutes les actions attendues
-- un script Ant ([exemple](https://ant.apache.org/manual/using.html)) décrit explicitement toutes les actions attendues
-- un script Maven ([exemple](https://maven.apache.org/pom.html)) décrit explicitement toutes les actions attendues
+- un script Makefile (link:https://www.gnu.org/software/make/manual/html_node/Simple-Makefile.html[exemple]) décrit explicitement toutes les actions attendues
+- un script Ant (link:https://ant.apache.org/manual/using.html[exemple]) décrit explicitement toutes les actions attendues
+- un script Maven (link:https://maven.apache.org/pom.html[exemple]) décrit explicitement toutes les actions attendues
 
 En comparaison avec les scripts donnés en exemple ci-dessus, un script Gradle se contente de **décrire ce qui change de la norme**.
 
@@ -321,7 +321,7 @@ Et quand on voudra changer de version gradle pour le projet, il suffit de regén
 
 Puis d'inclure les fichiers regénérés dans le gestionnaire de code.
 
-Pour les plus affamés, vous pouvez allez lire la [documentation](https://docs.gradle.org/current/userguide/gradle_wrapper.html) de la tâche wrapper
+Pour les plus affamés, vous pouvez allez lire la link:https://docs.gradle.org/current/userguide/gradle_wrapper.html[documentation] de la tâche wrapper
 
 == Groovy, étape 1 : dépendances et installation
 
@@ -508,7 +508,7 @@ A partir de là, dès qu'on met un fichier `.groovy` au bon endroit, il sera pri
 
 C'est ce que nous allons faire ensuite !
 
-Sinon, vous pouvez allez lire la [documentation](https://docs.gradle.org/current/userguide/groovy_plugin.html) du plugin Groovy
+Sinon, vous pouvez allez lire la link:https://docs.gradle.org/current/userguide/groovy_plugin.html[documentation] du plugin Groovy
 
 == Groovy, étape 2 : script, compilation et lancement
 
@@ -553,7 +553,7 @@ Lançons notre programme !
 
 Pour lancer le programme, le plus simple est de passer par un plugin gradle, qui va packager notre application et permettre son lancement d'une manière simple et robuste.
 
-Ajouter le plugin Gradle 'application' ([doc](https://docs.gradle.org/current/userguide/application_plugin.html)) au fichier `build.gradle`:
+Ajouter le plugin Gradle 'application' (link:https://docs.gradle.org/current/userguide/application_plugin.html[doc]) au fichier `build.gradle`:
 
 	apply plugin: 'application'
 
@@ -618,7 +618,7 @@ On constate :
 
 C'est pas génial tout ça ?!
 
-Pour finir, le plugin 'application' applique automatiquement le plugin 'distribution' ([doc](https://docs.gradle.org/current/userguide/distribution_plugin.html)) qui fournit les éléments suivants :
+Pour finir, le plugin 'application' applique automatiquement le plugin 'distribution' (link:https://docs.gradle.org/current/userguide/distribution_plugin.html[doc]) qui fournit les éléments suivants :
 
 - générer une archive (`distZip` et `distTar`) pour distribution)
 - `installDist` qui installe localement l'application
@@ -676,7 +676,7 @@ Une fois configuré, il sera utilisé pour les tâches de packaging (zip, tar, j
 
 Dans un programme, généralement on log des trucs. Que ça soit du debug, que ça soit de l'info, un programme ça log, surtout si ça tourne pendant longtemps.
 
-Comment logger ? Il existe des dizaines de framework, mais [Slf4j]()+[Logback]() semblent être sur le devant de la scène.
+Comment logger ? Il existe des dizaines de framework, mais link:[Slf4j]+link:[Logback] semblent être sur le devant de la scène.
 
 Commen ça se présente :
 
@@ -702,7 +702,7 @@ On édite d'abord la section `dependencies` du fichier `build.gradle` :
 		...
 	}
 
-Pour rappel, on a retrouvé les groupes, les noms, et les versions pour construire la ligne de dépendance via les infos consultables sur le dépôt [MavenCentral](http://search.maven.org/)
+Pour rappel, on a retrouvé les groupes, les noms, et les versions pour construire la ligne de dépendance via les infos consultables sur le dépôt link:http://search.maven.org/[MavenCentral]
 
 Ensuite, dans notre script principal :
 
@@ -766,7 +766,7 @@ IDEA est une interface de développement intégrée (comme Eclipse, Visual Studi
 
 On l'installe :
 
-- [télécharger](https://www.jetbrains.com/idea/) IDEA d'Intellij
+- link:https://www.jetbrains.com/idea/[télécharger] IDEA d'Intellij
 - décompresser dans son $HOME
 - lancer avec `bin/idea.sh`
 
@@ -844,7 +844,7 @@ On y retrouve :
 - les sourceSets et les dépendances
 - la possibilité de lancer une tâche à la main
 
-La [documentation](https://www.jetbrains.com/help/idea/2016.2/gradle-tool-window.html) est disponible sur le site de l'éditeur.
+La link:https://www.jetbrains.com/help/idea/2016.2/gradle-tool-window.html[documentation] est disponible sur le site de l'éditeur.
 
 === Fichier `ignore` pour GIT/SVN/etc
 

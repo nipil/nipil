@@ -6,7 +6,7 @@ tags: cloud ovh
 
 Après m'être intéressé à l'offre de stockage d'Hubic et son tarif formidable (10 tera-octets pour 50 euros par an !) et avoir appris que "Hubic ce n'est pas de l'OpenStack standard", j'ai voulu comprendre pourquoi.
 
-Pour accéder aux stockage OpenStack, on utilise un client Swift quelconque : [swift](https://github.com/openstack/python-swiftclient) pour la ligne de commande, et [SwiftExplorer](http://www.619.io/swift-explorer) ou [CyberDuck](https://cyberduck.io/) pour une version graphique.
+Pour accéder aux stockage OpenStack, on utilise un client Swift quelconque : link:https://github.com/openstack/python-swiftclient[swift] pour la ligne de commande, et link:http://www.619.io/swift-explorer[SwiftExplorer] ou link:https://cyberduck.io/[CyberDuck] pour une version graphique.
 
 Mais pour accéder à Hubic, on ne peut pas utiliser directement un client Swift directement. Je voulais comprendre la manière dont les choses s'articulent, donc ce billet d'aujourd'hui est un récapitulatif de ce que j'ai trouvé.
 

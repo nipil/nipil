@@ -4,7 +4,7 @@ title: SSL et (Perfect) Forward Secrecy
 tags: serveur ssl
 ---
 
-Tout d'abord, kezako la Forward Secrecy (PFS) ? Vincent Bernat [l'explique en détails](http://vincent.bernat.im/fr/blog/2011-ssl-perfect-forward-secrecy.html#sans-forward-secrecy) mais je vais résumer simplement :
+Tout d'abord, kezako la Forward Secrecy (PFS) ? Vincent Bernat link:http://vincent.bernat.im/fr/blog/2011-ssl-perfect-forward-secrecy.html#sans-forward-secrecy[l'explique en détails] mais je vais résumer simplement :
 1. sans précautions particulières, les communications chiffrées ayant été enregistrées par le passé peuvent être déchiffrées bien plus tard, si on obtient la clé privée du certificat serveur
 2. avec la Perfect Forward Secrecy, même si on obtient la clé privée du certificat serveur, les communications passées ne peuvent plus être déchiffrées
 
@@ -22,7 +22,7 @@ Un "cipher" est une combinaison de 4 séries de paramètres :
 
 Pour connaître la liste de toutes les combinaisons disponibles sur le système permettant le chiffrement, utiliser la commande suivante `openssl ciphers -v | column -t`. Sur une Debian Wheezy, l'obtient 82 lignes. La première colonne est le nom OpenSSL du cipher, la deuxième colonne la "cipher suite" dont il dépend, et ensuite on retrouve les paramètres évoqués plus haut.
 
-Pour forcer l'usage d'algorithmes permettant la PFS, il faut n'autoriser que les algorithmes basés sur Diffie-Hellman (DH) avec clés *éphémères*. On prendra soin de retirer les algorithmes DES (cassé) et RC4 (qui n'est [pas loin d'être cassé](https://community.qualys.com/blogs/securitylabs/2013/03/19/rc4-in-tls-is-broken-now-what)) et bien sûr retirer eNULL (sans chiffrement). On les triera finalement par "robustesse".
+Pour forcer l'usage d'algorithmes permettant la PFS, il faut n'autoriser que les algorithmes basés sur Diffie-Hellman (DH) avec clés *éphémères*. On prendra soin de retirer les algorithmes DES (cassé) et RC4 (qui n'est link:https://community.qualys.com/blogs/securitylabs/2013/03/19/rc4-in-tls-is-broken-now-what[pas loin d'être cassé]) et bien sûr retirer eNULL (sans chiffrement). On les triera finalement par "robustesse".
 
 On aboutit à la liste suivante (34 lignes)
 
@@ -73,7 +73,7 @@ On va maintenant appliquer tout ça !
 
 == Configuration du serveur Web (Lighttpd)
 
-Avec le paramètre `ssl.cipher-list` à sa valeur par défaut `ECDHE-RSA-AES256-SHA384:AES256-SHA256:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM`, le site d'analyse SSL [Qualis SSL Labs](https://www.ssllabs.com) nous donne le résultat suivant :
+Avec le paramètre `ssl.cipher-list` à sa valeur par défaut `ECDHE-RSA-AES256-SHA384:AES256-SHA256:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM`, le site d'analyse SSL link:https://www.ssllabs.com[Qualis SSL Labs] nous donne le résultat suivant :
 
 <img src="/files/ssl-pfs-default.png" />
 
@@ -88,7 +88,7 @@ Editer le fichier `/etc/lighttpd/conf-available/10-ssl.conf`
 - ajouter le paramètre `ssl.honor-cipher-order = "enable"` s'il n'est pas présent
 - mettre `ssl.cipher-list` à la valeur `"EECDH:EDH:!eNULL:!RC4:!DES:@STRENGTH"`
 
-Recharger la configuration du serveur (`service lighttpd restart`), et retester la configuration SSL en cliquant sur "Clear cache" en haut de la page de résultat de [Qualis SSL Labs](https://www.ssllabs.com). On obtient le résultat suivant :
+Recharger la configuration du serveur (`service lighttpd restart`), et retester la configuration SSL en cliquant sur "Clear cache" en haut de la page de résultat de link:https://www.ssllabs.com[Qualis SSL Labs]. On obtient le résultat suivant :
 
 <img src="/files/ssl-pfs-strict.png" />
 
@@ -98,11 +98,11 @@ On constate alors que :
 - aucun client ne chiffrera avec l'algorithme RC4
 - *IE6/8 sous Windows XP ne peut plus accéder au site en HTTPS !*
 
-Afin de permettre quand même aux utilisateurs de Windows XP d'accéder à notre site (*soit 18.91% du parc informatique en mai 2014 selon [statcounter](http://gs.statcounter.com/#os-ww-monthly-201305-201405-bar)*) on va ajouter un cipher "pas trop pourri" pour permettre à tous ces clients de se connecter à notre site, qui je vous le rapelle, a été configuré pour être uniquement accessible en HTTPS.
+Afin de permettre quand même aux utilisateurs de Windows XP d'accéder à notre site (*soit 18.91% du parc informatique en mai 2014 selon link:http://gs.statcounter.com/#os-ww-monthly-201305-201405-bar[statcounter]*) on va ajouter un cipher "pas trop pourri" pour permettre à tous ces clients de se connecter à notre site, qui je vous le rapelle, a été configuré pour être uniquement accessible en HTTPS.
 
 Vous pouvez aussi décider que les utilisateurs d'XP vont disparaître, et que le moteur de recherche Russe Yondex ne vous intéresse pas, et ne pas ajouter ce cipher à votre liste, à vous de voir... Mais personnellement je préfère que tout le monde puisse y accéder (d'autant que le message d'erreur sous IE/XP est peu clair !)
 
-En regardant le détail de ce qui est disponible chez le "moins compétent" des trois ([Yandex](https://www.ssllabs.com/ssltest/viewClient.html?name=YandexBot&version=3.0)) on voit deux lignes de RC4 et une ligne de 3DES. Ca tombe bien [IE6/XP](https://www.ssllabs.com/ssltest/viewClient.html?name=IE&version=6&platform=XP) et [IE8/XP](https://www.ssllabs.com/ssltest/viewClient.html?name=IE&version=8&platform=XP) supportent aussi cette même ligne 3DES : `TLS_RSA_WITH_3DES_EDE_CBC_SHA`. Une recherche de ce nom dans `man cipher` nous indique que le nom équivalent côté OpenSSL pour ce cipher est `DES-CBC3-SHA`.
+En regardant le détail de ce qui est disponible chez le "moins compétent" des trois (link:https://www.ssllabs.com/ssltest/viewClient.html?name=YandexBot&version=3.0[Yandex]) on voit deux lignes de RC4 et une ligne de 3DES. Ca tombe bien link:https://www.ssllabs.com/ssltest/viewClient.html?name=IE&version=6&platform=XP[IE6/XP] et link:https://www.ssllabs.com/ssltest/viewClient.html?name=IE&version=8&platform=XP[IE8/XP] supportent aussi cette même ligne 3DES : `TLS_RSA_WITH_3DES_EDE_CBC_SHA`. Une recherche de ce nom dans `man cipher` nous indique que le nom équivalent côté OpenSSL pour ce cipher est `DES-CBC3-SHA`.
 
 On va donc ajouter ce dernier tout à la fin de notre paramètre `ssl.ssl.cipher-list`
 
@@ -112,7 +112,7 @@ De cette manière, étant en tout dernier on aura le comportement suivant :
 - les clients "capables" continueront d'utiliser les meilleures versions "compatibles PFS"
 - les clients incompatibles choisiront ce dernier, et sauront toujours se connecter (sans PFS)
 
-On recharge à nouveau la configuration du serveur (`service lighttpd restart`), et on reteste la configuration SSL en cliquant sur "Clear cache" en haut de la page de résultat de [Qualis SSL Labs](https://www.ssllabs.com).
+On recharge à nouveau la configuration du serveur (`service lighttpd restart`), et on reteste la configuration SSL en cliquant sur "Clear cache" en haut de la page de résultat de link:https://www.ssllabs.com[Qualis SSL Labs].
 
 On obtient le résultat suivant :
 

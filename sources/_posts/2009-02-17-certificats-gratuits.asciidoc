@@ -4,7 +4,7 @@ title:  Certificats gratuits
 tags: sécurité serveur certificat
 ---
 
-Je pensais qu'il fallait payer pour avoir des certificats reconnus par les navigateurs ? Et bien en fait ça n'est pas le cas, grâce à [StartSSL](https://www.startssl.com), qui délivre *gratuitement* des certificats.
+Je pensais qu'il fallait payer pour avoir des certificats reconnus par les navigateurs ? Et bien en fait ça n'est pas le cas, grâce à link:https://www.startssl.com[StartSSL], qui délivre *gratuitement* des certificats.
 
 <!--more-->
 
@@ -26,7 +26,7 @@ A noter que la délivrance et le renouvellement de certificats est gratuite, mai
 
 == Inscription auprès de StartSSL
 
-L'inscription se fait sur le site [StartSSL](https://www.startssl.com), et au lieu de vous demander un identifiant et un mot de passe, ils ont décidé de vous créer un *certificat client*.
+L'inscription se fait sur le site link:https://www.startssl.com[StartSSL], et au lieu de vous demander un identifiant et un mot de passe, ils ont décidé de vous créer un *certificat client*.
 
 Ils vous demandent donc vos infos (nom, prénom, adresse, téléphone et email), et vérifieront que votre email est valide. A noter qu'il vaut mieux mettre des informations réelles, car à la moindre vérification invalide, tous les certificats générés après coup pourraient être révoqués.
 
@@ -41,14 +41,14 @@ Ce premier certificat ne sert qu'à une chose : vous identifier auprès du servi
 
 Pour exporter et sauvegarder le certificat qui permet d'accéder au site, sous FireFox 21, aller dans les "options/préférences", puis dans la section "avancé", puis dans l'onglet "encryption", puis "voir les certificats", puis dans l'onglet "vos certificats".
 
-Vous devriez avoir dans la liste le certificat identifié par votre adresse email, dans la section "StartCom Ltd". Sélectionner le certificat, et cliquer sur "sauvegarder". Il vous demande un mot de passe (que vous stockerez par exemple dans un gestionaire de mots de passe, mais dans tous les cas, que vous n'oublierez pas !) et il créé un fichier avec extension `.p12`, vu que le certificat est au format [PKCS12](http://fr.wikipedia.org/wiki/PKCS12).
+Vous devriez avoir dans la liste le certificat identifié par votre adresse email, dans la section "StartCom Ltd". Sélectionner le certificat, et cliquer sur "sauvegarder". Il vous demande un mot de passe (que vous stockerez par exemple dans un gestionaire de mots de passe, mais dans tous les cas, que vous n'oublierez pas !) et il créé un fichier avec extension `.p12`, vu que le certificat est au format link:http://fr.wikipedia.org/wiki/PKCS12[PKCS12].
 
 En regardant ce fichier, on voit que la seule information qu'il contient est l'adresse email qui a été vérifiée, aucune autre information demandée lors de l'inscription n'est présente (c'est logique vu qu'elles n'ont pas été vérifiées).
 
 Si vous voulez créer un autre certificat pour une autre adresse email, il faut d'abord valider cette autre adresse mail, et ensuite générer un certificat basé sur cette identité.
 
 Pour valider une adresse mail :
-- se connecter au site [StartSSL](https://www.startssl.com)
+- se connecter au site link:https://www.startssl.com[StartSSL]
 - aller dans l'onglet "validation wizard"
 - sélectionner "email address validation"
 - entrer l'adresse mail à vérifier
@@ -98,7 +98,7 @@ Une remarque importante : StartSSL ne permet de valider des zones directes (exem
 Pour créer un certificat serveur, il faut d'abord valider que vous ayez accès au nom de domaine, puis générer un ou plusieurs certificats serveurs correspondant aux besoins de ce domaine.
 
 Pour valider l'accès au domaine :
-- se connecter au site [StartSSL](https://www.startssl.com)
+- se connecter au site link:https://www.startssl.com[StartSSL]
 - aller dans l'onglet "validation wizard"
 - sélectionner "domain name validation"
 - entrer le nom de votre domaine et son extension

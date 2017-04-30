@@ -4,7 +4,7 @@ title:  Serveur-dns-personnel
 tags: serveur dns
 ---
 
-J'avais depuis longtemps envie de gérer mes propres enregistrements DNS, au lieu de confier les informations à mon registrar [online.net](http://www.online.net) qui fait le travail réel pour moi.
+J'avais depuis longtemps envie de gérer mes propres enregistrements DNS, au lieu de confier les informations à mon registrar link:http://www.online.net[online.net] qui fait le travail réel pour moi.
 
 En les gérant le nom de domaine soi-même :
 - on perd en fiabilité (on a pas les mêmes capacités réseau et la même redondance que le registrar), on ne dispose plus du support technique du service pour lequel on paye (*ie* faut se débrouiller pour la compréhension, la config, et les problèmes)
@@ -117,7 +117,7 @@ En général, c'est une fonctionnalité désactivée, car ça aide l'attaquant �
 
 Pour terminer, on peut regarder la résolution inverse (ce qui fait correspondre un nom de domaine à une adresse ip) et ce pour une adresse IPv4 et IPv6. A noter que ces informations ne sont **pas** liées à votre nom de domaine, mais gérée *par votre FAI* ! C'est effectivement votre opérateur d'accès à internet qui fera (s'il l'autorise et que vous l'avez configuré) ce travail de référencement.
 
-Par exemple, mon FAI [Free](http://www.free.fr) (fournisseur d'accès à internet) ne me permet que de référencer la résolution inverse de mon adresse IPv4. Je lui avais demandé via la console de gestion, de faire correspondre `home.nipil.org` à mon adresse internet.
+Par exemple, mon FAI link:http://www.free.fr[Free] (fournisseur d'accès à internet) ne me permet que de référencer la résolution inverse de mon adresse IPv4. Je lui avais demandé via la console de gestion, de faire correspondre `home.nipil.org` à mon adresse internet.
 
 	$ dig -x 88.189.158.57 +trace
 
@@ -331,7 +331,7 @@ Pour accepter les connexions entrantes en IPv6
 
 Pour vérifier ou suivre la propagation des requêtes, on peut ajouter le logging des connexions en utilisant `DNS(ACCEPT):info` à la place. On pourra enlever le logging après coup quand on sera satisfaits. Vérifier aussi que l'on accepte pas de spoofing avec des adresses sources locales sur l'interface côté internet, c'est à dire qu'il y a l'option `norfc1918` pour la ligne de l'interface de la zone `net` dans le fichier `/etc/shorewall/interface`.
 
-Tester via ce premier formulaire [Afnic Zonecheck](http://www.afnic.fr/fr/produits-et-services/services/zonecheck/formulaire-complet/), où il faut remplir la zone, et mettre dans la case "primaire" l'adresse de votre serveur, que votre zone est bien configurée (cocher la case "continue après fatal"). Puis tester via secondle formulaire [open resolver](http://dns.measurement-factory.com/cgi-bin/openresolvercheck.pl) en rentrant l'adresse IP de votre serveur, que votre daemon n'est pas un "open resolver" (ça doit marquer "closed").
+Tester via ce premier formulaire link:http://www.afnic.fr/fr/produits-et-services/services/zonecheck/formulaire-complet/[Afnic Zonecheck], où il faut remplir la zone, et mettre dans la case "primaire" l'adresse de votre serveur, que votre zone est bien configurée (cocher la case "continue après fatal"). Puis tester via secondle formulaire link:http://dns.measurement-factory.com/cgi-bin/openresolvercheck.pl[open resolver] en rentrant l'adresse IP de votre serveur, que votre daemon n'est pas un "open resolver" (ça doit marquer "closed").
 
 Une capture réseau `tcpdump -i interface_internet port domain` permet de voir les requêtes entrantes et sortantes, dans le tas on trouve celle du test de l'open resolver, qui est satisfaisant car la réponse fournie par Bind est "Refused".
 
@@ -353,7 +353,7 @@ Ca donnera quelque chose comme ça,pour mon registrar Online.net :
 	ns0.nipil.org    |     88.189.158.57
 	ns1.nipil.org    |     78.251.94.78
 
-Pourquoi mettre l'adresse IP en plus du nom de domaine qu'on vient de configurer ? C'est ce qu'on appelle un "[glue record](http://fr.wikipedia.org/wiki/Domain_Name_System#Glue_records)". C'est pour résoudre le problème de l'oeuf et de la poule.
+Pourquoi mettre l'adresse IP en plus du nom de domaine qu'on vient de configurer ? C'est ce qu'on appelle un "link:http://fr.wikipedia.org/wiki/Domain_Name_System#Glue_records[glue record]". C'est pour résoudre le problème de l'oeuf et de la poule.
 
 En effet, si les serveurs permettant de résoudre les noms de la zone `nipil.org` font partie de la zone `nipil.org` (c'est le cas ci-dessus), alors ils est impossible de les interroger, car pour leur faire correspondre une adresse IP, il faudrait les interroger, mais pour ça faudrait leur faire correspondre une adresse IP !
 
@@ -426,7 +426,7 @@ Dans tous les cas, lors d'une modification du fichier de zone, il faut **absolum
 
 Puis recharger la configuration du daemon via `/etc/init.d/bind9 reload` (ou restart)
 
-Pour toute configuration additionnelle, le mieux est de se référer au [wiki](http://wiki.debian.org/fr/Bind9) Debian, mais surtout sur le [site](http://www.bind9.net/) officiel de Bind, et le `man named.conf` est bien sûr le meilleur ami pendant la configuration.
+Pour toute configuration additionnelle, le mieux est de se référer au link:http://wiki.debian.org/fr/Bind9[wiki] Debian, mais surtout sur le link:http://www.bind9.net/[site] officiel de Bind, et le `man named.conf` est bien sûr le meilleur ami pendant la configuration.
 
 == Et notre registrar, alors ?
 

@@ -4,7 +4,7 @@ title: OpenBSD 5.6 sur Kimsufi 2G
 tags: server linux openbsd ovh
 ---
 
-La dernière version OpenBSD 5.6 a été [publiée](http://www.openbsd.org/56.html) le 1er novembre 2014, mais OVH ne permet pas l'installation directe d'OpenBSD.
+La dernière version OpenBSD 5.6 a été link:http://www.openbsd.org/56.html[publiée] le 1er novembre 2014, mais OVH ne permet pas l'installation directe d'OpenBSD.
 
 Cependant, ça ne va pas nous empêcher d'installer OpenBSD sur notre serveur ... Parce que oui, c'est possible !
 
@@ -23,7 +23,7 @@ La démarche générale sera la suivante :
 
 Si vous connaissez déjà vos infos techniques (surtout le nom "BSD" de la carte réseau !) vous pouvez aller directement à l'étape 3.
 
-Je précise aussi que ce billet détaillé se base sur [ce post](http://forum.kimsufi.com/showthread.php?11363-Installation-d-OpenBSD-5-3-sur-kimsufi-mKS-2g) des forums Kimsufi où la méthode est décrite.
+Je précise aussi que ce billet détaillé se base sur link:http://forum.kimsufi.com/showthread.php?11363-Installation-d-OpenBSD-5-3-sur-kimsufi-mKS-2g[ce post] des forums Kimsufi où la méthode est décrite.
 
 == Etape 1 - installer une FreeBSD via le manager OVH
 
@@ -173,7 +173,7 @@ Le plus important, c'est le nom de l'interface réseau :
 - sous \*BSD les interfaces s'appellent **drvX**, où *drv* est le nom du driver qui pilote la carte réseau en question
 - dans les deux cas, X s'incrémente selon le nombre de cartes réseau de chaque type
 
-Dans mon cas l'interface réseau de notre KS-2G est **sis0** (driver [sis](https://www.freebsd.org/cgi/man.cgi?query=sis&sektion=4)) et en résumé, partout où on voudrait mettre eth0 sous linux, on mettre sis0 sous BSD.
+Dans mon cas l'interface réseau de notre KS-2G est **sis0** (driver link:https://www.freebsd.org/cgi/man.cgi?query=sis&sektion=4[sis]) et en résumé, partout où on voudrait mettre eth0 sous linux, on mettre sis0 sous BSD.
 
 Pour voir la table de routage, sous BSD :
 
@@ -420,7 +420,7 @@ Et en bleu, je laisse l'installeur configurer les sysctl nécessaire au fonction
 
 On choisit d'utiliser tout le disque (ça créera juste un slice)
 
-On acceptera le partitionnement [par défaut](http://www.openbsd.org/cgi-bin/man.cgi/OpenBSD-56/man8/disklabel.8?query=disklabel&sec=8#x4155544f4d41544943204449534b20414c4c4f434154494f4e) qui alloue tout l'espace non utilisé à `/home`.
+On acceptera le partitionnement link:http://www.openbsd.org/cgi-bin/man.cgi/OpenBSD-56/man8/disklabel.8?query=disklabel&sec=8#x4155544f4d41544943204449534b20414c4c4f434154494f4e[par défaut] qui alloue tout l'espace non utilisé à `/home`.
 
 <img src="/files/openbsd-install-05.png" />
 
@@ -431,7 +431,7 @@ Le formatage de la plus grosse partition prend pas mal de temps, car les accès 
 
 On arrive à l'installation des ensembles de paquets (un simili tasksel sous Debian).
 
-A noter que comme l'indique la [FAQ](http://www.openbsd.org/faq/faq4.html#FilesNeeded), choisir d'installer un set ne constitue pas un "ramolissement" de la sécurité du système. C'est pour ça que tout est installé par défaut (sauf le kernel où seul un est choisi, dans notre cas c'est le kernel SP)
+A noter que comme l'indique la link:http://www.openbsd.org/faq/faq4.html#FilesNeeded[FAQ], choisir d'installer un set ne constitue pas un "ramolissement" de la sécurité du système. C'est pour ça que tout est installé par défaut (sauf le kernel où seul un est choisi, dans notre cas c'est le kernel SP)
 
 Cependant, on choisit d'installer le kernel MP (multiprocesseur) quand même, on verra plus loin pourquoi.
 
@@ -455,7 +455,7 @@ Il faut *absolument* finaliser deux points avant de quitter/rebooter.
 
 === Tout d'abord, la carte réseau
 
-Sous \*BSD le nom de la carté réseau dépend du driver qu'elle utilise. Dans QEmu, lors de l'install, quand on a configuré le réseau, elle s'appelait `em0`, car QEmu utilise un driver [em](https://www.freebsd.org/cgi/man.cgi?query=em) pour les cartes virtuelles.
+Sous \*BSD le nom de la carté réseau dépend du driver qu'elle utilise. Dans QEmu, lors de l'install, quand on a configuré le réseau, elle s'appelait `em0`, car QEmu utilise un driver link:https://www.freebsd.org/cgi/man.cgi?query=em[em] pour les cartes virtuelles.
 
 Comme on avait pu le voir lorsqu'on avait démarré la FreeBSD tout au début, notre carte réseau s'appellera en fait `sis0`. Il faut donc qu'on renomme le fichier de configuration réseau généré lors de l'installation, pour que notre carte réseau soit bien configurée.
 
@@ -470,7 +470,7 @@ Bon, le vital est fait, reste l'essentiel.
 
 Comme on a vu au début grâce à la FreeBSD, mon serveur KS-2G avec Celeron 220 a un seul processeur/coeur, donc je pourrais  tranquilement booter sur le kernel SP choisi par QEmu.
 
-Cependant, si le serveur s'avère avoir plusieurs coeurs (ou processeurs) il faut la version [SMP](http://www.openbsd.org/faq/faq8.html#SMP) du kernel et il faut vérifier qu'on boot bien sur le kernel MP.
+Cependant, si le serveur s'avère avoir plusieurs coeurs (ou processeurs) il faut la version link:http://www.openbsd.org/faq/faq8.html#SMP[SMP] du kernel et il faut vérifier qu'on boot bien sur le kernel MP.
 
 En résumé :
 
@@ -590,7 +590,7 @@ On constate que l'interface a été configurée correctement :
 Pour information, l'adresse link-local 
 
 - a été autoconfigurée lorsqu'on a affecté une adresse "globale" car elle est nécessaire pour dialoguer en IPv6
-- sa valeur "fe80::2**1c:c0**ff:fe**65:216e**%sis0" [se base sur l'adresse mac](http://en.wikipedia.org/wiki/IPv6_address#Modified_EUI-64) de notre interface sis0 00:**1c:c0**:**65:21:6e** et sera donc invariante
+- sa valeur "fe80::2**1c:c0**ff:fe**65:216e**%sis0" link:http://en.wikipedia.org/wiki/IPv6_address#Modified_EUI-64[se base sur l'adresse mac] de notre interface sis0 00:**1c:c0**:**65:21:6e** et sera donc invariante
 
 On va récupérer les instructions de routage grâce aux *router-advertisements* IPv6 (on peut ignorer ce message de la première ligne, dans la mesure où il ne nous gènera pas)
 
@@ -621,7 +621,7 @@ On regarde la table de routage (je ne donne ici que les lignes IPv6 et qui conce
 
 On retrouve dans la table de routage ce qu'on a vu dans le debug de `rtsol` : fe80::2**05:73**ff:fe**a0:1**
 
-Ca signifie qu'un routeur nous a envoyé un *router-advertisement* IPv6 et qu'on peut donc définir une route par défaut qui passe par lui. Pour info, de cette adresse *link-local* on peut extraire la mac adress du routeur 00:05:73:a0:00:01 qui montre que c'[est un équipement Cisco](http://www.coffer.com/mac_find/?string=00%3A05%3A73)
+Ca signifie qu'un routeur nous a envoyé un *router-advertisement* IPv6 et qu'on peut donc définir une route par défaut qui passe par lui. Pour info, de cette adresse *link-local* on peut extraire la mac adress du routeur 00:05:73:a0:00:01 qui montre que c'link:http://www.coffer.com/mac_find/?string=00%3A05%3A73[est un équipement Cisco]
 
 L'inconvénient de cette méthode est qu'on 
 

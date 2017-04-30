@@ -24,39 +24,39 @@ Bref. Pour vos comptes sur internet, il existe une solution extrêmement efficac
 
 Si vous ne deviez retenir que ça, ce sont ces trois points :
 
-- utilisez un [gestionnaire de mots de passe](http://keepass.info)
+- utilisez un link:http://keepass.info[gestionnaire de mots de passe]
 - utilisez le pour avoir des mot de passe différent pour chaque site
 - utilisez le pour générer des password sécurisés (aléatoires, complexes et longs)
 
 *Franchement, faites le vraiment, là tout de suite, c'est pour votre bien*.
 
-Sinon, le jour où vous vous ferez avoir, la déception sera [amère](http://www.wired.com/gadgetlab/2012/08/apple-amazon-mat-honan-hacking/all/). Et ça pourrait être encore pire que ce qui est arrivé à ce gars là, car il n'y a pas de limites à la loi de l'emmerdement maximum...
+Sinon, le jour où vous vous ferez avoir, la déception sera link:http://www.wired.com/gadgetlab/2012/08/apple-amazon-mat-honan-hacking/all/[amère]. Et ça pourrait être encore pire que ce qui est arrivé à ce gars là, car il n'y a pas de limites à la loi de l'emmerdement maximum...
 
 == Un point sur la réalité des choses
 
-Chaque internaute [possède](https://research.microsoft.com/pubs/74164/www2007.pdf) en moyenne *25 comptes en ligne*, mais on utilise en moyenne que *6.5 mots de passe* pour ces 25 comptes. Pourquoi ? Parce qu'on a tendance à choisir des mots de passe mémorisables et qu'on réutilise souvent tout ou partie des password utilisés ailleurs.
+Chaque internaute link:https://research.microsoft.com/pubs/74164/www2007.pdf[possède] en moyenne *25 comptes en ligne*, mais on utilise en moyenne que *6.5 mots de passe* pour ces 25 comptes. Pourquoi ? Parce qu'on a tendance à choisir des mots de passe mémorisables et qu'on réutilise souvent tout ou partie des password utilisés ailleurs.
 
 D'autre part, la réalité du terrain montre que les sites web se font régulièrement hacker et des millions de mots de passe sont publiés à chaque fois : 
-- [Sony PSN](http://en.wikipedia.org/wiki/PlayStation_Network_outage) : 77 millions de comptes
-- [LivingSocial](http://arstechnica.com/security/2013/04/why-livingsocials-50-million-password-breach-is-graver-than-you-may-think/) : 50 millions de comptes
-- [Evernote](http://arstechnica.com/security/2013/03/evernote-resets-all-user-passwords-after-coordinated-breach-attempt/) : 50 millions de comptes
-- [RockYou](http://arstechnica.com/security/2010/01/32-million-passwords-show-most-users-careless-about-security/) : 32 millions de comptes
-- [Zoosk](http://arstechnica.com/security/2013/03/dating-site-zoosk-resets-some-user-accounts-following-password-dump/) : 29 millions de comptes
-- [LinkedIn](http://arstechnica.com/security/2012/06/8-million-leaked-passwords-connected-to-linkedin/) : 6.5 millions de comptes
-- [Gawker](http://www.theregister.co.uk/2010/12/13/gawker_hacked/) : 1.3 millions de comptes
-- [Yahoo](http://news.cnet.com/8301-1009_3-57471178-83/yahoos-password-leak-what-you-need-to-know-faq/) : 450 000 comptes
-- [Twitter](http://arstechnica.com/security/2013/02/twitter-detects-and-shuts-down-password-data-hack-in-progress/) : 250 000 comptes
-- [Amazon](http://www.ehackingnews.com/2012/11/security-breach-hits-amazoncouk-628.html) : 628 comptes
-- [Skype](http://www.inquisitr.com/398517/skype-security-breach-forces-microsoft-to-suspend-password-resets/) : récupération de compte à volonté
-- [Google](http://www.cryptzone.com/news/article.aspx?category=Email-security&title=Google-reveals-data-security-breach-on-Gmail&id=800565910) : écoute des correspondances
+- link:http://en.wikipedia.org/wiki/PlayStation_Network_outage[Sony PSN] : 77 millions de comptes
+- link:http://arstechnica.com/security/2013/04/why-livingsocials-50-million-password-breach-is-graver-than-you-may-think/[LivingSocial] : 50 millions de comptes
+- link:http://arstechnica.com/security/2013/03/evernote-resets-all-user-passwords-after-coordinated-breach-attempt/[Evernote] : 50 millions de comptes
+- link:http://arstechnica.com/security/2010/01/32-million-passwords-show-most-users-careless-about-security/[RockYou] : 32 millions de comptes
+- link:http://arstechnica.com/security/2013/03/dating-site-zoosk-resets-some-user-accounts-following-password-dump/[Zoosk] : 29 millions de comptes
+- link:http://arstechnica.com/security/2012/06/8-million-leaked-passwords-connected-to-linkedin/[LinkedIn] : 6.5 millions de comptes
+- link:http://www.theregister.co.uk/2010/12/13/gawker_hacked/[Gawker] : 1.3 millions de comptes
+- link:http://news.cnet.com/8301-1009_3-57471178-83/yahoos-password-leak-what-you-need-to-know-faq/[Yahoo] : 450 000 comptes
+- link:http://arstechnica.com/security/2013/02/twitter-detects-and-shuts-down-password-data-hack-in-progress/[Twitter] : 250 000 comptes
+- link:http://www.ehackingnews.com/2012/11/security-breach-hits-amazoncouk-628.html[Amazon] : 628 comptes
+- link:http://www.inquisitr.com/398517/skype-security-breach-forces-microsoft-to-suspend-password-resets/[Skype] : récupération de compte à volonté
+- link:http://www.cryptzone.com/news/article.aspx?category=Email-security&title=Google-reveals-data-security-breach-on-Gmail&id=800565910[Google] : écoute des correspondances
 
 D'après vous, est ce que les mots de passe `momof3g8kids`, `qeadzcwrsfxv1331`, `k1araj0hns0n`, `Apr!l221973`, `Qbesancon321`, et `tmdmmj17` sont des mots de passe sécurisés ?
 
-La réponse est non, ils ont tous été publiés récemment, après avoir été [crackés](http://arstechnica.com/security/2013/05/how-crackers-make-minced-meat-out-of-your-passwords/) facilement, en moins de 6 heures par une seule personne avec un ordinateur à 500 euros.
+La réponse est non, ils ont tous été publiés récemment, après avoir été link:http://arstechnica.com/security/2013/05/how-crackers-make-minced-meat-out-of-your-passwords/[crackés] facilement, en moins de 6 heures par une seule personne avec un ordinateur à 500 euros.
 
 Pourtant, ils rassemblent tous les critères d'un "bon" mot de passe : il sont long et utilisent majuscules, minuscules, chiffres et ponctuation. La majorité des "password meter" diront que c'est un bon mot de passe, mais malheurseusement ça n'est pas le cas, car ils sont partiellement composés de mots présents dans des dictionnaires qui ont été construits à partir des attaques listées plus haut.
 
-A contrario, le site [My1login](https://www.my1login.com) tient compte, contrairement à la majorité des évaluateurs de mots de passe, de ces dictionnaires. Il indique à titre informatif qu'il faut 0.69 secondes pour cracker `k1araj0hns0n`, et tout juste 21 minutes pour `Apr!l221973`. Ce qui est une bonne chose.
+A contrario, le site link:https://www.my1login.com[My1login] tient compte, contrairement à la majorité des évaluateurs de mots de passe, de ces dictionnaires. Il indique à titre informatif qu'il faut 0.69 secondes pour cracker `k1araj0hns0n`, et tout juste 21 minutes pour `Apr!l221973`. Ce qui est une bonne chose.
 
 Mais malheureusement il indique aussi que les autres mots de passe sont "forts" et prennent plus d'un mois à être cracké, alors qu'en réalité il a fallu moins de 6 heures, notemment grâce aux précédentes attaques qui ont permis à la fois de construire des dictionnaires, et des trouver les habitudes des gens quand il s'agit de choisir un mot de passe.
 
@@ -70,7 +70,7 @@ Imaginons que vous ayez été utilisateur d'un site `http://site.com`, que ce si
 
 `toto@email.com:5d7f770a272b5c129e91ae5b8d5b6a5c`
 
-[Sans](http://arstechnica.com/security/2013/03/how-i-became-a-password-cracker/) véritables connaissances préalables, il faudra moins de 24 heures à un amateur armé des bons [outils](http://hashcat.net) pour récupérer le mot de passe correspondant : `EcranMichael2012*`.
+link:http://arstechnica.com/security/2013/03/how-i-became-a-password-cracker/[Sans] véritables connaissances préalables, il faudra moins de 24 heures à un amateur armé des bons link:http://hashcat.net[outils] pour récupérer le mot de passe correspondant : `EcranMichael2012*`.
 
 Maintenant, il peut déjà continuer d'utiliser ces informations pour consulter, modifier, et agir en votre nom sur `http://site.com` si ses créateurs n'ont pas communiqué sur le fait qu'il s'est fait attaquer (c'est plus fréquent qu'on ne le pense)
 
@@ -101,7 +101,7 @@ Il y a deux semaines, j'ai sauté le pas et décidé d'appliquer ces principes.
 
 Pourquoi ne pas simplement utiliser le gestionnaire de mots de passe de votre navigateur ? D'une part parce que vous pouvez changer de navigateur, ou en utiliser plusieurs, mais aussi parce que tous vos comptes ne sont pas forcément accessibles par navigateur. Ou bien parce que vous n'êtes pas chez vous.
 
-J'ai commencé par le choix d'un outil de gestion de mots de passe : [KeePass](http://keepass.info). Il est multi-plateforme vu qu'il est écrit en [C#](http://en.wikipedia.org/wiki/C_Sharp_(programming_language) et il existe une version portable, ce qui permet de l'avoir toujours avec soi sur une clé USB. Et il est disponible en français.
+J'ai commencé par le choix d'un outil de gestion de mots de passe : link:http://keepass.info[KeePass]. Il est multi-plateforme vu qu'il est écrit en link:http://en.wikipedia.org/wiki/C_Sharp_(programming_language[C#] et il existe une version portable, ce qui permet de l'avoir toujours avec soi sur une clé USB. Et il est disponible en français.
 
 Primo-configuration :
 - lancer le logiciel

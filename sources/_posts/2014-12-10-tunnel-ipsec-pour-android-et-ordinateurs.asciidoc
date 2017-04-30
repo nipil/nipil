@@ -226,7 +226,7 @@ Sur mon téléphone android kitkat (4.4.4) on configure le vpn via ces écrans
 
 <img src="/files/ipsec-l2tp-android.png" />
 
-Normalement, en allant sur [monip.org](http://monip.org) on devrait avoir
+Normalement, en allant sur link:http://monip.org[monip.org] on devrait avoir
 affiché l'adresse IP de notre serveur plutôt que celui de l'accès qu'on
 utilise.
 
@@ -336,7 +336,7 @@ Et la table de routage est mise à jour
 	192.168.34.1 dev ppp0  proto kernel  scope link  src 192.168.34.100 
 	192.168.111.0/24 dev eth0  proto kernel  scope link  src 192.168.111.3
 
-Normalement, en allant sur [monip.org](http://monip.org) on devrait avoir
+Normalement, en allant sur link:http://monip.org[monip.org] on devrait avoir
 affiché l'adresse IP de notre serveur plutôt que celui de l'accès qu'on
 utilise.
 

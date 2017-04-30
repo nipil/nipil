@@ -15,14 +15,14 @@ Mais même sur ces petites machines on ne fait pas de virtualisation pour "renta
 - pour segmenter la partie "réseau", car chaque guest/conteneur a sa propre table de routage
 - voire même les deux en même temps !
 
-Sous debian, deux possibilités dans ce cas : OpenVZ et LXC. Or depuis la dernière release (wheezy/7) OpenVZ n'est plus supporté par Debian, même s'il reste tout à fait possible de l'utiliser via les kernels spécifiques générés par [OpenVZ](http://download.openvz.org/debian/) et ne reste donc que la solution LXC.
+Sous debian, deux possibilités dans ce cas : OpenVZ et LXC. Or depuis la dernière release (wheezy/7) OpenVZ n'est plus supporté par Debian, même s'il reste tout à fait possible de l'utiliser via les kernels spécifiques générés par link:http://download.openvz.org/debian/[OpenVZ] et ne reste donc que la solution LXC.
 
-**Update 2013-10-17** : Je viens de découvrir qu'OpenVZ [collecte des infos internes de vos serveurs](https://blog.ipredator.se/2013/06/why-data-collection-should-be-opt-in-and-not-opt-out.html) sans demander votre avis, et en envoyant en plus tout ça en clair, et à une machine située aus USA... Je n'ai jamais utilisé OpenVZ, donc je ne sais pas si Debian pose la question concernant les stats. Dans le doute, gare à vous selon ce que vous répondez, et attention si vous utilisez une distrib qui de toute façon ne pose pas de questions lors de l'install.
+**Update 2013-10-17** : Je viens de découvrir qu'OpenVZ link:https://blog.ipredator.se/2013/06/why-data-collection-should-be-opt-in-and-not-opt-out.html[collecte des infos internes de vos serveurs] sans demander votre avis, et en envoyant en plus tout ça en clair, et à une machine située aus USA... Je n'ai jamais utilisé OpenVZ, donc je ne sais pas si Debian pose la question concernant les stats. Dans le doute, gare à vous selon ce que vous répondez, et attention si vous utilisez une distrib qui de toute façon ne pose pas de questions lors de l'install.
 
-Les [LXC](http://lxc.sourceforge.net/) sont appelés "[Linux Containers](http://en.wikipedia.org/wiki/Linux_Containers)" et permettent de faire tourner des applications ou un OS complet dans un conteneur isolé du reste du système, tant sur l'utilisation de la mémoire, du CPU, du dique etc, tout en conservant côté hôte le contrôle et la limitation des ressources utilisées.
+Les link:http://lxc.sourceforge.net/[LXC] sont appelés "link:http://en.wikipedia.org/wiki/Linux_Containers[Linux Containers]" et permettent de faire tourner des applications ou un OS complet dans un conteneur isolé du reste du système, tant sur l'utilisation de la mémoire, du CPU, du dique etc, tout en conservant côté hôte le contrôle et la limitation des ressources utilisées.
 
 On aura quelques problèmes annexes à résoudre en chemin :
-- Debian a décidé de ne pas inclure par défaut le point de montages des [groupe de contrôle](http://en.wikipedia.org/wiki/Cgroups) et il faudra qu'on le monte nous même
+- Debian a décidé de ne pas inclure par défaut le point de montages des link:http://en.wikipedia.org/wiki/Cgroups[groupe de contrôle] et il faudra qu'on le monte nous même
 - il y a un bug dans les scripts Debian (utilisation du paquet `live-debconfig` qui n'existe pas dans wheezy) : on va soit récupérer le script de jessie/testing pour l'utiliser dans wheezy/stable, ou installer directement le paquet LXC de jessie/testing (c'est ce que je préfère faire)
 - si on est pas sur un kernel Debian standard, et par exemple sur un KS2G chez l'hébergeur OVH, il se peut qu'ils n'aient pas activé toutes les extensions nécessaires et qu'on doive recompiler le kernel
 
@@ -65,7 +65,7 @@ Avec un noyau standard Debian, on obtient le résultat ci-dessous :
 	Vlan: enabled
 	File capabilities: enabled
 
-Ca nous indique que tout est OK, sauf le "Cgroup namespace". Quel est le problème ? Et bien, l'équipe Debian a décidé de rendre les "[Control Groups](http://en.wikipedia.org/wiki/Cgroups)"diponible dans le kernel standard, mais de ne pas les activer par défaut, car dans la grande majorité des cas les gens ne les utiliseront pas et ce serait donc un gâchis de mémoire.  En conséquence on doit activer nous-même les "Cgroup namespace", via le "système de fichier virtuel" `cgroup`.
+Ca nous indique que tout est OK, sauf le "Cgroup namespace". Quel est le problème ? Et bien, l'équipe Debian a décidé de rendre les "link:http://en.wikipedia.org/wiki/Cgroups[Control Groups]"diponible dans le kernel standard, mais de ne pas les activer par défaut, car dans la grande majorité des cas les gens ne les utiliseront pas et ce serait donc un gâchis de mémoire.  En conséquence on doit activer nous-même les "Cgroup namespace", via le "système de fichier virtuel" `cgroup`.
 
 Pour que ça soit fait automatiquement à chaque démarrage :
 
@@ -107,7 +107,7 @@ Sur mon serveur Kimsifu 2G, j'obtiens le résultat ci-dessous.
 	Note : Before booting a new kernel, you can check its configuration
 	usage : CONFIG=/path/to/config /usr/bin/lxc-checkconfig
 
-On voit qu'il manque plein de choses, que ça soit `missing` ou pire, `required`. Après quelques heures de recherche sur internet, je suis tombé sur [deux](http://www.marc-cesarine.fr/?p=154) [explications](http://www.delloye.org/linux/lxc.html) : OVH n'a pas compilé le support des "Control Groups" (`cgroups`) dans ses kernels.
+On voit qu'il manque plein de choses, que ça soit `missing` ou pire, `required`. Après quelques heures de recherche sur internet, je suis tombé sur link:http://www.marc-cesarine.fr/?p=154[deux] link:http://www.delloye.org/linux/lxc.html[explications] : OVH n'a pas compilé le support des "Control Groups" (`cgroups`) dans ses kernels.
 
 Et en fait c'est logique dans le fond, car une machine qui n'a pas vocation à faire de la virtualisation (pour des raisons de faible performances, et d'extensions CPU absentes) n'a pas non plus spécialement vocation à faire des Linux Containers.
 
@@ -119,7 +119,7 @@ On commence par installer ce dont on aura besoin pour la récupération et la co
 
 	aptitude install make gcc lzma bc ncurses-dev dpkg-dev gcc-4.7-plugin-dev
 
-OVH nous a fourni un kernel 3.10.9, on va donc récupérer tout ce qui s'y réfère : source officielles, patch grsecurity (via le mirroir non officiel de [digdeo](https://www.digdeo.fr/), merci à eux) et la config ovh.
+OVH nous a fourni un kernel 3.10.9, on va donc récupérer tout ce qui s'y réfère : source officielles, patch grsecurity (via le mirroir non officiel de link:https://www.digdeo.fr/[digdeo], merci à eux) et la config ovh.
 
 	wget -c https://www.kernel.org/pub/linux/kernel/v3.x/linux-3.10.9.tar.xz
 	wget -c https://www.kernel.org/pub/linux/kernel/v3.x/linux-3.10.9.tar.sign
@@ -127,15 +127,15 @@ OVH nous a fourni un kernel 3.10.9, on va donc récupérer tout ce qui s'y réf�
 	wget -c http://deb.digdeo.fr/grsecurity-archives/kernel-3.10/grsecurity-2.9.1-3.10.9-201308282054.patch.sig
 	wget -c ftp://ftp.ovh.net/made-in-ovh/bzImage/latest-production/config-3.10.9-xxxx-grs-ipv6-64
 
-**Update 2014-07-03** OVH fait vivre en permanence ses kernels, et bien entendu, de nouvelles versions sont disponibles. Pour ce faire, il suffit d'aller voir le [FTP OVH](ftp://ftp.ovh.net/made-in-ovh/bzImage/latest-production/) pour voir quelle version est celle utilisée en production par OVH pour leur nouvelles installations. En plus, depuis quelques temps, OVH fournit aussi le patch GRSEC (dans le même répertoire) pour chaque version de kernel supportée, donc plus besoin d'aller la chercher ailleurs ! Par exemple, à l'heure où j'écris, c'est la version 3.10.23, que je viens de compiler en suivant le même principe donné ci-dessous.
+**Update 2014-07-03** OVH fait vivre en permanence ses kernels, et bien entendu, de nouvelles versions sont disponibles. Pour ce faire, il suffit d'aller voir le link:ftp://ftp.ovh.net/made-in-ovh/bzImage/latest-production/[FTP OVH] pour voir quelle version est celle utilisée en production par OVH pour leur nouvelles installations. En plus, depuis quelques temps, OVH fournit aussi le patch GRSEC (dans le même répertoire) pour chaque version de kernel supportée, donc plus besoin d'aller la chercher ailleurs ! Par exemple, à l'heure où j'écris, c'est la version 3.10.23, que je viens de compiler en suivant le même principe donné ci-dessous.
 
-On décompresse et on vérifie la signature du kernel : OK si "Bonne signature" (voir [ici](https://www.kernel.org/signature.html) pour plus d'infos)
+On décompresse et on vérifie la signature du kernel : OK si "Bonne signature" (voir link:https://www.kernel.org/signature.html[ici] pour plus d'infos)
 
 	unxz --keep linux-3.10.9.tar.xz
 	gpg --recv-key 6092693E
 	gpg --verify linux-3.10.9.tar.sign
 
-On vérifie la signature du le patch GRSEC : OK si "Bonne signature" (voir [ici](http://en.wikibooks.org/wiki/Grsecurity/Obtaining_grsecurity#Verifying_the_Downloads) pour plus d'infos)
+On vérifie la signature du le patch GRSEC : OK si "Bonne signature" (voir link:http://en.wikibooks.org/wiki/Grsecurity/Obtaining_grsecurity#Verifying_the_Downloads[ici] pour plus d'infos)
 
 	gpg --recv-key 4245D46A
 	gpg --verify grsecurity-2.9.1-3.10.9-201308282054.patch.sig
@@ -389,9 +389,9 @@ On va donc corriger ça pour générer des conteneurs wheezy/stable, et ça se p
 	sed -i -e 's/squeeze/wheezy/gi' \
 		/usr/share/lxc/templates/lxc-debian
 
-Puis au besoin (c'est utile chez un hébergeur qui disposerait d'un mirroir local) on édite ce fichier `/usr/share/lxc/templates/lxc-wheezy` pour changer le mirroir utilisés pour l'installation des conteneurs (actuellement c'est le [CDN Debian](http://cdn.debian.net/debian), qui lui renvoie vers le plus proche de la machine).
+Puis au besoin (c'est utile chez un hébergeur qui disposerait d'un mirroir local) on édite ce fichier `/usr/share/lxc/templates/lxc-wheezy` pour changer le mirroir utilisés pour l'installation des conteneurs (actuellement c'est le link:http://cdn.debian.net/debian[CDN Debian], qui lui renvoie vers le plus proche de la machine).
 
-Pour un serveur dédié chez OVH, on ne se privera pas d'utiliser leur [mirroir local](http://debian.mirrors.ovh.net/debian)
+Pour un serveur dédié chez OVH, on ne se privera pas d'utiliser leur link:http://debian.mirrors.ovh.net/debian[mirroir local]
 
 	sed -i -e 's#http://cdn.debian.net/debian#http://debian.mirrors.ovh.net/debian#g' \
 		/usr/share/lxc/templates/lxc-debian
@@ -418,9 +418,9 @@ De plus, un firewall ethernet (couche 2 du modèle ISO) ça ne fait pas tout à 
 
 D'un autre côté, la solution 2) permet de router et de filtrer les flux via iptables au niveau de l'hôte, de permettre la communication en IPv4 de tous les guests/conteneurs via un NAT sur l'adresse unique dont on dispose, mais seul l'hôte pourrait avoir acès au réseau IPv6 /64.
 
-Pour pallier à ce soucis IPv6, on pourrait passer passer d'un côté par [Kernel NDP]() ou [npd6](http://code.google.com/p/npd6/) ou [ndppd](http://priv.nu/projects/ndppd/) pour "aspirer" toute ou partie des addresses IPv6 depuis l'extérieur par l'hôte, et d'un autre côté grâce à [radvd](http://www.litech.org/radvd/) informer les guests/conteneurs que l'hôte est la gateway IPv6.
+Pour pallier à ce soucis IPv6, on pourrait passer passer d'un côté par link:[Kernel NDP] ou link:http://code.google.com/p/npd6/[npd6] ou link:http://priv.nu/projects/ndppd/[ndppd] pour "aspirer" toute ou partie des addresses IPv6 depuis l'extérieur par l'hôte, et d'un autre côté grâce à link:http://www.litech.org/radvd/[radvd] informer les guests/conteneurs que l'hôte est la gateway IPv6.
 
-Ou bien on pourrait faire une solution 3), qui serait un mix des deux solutions et mettre en place un "[brouter](http://ip6.fr/free-broute/)" (bridge routeur) qui permettra de router/filtrer/natter les flux IPv4, et de bridger/filtrer directement les flux IPv6. Mais on aurait le "problème" c'est que l'on ne gèrerait plus la sécurisation IPv6 en un seul point (car les flux IPv6 traversent l'hôte au lieu d'être "routé" par lui)
+Ou bien on pourrait faire une solution 3), qui serait un mix des deux solutions et mettre en place un "link:http://ip6.fr/free-broute/[brouter]" (bridge routeur) qui permettra de router/filtrer/natter les flux IPv4, et de bridger/filtrer directement les flux IPv6. Mais on aurait le "problème" c'est que l'on ne gèrerait plus la sécurisation IPv6 en un seul point (car les flux IPv6 traversent l'hôte au lieu d'être "routé" par lui)
 
 Bref, ici on va utiliser la solution 2) plutôt que le "brouter", parce que ça permet même de subnetter le bloc IPv6 dont on dispose pour en faire des DMZ internes au serveur, et dans ce cas on utiliserait alors un pont/bridge par DMZ.
 
@@ -555,7 +555,7 @@ On va donc ajouter sur l'interface côté opérateur/hébergeur des "proxy"
 
 C'est plus "fiable" que d'utiliser ndp/ndppd et autre radvd, au prix de devoir ajouter une ligne par conteneur/guest, ce qui n'est pas si lourd vu leur faible nombre
 
-A noter qu'on peut aussi configurer le NDP via le fichier `/etc/shorewall6/proxyndp` (cf la [documentation](http://www.shorewall.net/manpages6/shorewall6-proxyndp.html)) mais je préfère gérer les couches L1/L2/L3 d'un côté, et le firewalling de l'autre.
+A noter qu'on peut aussi configurer le NDP via le fichier `/etc/shorewall6/proxyndp` (cf la link:http://www.shorewall.net/manpages6/shorewall6-proxyndp.html[documentation]) mais je préfère gérer les couches L1/L2/L3 d'un côté, et le firewalling de l'autre.
 
 == Création du conteneur LXC
 
@@ -567,7 +567,7 @@ Quelques informations sur la localisation des différents répertoires leurs fon
 
 La première étape consiste à donner un nom au conteneur, ce nom désignera à la fois le hostname de la machine, l'endroit où les fichiers seront stockés, et le nom par lequel lancer/arrêter ce conteneur, et servira même à la "console".
 
-Les protections [grsecurity](http://grsecurity.net) qu'on a compilé dans le kernel empêchent de "monter pendant un chroot" et de "chmod pendant un chroot", ce qui empêcherait de monter `/proc` pendant le debootstrap, et de `chmod +s` lors de l'install de certains packages pendant le `debootstrap`. Alors on désactive l'extension qui bloquerait, le temps de la création du conteneur :
+Les protections link:http://grsecurity.net[grsecurity] qu'on a compilé dans le kernel empêchent de "monter pendant un chroot" et de "chmod pendant un chroot", ce qui empêcherait de monter `/proc` pendant le debootstrap, et de `chmod +s` lors de l'install de certains packages pendant le `debootstrap`. Alors on désactive l'extension qui bloquerait, le temps de la création du conteneur :
 
 	sysctl kernel.grsecurity.chroot_deny_mount=0
 	sysctl kernel.grsecurity.chroot_deny_chmod=0
@@ -679,7 +679,7 @@ Une fois qu'on est satisfait du conteneur, on configure l'auto-start
 	mkdir -p /etc/lxc/auto/
 	ln -s /var/lib/lxc/toto/config /etc/lxc/auto/toto
 
-Il y a un [bug debian](http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=723131) actuellement dans jessie/sid (fixé dans 0.9.0-20, uppé dans experimental le 2013-09-03) et qui bloque le démarrage automatique. Il suffit pour le résoudre d'ici à ce que ça arrive dans jessie, de supprimer/commenter quelques lignes au début du fichier `/etc/init.d/lxc`
+Il y a un link:http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=723131[bug debian] actuellement dans jessie/sid (fixé dans 0.9.0-20, uppé dans experimental le 2013-09-03) et qui bloque le démarrage automatique. Il suffit pour le résoudre d'ici à ce que ça arrive dans jessie, de supprimer/commenter quelques lignes au début du fichier `/etc/init.d/lxc`
 
 	#if [ ! -x /usr/bin/lxc ]
 	#then
@@ -728,9 +728,9 @@ Comme on peut le voir, le device est créé correctement (c=caractère, 10 = typ
 
 	crw-r--r-- 1 root root 10, 200 oct.  16 16:17 /var/lib/lxc/NOM_DU_CONTENEUR/rootfs/dev/net/tun
 
-Mais au fait, d'où sortent ces deux nombres 10 et 200 ? Simplement de la [Linux Allocated Devices](http://www.lanana.org/docs/device-list/) où il est indiqué que majeur 10 + mineur 200 correspond au driver "TAP/TUN network device".
+Mais au fait, d'où sortent ces deux nombres 10 et 200 ? Simplement de la link:http://www.lanana.org/docs/device-list/[Linux Allocated Devices] où il est indiqué que majeur 10 + mineur 200 correspond au driver "TAP/TUN network device".
 
-Pour information, cette table sert à faire la correspondance avec les drivers, et pour faire un parallèle avec windows, ces deux chiffres rendent les mêmes services que les `VENDOR_ID` et `DEVICE_ID` sous Windows, qui sont utilisés pour référencer les drivers inventoriés sur [ce site](http://www.pcidatabase.com).
+Pour information, cette table sert à faire la correspondance avec les drivers, et pour faire un parallèle avec windows, ces deux chiffres rendent les mêmes services que les `VENDOR_ID` et `DEVICE_ID` sous Windows, qui sont utilisés pour référencer les drivers inventoriés sur link:http://www.pcidatabase.com[ce site].
 
 Bref, après avoir redémarré le conteneur, on peut maitnenant utiliser tout ce qui se base sur ce device TUN, normalement sans avoir d'erreurs.
 
@@ -748,5 +748,5 @@ Pour limiter la consommation des conteneurs :
 - pour assigner des coeurs CPU `lxc.cgroup.cpuset.cpus = 0-1,3`
 - pour donner plus ou moins de CPU (chacun a 1024 de base) il s'agit de `lxc.cgroup.cpu.shares = 512`, et ici on donne deux fois moins de CPU à ce conteneur qu'aux autres
 
-Plus de documentation sur la limitation activable via `cgroups` on ira voir [la documentation kernel](https://www.kernel.org/doc/Documentation/cgroups/).
+Plus de documentation sur la limitation activable via `cgroups` on ira voir link:https://www.kernel.org/doc/Documentation/cgroups/[la documentation kernel].
 
