@@ -8,7 +8,7 @@ La dernière version OpenBSD 5.6 a été link:http://www.openbsd.org/56.html[pub
 
 Cependant, ça ne va pas nous empêcher d'installer OpenBSD sur notre serveur ... Parce que oui, c'est possible !
 
-<!--more-->
+== Vision d'ensemble
 
 La démarche générale sera la suivante :
 

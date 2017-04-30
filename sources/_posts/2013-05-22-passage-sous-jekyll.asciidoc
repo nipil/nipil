@@ -14,7 +14,6 @@ Et on se rend compte qu'on passe environ 10-25% de notre temps à l'édition et 
 
 Aujourd'hui, je reprends une fois de plus ma copie pour l'adapter au mieux à mes besoins. Mais la méthodologie sera radicalement différente cette fois, car l'accent sera mis sur la facilité de produire du contenu plutôt que l'outillage du site.
 
-<!--more-->
 
 Ensuite, j'importerai un par un tous les anciens contenus issus de mes anciens sites.
 
@@ -217,7 +216,6 @@ est devenu
 Et dans chaque article, j'ai inséré le texte suivant, sur une ligne vide,
 à l'endroit où je voulais que mon résumé s'arrête :
 
-	<!--more-->
 
 Comment ça marche ? Pour générer le flux RSS d'un post :
 

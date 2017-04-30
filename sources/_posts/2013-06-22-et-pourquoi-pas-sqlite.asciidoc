@@ -6,7 +6,7 @@ tags: linux
 
 Intéresons nous aujourd'hui à link:http://www.sqlite.org/[SQLite]. En effet, il semblerait que j'ai un train de retard ce coup ci : l'habitude de déployer toujours du MySQL, et le fait que j'ai déjà un service link:http://en.wikipedia.org/wiki/SQL[SQL] qui tourne m'a détourné du droit chemin de la curiosité. Corrigeons ça tout de suite !
 
-<!--more-->
+== Foultitude et multitude
 
 Il existe link:http://en.wikipedia.org/wiki/Comparison_of_relational_database_management_systems[pleins] de protagonistes, mais sur Debian on retrouve : link:http://packages.debian.org/fr/wheezy/database/mysql-server[MySQL], link:http://packages.debian.org/fr/wheezy/database/postgresql[PostgreSQL], link:http://packages.debian.org/fr/wheezy/database/drizzle[Drizzle] qui est plutôt orienté cloud, link:http://packages.debian.org/fr/wheezy/database/mongodb[MongoDB] qui est orienté orientée objets, link:http://packages.debian.org/fr/wheezy/database/sqlite3[SQLite] qui foncitonne sans daemon, link:http://packages.debian.org/fr/wheezy/database/tarantool[Tarantool] qui est en link:http://en.wikipedia.org/wiki/NoSQL[NoSQL] en ram, et link:http://packages.debian.org/fr/wheezy/database/virtuoso-minimal[Virtuoso].
 

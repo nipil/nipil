@@ -12,7 +12,7 @@ Mais je constate aussi que les personnes de mon entourage se mettent en danger e
 
 Et il faut que ça change.
 
-<!--more-->
+== Vision d'ensemble
 
 La sécurité absolue n'existe pas. Il faut faire "au mieux". Et sur internet, il s'agit en fait plutôt de faire "mieux" que les autres cibles potentielles, afin que l'attaqueur ait d'autres proies plus facile à abuser et ne s'intéresse pas à vous, car ça lui demanderait plus d'efforts que nécessaire.
 

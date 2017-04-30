@@ -12,8 +12,6 @@ Alors pourquoi s'embêter ?
 - Parce qu'on pourra détruire l'une ou l'autre quand on veut
 - Parce qu'on garde nos données si on change d'hébergeur
 
-<!--more-->
-
 En effet, en général, les hébergeurs limitent le nombre de comptes et redirections qui peuvent être créés. Et il y a très peu de fournisseurs d'email qui permettent de clore le compte, ce qui fait qu'on se retrouve avec des comptes un peu partout.
 
 A titre personnel, ça me permettra de créer des alias temporaires pour m'enregistrer avec des adresses différentes, de désactiver ces alias si un jour je reçois trop de spam, de  rediriger tous les couriers locaux du serveur vers une adresse perso, et donc de consulter tous ces comptes créés dans mon domaine via une seule adresse.

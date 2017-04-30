@@ -10,7 +10,7 @@ La première solution serait de chercher un fournisseur de service sur internet 
 
 L'autre solution est de se monter un serveur à domicile, qui va proposer ces services, tout en offrant pérénité, sécurité, performance, et une totale flexibilité. C'est pourquoi j'ai décidé de me créer un serveur "dédié" à la maison.
 
-<!--more-->
+== Solution choisie
 
 Le but du jeu ? Avoir la maîtrise totale, et essayer d'appliquer pour chaque point les "règles de l'art". Et aussi monter en compétence pour éviter le syndrôme du *"qui ne progresse pas régresse"* bien connu en informatique !
 

@@ -8,7 +8,7 @@ Après 4 ans d'attente et de travail au corps, notre immeuble a finit par être 
 
 **Update 2014-06-19** : passage à la livebox "Jet" ... débit amélioré et sinon c'est pareil.
 
-<!--more-->
+== Surpuissance ?
 
 Pour info, l'upload est *la seule et unique raison* pour laquelle je voulais la fibre, car pour moi la vitesse de téléchargement n'a plus d'importance au delà d'un débit qui permette : de regarder une chaine de télé HD (4mbit/s), d'enregistrer une autre chaîne en HD (4mbit/s) et de télécharger à 1Mo/s, chiffre psychologique (8mbits). En cumulant, on arrive aux 16mbit/s IP, soit 20mbit ATM de FREE en ADSL.
 

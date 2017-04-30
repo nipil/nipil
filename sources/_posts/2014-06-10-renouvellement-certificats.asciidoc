@@ -8,7 +8,7 @@ En avril dernier la librairie OpenSSL a subit la catastrophique faille link:http
 
 Outre les "autres failles" (link:https://www.openssl.org/news/vulnerabilities.html[historique]) qui ne nécessitent en général qu'une mise à jour de la librairie, celle là a demandé le renouvellement de la clé privée du certificat avant l'expiration annuelle habituelle, donc autant documenter ça pour les futurs renouvellements.
 
-<!--more-->
+== Heartbleed, kezako ?
 
 La faille permet à un attaquant de récupérer la clé privée du certificat serveur.
 

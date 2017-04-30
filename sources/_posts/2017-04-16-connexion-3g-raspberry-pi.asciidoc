@@ -6,7 +6,7 @@ tags: raspberry 3g modem
 
 **Ajout 2017-04-22** : ajout des remarques sur les déconnexions périodiques de l'opérateur, et sur les paramètres `persist` et `maxfail` de `pppd`
 
-== L'objectif
+== La "cible" finale ... et l'étape du jour
 
 J'aimerais pouvoir faire des trucs à distance, mais sans avoir sur place une connexion permanente (pas d'adsl) pour des questions de coût, de maintenance.
 

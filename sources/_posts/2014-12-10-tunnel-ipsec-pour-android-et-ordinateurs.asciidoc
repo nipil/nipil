@@ -15,7 +15,7 @@ opérateur fixe, réseau employeur, hotspot gratuits de restaurants ou
 boutiques ou hotels, réseau informatique de notre employeur, chez la
 famille et les amis, etc)
 
-<!--more-->
+== Mise en oeuvre
 
 Pour ce faire, on va utiliser :
 

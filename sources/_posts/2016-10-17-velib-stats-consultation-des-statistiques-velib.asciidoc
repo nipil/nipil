@@ -8,6 +8,8 @@ Un nouvel article, quasiment un an après le dernier ? Ouaip. Ces 18 derniers mo
 
 En parlant de rattrapage, côté boulot, j'ai fait beaucoup de "catch-up" (rattrapage) technologique. Et pour me mettre au goût du jour sur les technos utilisées par l'un des quelques projets que je gère, j'ai créé link:https://nipil.org/velib-stats/[velib-stats]
 
+== Présentation
+
 L'idée derrière ce site, est de pouvoir connaître (parce que publiées nulle part), visualiser et utiliser les informations d'utilisation des Vélibs, d'une part pour satisfaire ma curiosité, et d'autre part pour optimiser mes déplacements.
 
 La page *conception* du site explique comment la solution est construite. Les trois répos de code sont présents sur GitHub avec des licences sympas, et les données collectée et affichées par le programme sont libres et téléchargeables.

@@ -6,7 +6,7 @@ tags: sécurité serveur certificat
 
 Je pensais qu'il fallait payer pour avoir des certificats reconnus par les navigateurs ? Et bien en fait ça n'est pas le cas, grâce à link:https://www.startssl.com[StartSSL], qui délivre *gratuitement* des certificats.
 
-<!--more-->
+== On y va !
 
 Un certificat est comme une carte d'identité, qui a été validée par quelqu'un "de confiance". Ca permet de décider de faire confiance à celui qui présente sa carte, dans la limite de ce qui a été vérifié.
 
