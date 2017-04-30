@@ -12,14 +12,14 @@ Cependant, ça ne va pas nous empêcher d'installer OpenBSD sur notre serveur ..
 
 La démarche générale sera la suivante :
 
-1. installer une FreeBSD sur le KS-2G via la manager OVH
-1. récupérer les infos/noms "BSD" de notre matos en bootant FreeBSD sur le KS-2G
-1. redémarrer sur une rescue FreeBSD
-1. télécharger et vérifier l'iso d'installation OpenBSD 5.6
-1. créer un espace en ram pour QEmu
-1. installer QEmu "dans" la rescue FreeBSD
-1. utiliser QEmu de FreeBSD pour installer OpenBSD sur le disk du KS-2G
-1. finaliser l'installation 
+* installer une FreeBSD sur le KS-2G via la manager OVH
+* récupérer les infos/noms "BSD" de notre matos en bootant FreeBSD sur le KS-2G
+* redémarrer sur une rescue FreeBSD
+* télécharger et vérifier l'iso d'installation OpenBSD 5.6
+* créer un espace en ram pour QEmu
+* installer QEmu "dans" la rescue FreeBSD
+* utiliser QEmu de FreeBSD pour installer OpenBSD sur le disk du KS-2G
+* finaliser l'installation
 
 Si vous connaissez déjà vos infos techniques (surtout le nom "BSD" de la carte réseau !) vous pouvez aller directement à l'étape 3.
 
