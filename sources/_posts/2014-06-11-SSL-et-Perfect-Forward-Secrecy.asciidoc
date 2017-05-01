@@ -3,8 +3,11 @@ layout: post
 title: SSL et (Perfect) Forward Secrecy
 tags: serveur ssl
 ---
+:toc:
+:toc-title: Table des matières
 
 Tout d'abord, kezako la Forward Secrecy (PFS) ? Vincent Bernat link:http://vincent.bernat.im/fr/blog/2011-ssl-perfect-forward-secrecy.html#sans-forward-secrecy[l'explique en détails] mais je vais résumer simplement :
+
 1. sans précautions particulières, les communications chiffrées ayant été enregistrées par le passé peuvent être déchiffrées bien plus tard, si on obtient la clé privée du certificat serveur
 2. avec la Perfect Forward Secrecy, même si on obtient la clé privée du certificat serveur, les communications passées ne peuvent plus être déchiffrées
 
@@ -13,10 +16,11 @@ Dans le cas 1, c'est possible car la clé privée est utilisée à la fois pour 
 == Inventaire des ciphers souhaités
 
 Un "cipher" est une combinaison de 4 séries de paramètres :
-- Kx = échange de clés (pour échanger les informations nécessaires aux méthodes suivantes)
-- Au = authentification (pour vérifier à qui on cause et prouver qui on est)
-- Enc = chiffrement (pour rendre les données confidentielles)
-- Mac = vérification d'intégrité (pour vérifier que rien n'a été modifié en chemin)
+
+* Kx = échange de clés (pour échanger les informations nécessaires aux méthodes suivantes)
+* Au = authentification (pour vérifier à qui on cause et prouver qui on est)
+* Enc = chiffrement (pour rendre les données confidentielles)
+* Mac = vérification d'intégrité (pour vérifier que rien n'a été modifié en chemin)
 
 Pour connaître la liste de toutes les combinaisons disponibles sur le système permettant le chiffrement, utiliser la commande suivante `openssl ciphers -v | column -t`. Sur une Debian Wheezy, l'obtient 82 lignes. La première colonne est le nom OpenSSL du cipher, la deuxième colonne la "cipher suite" dont il dépend, et ensuite on retrouve les paramètres évoqués plus haut.
 
@@ -62,8 +66,9 @@ On aboutit à la liste suivante (34 lignes)
 	DHE-DSS-CAMELLIA128-SHA        SSLv3    Kx=DH    Au=DSS    Enc=Camellia(128)  Mac=SHA1
 
 La "cipher spec" peut être définie de deux manières dans les divers serveurs :
-- soit par le critère de tri de la commande `EECDH:EDH:!eNULL:!RC4:!DES:@STRENGTH`
-- soit par le résultat complet et non formaté de la commande openssl, ci-dessous
+
+* soit par le critère de tri de la commande `EECDH:EDH:!eNULL:!RC4:!DES:@STRENGTH`
+* soit par le résultat complet et non formaté de la commande openssl, ci-dessous
 
 ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-DSS-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA256:DHE-RSA-AES256-SHA:DHE-DSS-AES256-SHA:DHE-RSA-CAMELLIA256-SHA:DHE-DSS-CAMELLIA256-SHA:ECDHE-RSA-DES-CBC3-SHA:ECDHE-ECDSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:EDH-DSS-DES-CBC3-SHA:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:DHE-DSS-AES128-GCM-SHA256:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES128-SHA256:DHE-DSS-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA:DHE-RSA-SEED-SHA:DHE-DSS-SEED-SHA:DHE-RSA-CAMELLIA128-SHA:DHE-DSS-CAMELLIA128-SHA
 
@@ -73,28 +78,31 @@ On va maintenant appliquer tout ça !
 
 Avec le paramètre `ssl.cipher-list` à sa valeur par défaut `ECDHE-RSA-AES256-SHA384:AES256-SHA256:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM`, le site d'analyse SSL link:https://www.ssllabs.com[Qualis SSL Labs] nous donne le résultat suivant :
 
-<img src="/files/ssl-pfs-default.png" />
+image:/files/ssl-pfs-default.png[]
 
 On constate alors que :
-- 3 clients sur 30 testés ne supportent pas la PFS d'après le "No FS" en jaune à droite du nom (WinXP, et le crawler du plus gros moteur de recherche russe)
-- 10 clients sur 30 ne bénéficient pas de la PFS alors qu'ils en seraient capables (Android Gingerbread et KitKat, IE sous Win7/8, Java6)
-- 23 clients sur 30 chiffrent en utilisant RC4...
+
+* 3 clients sur 30 testés ne supportent pas la PFS d'après le "No FS" en jaune à droite du nom (WinXP, et le crawler du plus gros moteur de recherche russe)
+* 10 clients sur 30 ne bénéficient pas de la PFS alors qu'ils en seraient capables (Android Gingerbread et KitKat, IE sous Win7/8, Java6)
+* 23 clients sur 30 chiffrent en utilisant RC4...
 
 Remédions à tout ça.
 
 Editer le fichier `/etc/lighttpd/conf-available/10-ssl.conf`
-- ajouter le paramètre `ssl.honor-cipher-order = "enable"` s'il n'est pas présent
-- mettre `ssl.cipher-list` à la valeur `"EECDH:EDH:!eNULL:!RC4:!DES:@STRENGTH"`
+
+* ajouter le paramètre `ssl.honor-cipher-order = "enable"` s'il n'est pas présent
+* mettre `ssl.cipher-list` à la valeur `"EECDH:EDH:!eNULL:!RC4:!DES:@STRENGTH"`
 
 Recharger la configuration du serveur (`service lighttpd restart`), et retester la configuration SSL en cliquant sur "Clear cache" en haut de la page de résultat de link:https://www.ssllabs.com[Qualis SSL Labs]. On obtient le résultat suivant :
 
-<img src="/files/ssl-pfs-strict.png" />
+image:/files/ssl-pfs-strict.png[]
 
 On constate alors que :
-- tous les autres clients bénéficient de la PFS
-- tous les autres clients bénéficient de clés conséquentes
-- aucun client ne chiffrera avec l'algorithme RC4
-- *IE6/8 sous Windows XP ne peut plus accéder au site en HTTPS !*
+
+* tous les autres clients bénéficient de la PFS
+* tous les autres clients bénéficient de clés conséquentes
+* aucun client ne chiffrera avec l'algorithme RC4
+* *IE6/8 sous Windows XP ne peut plus accéder au site en HTTPS !*
 
 Afin de permettre quand même aux utilisateurs de Windows XP d'accéder à notre site (*soit 18.91% du parc informatique en mai 2014 selon link:http://gs.statcounter.com/#os-ww-monthly-201305-201405-bar[statcounter]*) on va ajouter un cipher "pas trop pourri" pour permettre à tous ces clients de se connecter à notre site, qui je vous le rapelle, a été configuré pour être uniquement accessible en HTTPS.
 
@@ -107,16 +115,16 @@ On va donc ajouter ce dernier tout à la fin de notre paramètre `ssl.ssl.cipher
 	ssl.cipher-list = "EECDH:EDH:!eNULL:!RC4:!DES:@STRENGTH:DES-CBC3-SHA"
 
 De cette manière, étant en tout dernier on aura le comportement suivant :
-- les clients "capables" continueront d'utiliser les meilleures versions "compatibles PFS"
-- les clients incompatibles choisiront ce dernier, et sauront toujours se connecter (sans PFS)
+
+* les clients "capables" continueront d'utiliser les meilleures versions "compatibles PFS"
+* les clients incompatibles choisiront ce dernier, et sauront toujours se connecter (sans PFS)
 
 On recharge à nouveau la configuration du serveur (`service lighttpd restart`), et on reteste la configuration SSL en cliquant sur "Clear cache" en haut de la page de résultat de link:https://www.ssllabs.com[Qualis SSL Labs].
 
 On obtient le résultat suivant :
 
-<img src="/files/ssl-pfs-withxp.png" />
+image:/files/ssl-pfs-withxp.png[]
 
 Tout le monde accède correctement à notre site, tous ceux qui sont capables de bénéficier de la PFS en disposent, bingo c'est gagné !
 
 *Addendum : les clients non compatibles PFS ainsi que toutes les versions Java, sont passés d'un chiffrement RC4/128 bits à un chiffrement 3DES/112 bits. La clé est certes plus petite, mais sur la base de l'état des algorithmes il est (sauf erreur de ma part) préférable d'avoir du 3DES que du RC4*
-

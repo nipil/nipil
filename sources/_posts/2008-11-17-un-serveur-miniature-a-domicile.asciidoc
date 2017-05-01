@@ -3,6 +3,8 @@ layout: post
 title:  "Un serveur miniature à domicile"
 tags: server
 ---
+:toc:
+:toc-title: Table des matières
 
 Quand on est un geek, on a des besoins informatiques en terme de services et de données très variés, et il y a plusieures manières d'y répondre.
 
@@ -15,21 +17,22 @@ L'autre solution est de se monter un serveur à domicile, qui va proposer ces se
 Le but du jeu ? Avoir la maîtrise totale, et essayer d'appliquer pour chaque point les "règles de l'art". Et aussi monter en compétence pour éviter le syndrôme du *"qui ne progresse pas régresse"* bien connu en informatique !
 
 Mes besoins sont les suivants:
-- un petit serveur silencieux et faible consommation
-- un fonctionnement sans écran ni clavier
-- un système d'exploitation stable et sécurisé
-- une connectivité IPv4 et IPv6 pour le serveur
-- un firewall réseau pour chaque équipement LAN
-- un point d'accès Wifi
-- un partage de fichiers LAN Windows/Linux
-- un dépôt de code source
-- un serveur web pour les sites et les blogs
-- un serveur mail pour son nom de domaine
-- une seedbox avec au besoin un tunnel VPN
-- un mécanisme de sauvegarde système
-- un mécanisme de sauvegarde hors-site pour les données importantes
-- un service SSH pour l'administration à distance
-- un service VPN pour accéder aux service locaux à distance
+
+* un petit serveur silencieux et faible consommation
+* un fonctionnement sans écran ni clavier
+* un système d'exploitation stable et sécurisé
+* une connectivité IPv4 et IPv6 pour le serveur
+* un firewall réseau pour chaque équipement LAN
+* un point d'accès Wifi
+* un partage de fichiers LAN Windows/Linux
+* un dépôt de code source
+* un serveur web pour les sites et les blogs
+* un serveur mail pour son nom de domaine
+* une seedbox avec au besoin un tunnel VPN
+* un mécanisme de sauvegarde système
+* un mécanisme de sauvegarde hors-site pour les données importantes
+* un service SSH pour l'administration à distance
+* un service VPN pour accéder aux service locaux à distance
 
 A noter qu'un principe de base de la sécurité, qui est de séparer les services fournis les uns des autres, et de séparer le tout du transport et du contrôle d'accès, n'est pas respectée.
 
@@ -51,19 +54,20 @@ Idéalement, un équipement qui soit petit, discret, et silencieux.
 
 Après avoir découvert l'existance de cartes mères au format mini-ITX, et des boitiers qui vont avec, je suis tombé sur ce qui l'a semblé être la solution parfaite, l'Alix 2d3, créé par link:http://pcengines.ch/[PCEngines].
 
-<a href="/files/alix2d3.jpg"><img src="/files/alix2d3_small.jpg" /></a>
+link:/files/alix2d3.jpg[image:/files/alix2d3_small.jpg[Alix 2D3]]
 
-En détails, il s'agit
-- un boitier de la taille d'un double CD
-- absolument aucun ventilateur
-- un cpu monocoeur AMD Geode 800 à 500 mhz
-- 256 mo de ram non extensible car soudée
-- un connecteur interne mini-PCI pour une carte Wifi
-- un connecteur interne pour une carte CF
-- 2 ports usb dont 1 utilisé pour 1 tera de stockage
-- 3 prises réseaux 10/100
-- une prise série RS232 (pas d'écran)
-- une alimentation externe
+En détails, il s'agit :
+
+* un boitier de la taille d'un double CD
+* absolument aucun ventilateur
+* un cpu monocoeur AMD Geode 800 à 500 mhz
+* 256 mo de ram non extensible car soudée
+* un connecteur interne mini-PCI pour une carte Wifi
+* un connecteur interne pour une carte CF
+* 2 ports usb dont 1 utilisé pour 1 tera de stockage
+* 3 prises réseaux 10/100
+* une prise série RS232 (pas d'écran)
+* une alimentation externe
 
 Ca m'aura coûté 250 euros (carte mère + carte CF + carte wifi + boitier + antennes + alimentation + adaptateur RS 232, mais hors disque dur que j'avais déjà) sur le site Think-ITX.com (**Update 2013-05-22:** ce site en particulier a disparu depuis, mais il existe un grand nombre de link:http://pcengines.ch/order.htm[revendeurs]).
 
@@ -100,75 +104,79 @@ Je ne précise pas la version, car on maintiendra évidement le système à jour
 == Installation pour un serveur "normal"
 
 Il y a des tonnes de documents expliquant comment installer une Debian, notemment le link:http://www.debian.org/releases/wheezy/i386/index.html.fr[wiki] officiel. Mais bon en quelques lignes ça donne ça sur un serveur normal :
-- télécharger une iso d'installation Debian *i386* (attention *pas* une amd64)
-- graver sur un RW, ou sur une clé USB avec link:http://unetbootin.sourceforge.net/[unetbootin]
-- déconnecter les interfaces réseau de la machine
-- installer le système normalement pour tout sauf le "tasksel"
-- faut *tout décocher* au moment du choix de la "Sélection de logiciels"
-- terminer l'installation et rebooter
-- installe run pare-feux (shorewall / shorewall6)
-- configurer le FW de manière basique (deny in, allow out)
-- changer les sources APT et faire un update complet
+
+* télécharger une iso d'installation Debian *i386* (attention *pas* une amd64)
+* graver sur un RW, ou sur une clé USB avec link:http://unetbootin.sourceforge.net/[unetbootin]
+* déconnecter les interfaces réseau de la machine
+* installer le système normalement pour tout sauf le "tasksel"
+* faut *tout décocher* au moment du choix de la "Sélection de logiciels"
+* terminer l'installation et rebooter
+* installe run pare-feux (shorewall / shorewall6)
+* configurer le FW de manière basique (deny in, allow out)
+* changer les sources APT et faire un update complet
 
 Bref, c'est simple, et rapide, et y a plein d'aide sur internet.
 
 == Installation pour mon serveur utilisant la liaison série
 
 La primo installation du système se fait en 4 étapes
-- préparation de l'installation
-- installation du système sur la carte CF
-- post-configuration pour prise en compte du port série
-- insertion de la CF et test de démarrage via port série
+
+* préparation de l'installation
+* installation du système sur la carte CF
+* post-configuration pour prise en compte du port série
+* insertion de la CF et test de démarrage via port série
 
 Préparation
-- se munir d'une carte CF de 2 go minimum et d'un lecteur de cartes CF
-- se munir d'un cable adaptateur RS-232 reconnu par votre PC
-- télécharger une image ISO Debian-live
-- mettre l'image sur une clé USB ou un cd/dvd RW
-- démarrer sur le support amovible Debian-live
-- faire un aptitude update
-- installer debootstrap
+
+* se munir d'une carte CF de 2 go minimum et d'un lecteur de cartes CF
+* se munir d'un cable adaptateur RS-232 reconnu par votre PC
+* télécharger une image ISO Debian-live
+* mettre l'image sur une clé USB ou un cd/dvd RW
+* démarrer sur le support amovible Debian-live
+* faire un aptitude update
+* installer debootstrap
 
 En imaginant que la carte CF soir le device `/dev/sde`
-- `fdisk /dev/sde`
-- `mke2fs /dev/sde1` pour la partition boot
-- `mke2fs /dev/sde2` pour la partition root
-- `mkdir /mnt/cfroot`
-- `mount /dev/sde2 /mnt/cfroot`
-- `mount /dev/sde1 /mnt/cfroot/boot`
+
+* `fdisk /dev/sde`
+* `mke2fs /dev/sde1` pour la partition boot
+* `mke2fs /dev/sde2` pour la partition root
+* `mkdir /mnt/cfroot`
+* `mount /dev/sde2 /mnt/cfroot`
+* `mount /dev/sde1 /mnt/cfroot/boot`
 
 Installer le système
-- `debootstrap --arch i386 squeeze /mnt/cfroot http://ftp.debian.org/debian/`
-- documentation annexe sur le link:http://wiki.debian.org/fr/Debootstrap[wiki] officiel
+
+* `debootstrap --arch i386 squeeze /mnt/cfroot http://ftp.debian.org/debian/`
+* documentation annexe sur le link:http://wiki.debian.org/fr/Debootstrap[wiki] officiel
 
 Passer du système "hôte" au système "cible"
-- `mount –bind /dev/ /mnt/cfroot/dev`
-- `mount -t proc /proc /mnt/cfroot/proc`
-- `mount -t sysfs /sys /mnt/cfroot/sys`
-- `chroot /mnt/cfroot /bin/bash`
+
+* `mount –bind /dev/ /mnt/cfroot/dev`
+* `mount -t proc /proc /mnt/cfroot/proc`
+* `mount -t sysfs /sys /mnt/cfroot/sys`
+* `chroot /mnt/cfroot /bin/bash`
 
 La mainenant on est "en cible"
-- `aptitude update`
-- `aptitude install grub2`
-- `mkdir /boot/grub/`
-- `cp /usr/lib/grub/i386-pc/* /boot/grub`
+
+* `aptitude update`
+* `aptitude install grub2`
+* `mkdir /boot/grub/`
+* `cp /usr/lib/grub/i386-pc/* /boot/grub`
 
 Prendre en compte le port série
-- éditer le fichier `/etc/default/grub`
-- changer `GRUB_CMDLINE_LINUX="console=ttyS0,38400n8 rootdelay=10"`
-- changer `GRUB_TERMINAL=serial`
-- ajouter `GRUB_SERIAL_COMMAND="serial --speed=38400 --unit=0 --word=8 --parity=no –stop=1"`
-- faire un `update-grub` pour prendre en compte les modifications
+
+* éditer le fichier `/etc/default/grub`
+* changer `GRUB_CMDLINE_LINUX="console=ttyS0,38400n8 rootdelay=10"`
+* changer `GRUB_TERMINAL=serial`
+* ajouter `GRUB_SERIAL_COMMAND="serial --speed=38400 --unit=0 --word=8 --parity=no –stop=1"`
+* faire un `update-grub` pour prendre en compte les modifications
 
 Identification des partitions
-- utiliser la sortie de la commande `ls -l /dev/disk/by-uuid/` pour construire `/etc/fstab` en se basant sur  le format suivant `UUID=xxx /mntpnt  fstype defaults 0 N` où N vaut 1 pour la partition root, ou 2 pour les autres partitions
-- éditer `/etc/inittab` pour y mettre `s0:12345:respawn:/sbin/agetty -L 38400 ttyS0 vt100` afin qu'on ait un invité de connexion sur le port série
+
+* utiliser la sortie de la commande `ls -l /dev/disk/by-uuid/` pour construire `/etc/fstab` en se basant sur  le format suivant `UUID=xxx /mntpnt  fstype defaults 0 N` où N vaut 1 pour la partition root, ou 2 pour les autres partitions
+* éditer `/etc/inittab` pour y mettre `s0:12345:respawn:/sbin/agetty -L 38400 ttyS0 vt100` afin qu'on ait un invité de connexion sur le port série
 
 Insérer la carte CF dans la carte Alix, l'alimenter après avoir connecté le port série, et vérifier que tout démarre. Accepter le "rescue" pour avoir une ligne de commande. Dès que c'est possible, re-lancer un `update-grub` pour virer toutes les références mises lors de l'install après le debootstrap.
 
-Redémarrer encore une fois, et on a un serveur autonome qui fonctionne.
-
-Quelques autres liens d'installation debian pour alix2d3
-- *update 2017-04-30*: page ericbosdure.com/2012/01/16/debian-6-sur-alix-2d13 introuvable, même sur archive.org
-- link:http://www.bitprocessor.be/2011/11/13/alix-2d13-debian-squeeze/[bitprocessor.be]
-
+Redémarrer encore une fois, et on a un serveur autonome qui fonctionne !

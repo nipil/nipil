@@ -3,6 +3,8 @@ layout: post
 title: Connexion 3G avec raspbian jessie
 tags: raspberry 3g modem
 ---
+:toc:
+:toc-title: Table des matières
 
 **Ajout 2017-04-22** : ajout des remarques sur les déconnexions périodiques de l'opérateur, et sur les paramètres `persist` et `maxfail` de `pppd`
 
@@ -16,8 +18,8 @@ Ensuite on déclencherait la connexion 3G en envoyant un SMS au numéro de la ca
 
 À terme en plus on prendra soin des éléments additionnels :
 
-- on montera le filesystem en lecture seule pour ne pas avoir de soucis de carte SD
-- on le redémarre une fois par jour au cas où quelque chose a planté.
+* on montera le filesystem en lecture seule pour ne pas avoir de soucis de carte SD
+* on le redémarre une fois par jour au cas où quelque chose a planté.
 
 *Dans le post d'aujourd'hui, je montrerai 3 façons de créer une connexion 3G avec une clé 3G (un modem usb quoi) sous Linux*.
 
@@ -35,10 +37,10 @@ Pour savoir quel fichier sert à quoi, on regardera dans `/sys` :
 
     find /sys/devices/ -name 'hsotype' | xargs grep ''
 
-    ... /ttyHS0/hsotype:Control
-    ... /ttyHS1/hsotype:Application
-    ... /ttyHS2/hsotype:Diagnostic
-    ... /ttyHS3/hsotype:Modem
+    .../ttyHS0/hsotype:Control
+    .../ttyHS1/hsotype:Application
+    .../ttyHS2/hsotype:Diagnostic
+    .../ttyHS3/hsotype:Modem
 
 Le device pour le modem (3G/SMS) est `ttyHS3`.
 
@@ -98,19 +100,19 @@ Maintenant, plus aucun code ne sera nécessaire lors des débranchements/redéma
 
 Quand on dispose d'une interface graphique, rien de plus simple avec NetworkManager :
 
-- faire un clic sur l'icône du NetworkManager, et sélectionner l'option `Activer la connexion mobile"
+* faire un clic sur l'icône du NetworkManager, et sélectionner l'option `Activer la connexion mobile"
 
-- on obtient une association avec le point réseau `Free (itinérance UMTS/HSDPA)` mais la connexion 3G n'est pas établie
+* on obtient une association avec le point réseau `Free (itinérance UMTS/HSDPA)` mais la connexion 3G n'est pas établie
 
-- cliquer sur `Nouvelle connexion mobile...`
+* cliquer sur `Nouvelle connexion mobile...`
 
-- cliquer sur `Suivant`, sélectionner `France`, sélectionner `Free Mobile`, cliquer sur `Suivant`
+* cliquer sur `Suivant`, sélectionner `France`, sélectionner `Free Mobile`, cliquer sur `Suivant`
 
-- Dans la liste déroulant, sélectionner l'option `Free-Mobile`, contrôler le nom du point d'accès "APN" qui apparait `free`.
+* Dans la liste déroulant, sélectionner l'option `Free-Mobile`, contrôler le nom du point d'accès "APN" qui apparait `free`.
 
-- *Attention*: Si ce n'est pas `free` qui apparaît en tant qu'APN, sélectionner l'autre option `Free-Mobile` !
+* *Attention*: Si ce n'est pas `free` qui apparaît en tant qu'APN, sélectionner l'autre option `Free-Mobile` !
 
-- Cliquer sur `Suivant` puis sur `Appliquer`
+* Cliquer sur `Suivant` puis sur `Appliquer`
 
 Lors de la première connexion, on nous demandera un mot de passe : saisir `free` puis entrée. Ce mot de passe sera mémorisé pour la suite.
 
@@ -337,9 +339,9 @@ On désactive la connexion : `sudo poff`
 
 Si on ne souhaite pas que la route par défaut soit utilisée via la connexion 3G, mais plutôt définir des routes spécifiques :
 
-- d'abord ajouter `nodefaultroute` à `/etc/ppp/peers/freemobile`
+* d'abord ajouter `nodefaultroute` à `/etc/ppp/peers/freemobile`
 
-- ensuite, créer un script qui devra être exécutable et qui sera exécuté quand l'interface devient up
+* ensuite, créer un script qui devra être exécutable et qui sera exécuté quand l'interface devient up
 
 On l'appellera `/etc/ppp/ip-up.d/0100local_freemobile` et il aura avec le contenu suivant :
 

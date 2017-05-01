@@ -3,6 +3,8 @@ layout: post
 title: Pourquoi doit on bidouiller Hubic pour utiliser un client swift ?
 tags: cloud ovh
 ---
+:toc:
+:toc-title: Table des matières
 
 Après m'être intéressé à l'offre de stockage d'Hubic et son tarif formidable (10 tera-octets pour 50 euros par an !) et avoir appris que "Hubic ce n'est pas de l'OpenStack standard", j'ai voulu comprendre pourquoi.
 
@@ -16,13 +18,13 @@ Comme toujours quand les choses sont sécurisées, l'accès à une resource se f
 
 En conséquence, un appel "swift" va générer deux opérations successives :
 
-- La première opération est l'authentification (la partie jaune) sous la forme d'un appel à l'API Auth v1, où on donne des informations d'identification, et où on récupère (en orange) le "périphérique de stockage" (endpoint) ainsi qu'un moyen d'authentifier l'accès (token) à cette resource.
+* La première opération est l'authentification (la partie jaune) sous la forme d'un appel à l'API Auth v1, où on donne des informations d'identification, et où on récupère (en orange) le "périphérique de stockage" (endpoint) ainsi qu'un moyen d'authentifier l'accès (token) à cette resource.
 
-- La deuxième opération est la réalisation de l'opération demandée (en rouge) : on utilise la commande, le token, et le périphérique, pour effectivement faire faire ce qu'on veut (lister les fichiers, uploader, downloader, supprimer...) via un appel à l'API Object Storage v1.
+* La deuxième opération est la réalisation de l'opération demandée (en rouge) : on utilise la commande, le token, et le périphérique, pour effectivement faire faire ce qu'on veut (lister les fichiers, uploader, downloader, supprimer...) via un appel à l'API Object Storage v1.
 
 On voit ça sur le diagramme ci-dessous :
 
-<img src="/files/hubic002.png" />
+image:/files/hubic002.png[]
 
 Dans tous les cas, c'est "juste un protocole". *N'importe quelle application* qui respecte ce protocole *peut accéder à toutes les resources accessibles* offerte via ce protocole.
 
@@ -32,23 +34,23 @@ La raison se trouve dans la dernière phrase du paragraphe ci-dessus : à la pre
 
 D'une part, *"n'importe quelle application peut accéder"*, ça signifie aussi que :
 
-- une application légitime peut accéder, mais qu'une application illégitime peut accéder aussi, tant qu'il a les logins/mots de passe.
-- qu'une application légitime qu'on arrête d'utiliser, ou qui devient "encombrante/gênante", ne peut pas être empêchée d'accéder aux données
+* une application légitime peut accéder, mais qu'une application illégitime peut accéder aussi, tant qu'il a les logins/mots de passe.
+* qu'une application légitime qu'on arrête d'utiliser, ou qui devient "encombrante/gênante", ne peut pas être empêchée d'accéder aux données
 
 D'autre part, "*peut accéder à toutes les resources*", ça signifie aussi que :
 
-- dans le cas où plusieurs resources sont accessibles (un peu comme si on avait plusieurs disques durs), alors tous peuvent être accédés par l'application
-- imaginons que l'application ne fasse pas que du stockage (par exemple aussi du chat), et bien il est impossible de "supprimer" l'autorisation d'accès au stockage sans supprimer tous les autres droits d'accès.
+* dans le cas où plusieurs resources sont accessibles (un peu comme si on avait plusieurs disques durs), alors tous peuvent être accédés par l'application
+* imaginons que l'application ne fasse pas que du stockage (par exemple aussi du chat), et bien il est impossible de "supprimer" l'autorisation d'accès au stockage sans supprimer tous les autres droits d'accès.
 
 Pour finir, et ça c'est presque le plus importat : *comme tout accès aux services d'Hubic se faisant par un `username`/`password`, si on ouvre l'accès à vos resources auprès d'une application tierce, ces applications et programme tierces devraient "de base" connaître/utiliser/stocker vous informations de connexion de l'utilisateur pour accéder au service*. Et ça c'est pas bien du tout...
 
 En conséquence, OVH a choisi :
 
-- d'une part que chaque application soit habilitée explicitement par ses clients, afin de pouvoir par exemple révoquer l'accès de cette application aux infrastructures.
+* d'une part que chaque application soit habilitée explicitement par ses clients, afin de pouvoir par exemple révoquer l'accès de cette application aux infrastructures.
 
-- d'autre part que chaque utilisateur puisse autoriser (et être au courant, et ait la capacité de révoquer) l'accès  à ses propres données pour l'une ou l'autre des applications compatibles Hubic
+* d'autre part que chaque utilisateur puisse autoriser (et être au courant, et ait la capacité de révoquer) l'accès  à ses propres données pour l'une ou l'autre des applications compatibles Hubic
 
-- pour finir OVH a souhaité être le seul capable d'accéder aux informations de connexion de l'utilisateur, dans le but d'assurer au mieux la sécurisation de celles-ci et de réduire les risques de fuite et de mauvais usages
+* pour finir OVH a souhaité être le seul capable d'accéder aux informations de connexion de l'utilisateur, dans le but d'assurer au mieux la sécurisation de celles-ci et de réduire les risques de fuite et de mauvais usages
 
 En bref, ces changements permettent de contrôler l'accès des applications aux resources Hubic de l'utilisateur et de sécuriser les informations client. Mais forcément, ça va compliquer un peu la tâche...
 
@@ -60,30 +62,30 @@ C'est réalisé en se connectant sur son compte hubic, en allant dans "mon compt
 
 Etape 1: aller dans son compte Hubic
 
-<img src="/files/hubic003.png" />
+image:/files/hubic003.png[]
 
 Etape 2: aller dans la section developpeur
 
-<img src="/files/hubic004.png" />
+image:/files/hubic004.png[]
 
 Etape 3: ajouter une application
 
-<img src="/files/hubic005.png" />
+image:/files/hubic005.png[]
 
 Etape 4: relever les informations de l'application
 
-<img src="/files/hubic006.png" />
+image:/files/hubic006.png[]
 
 *Information : j'ai modifié toutes les infos dans Firefox (via Inspect Element des extensiosn Web Developer) avant de faire les captures d'écran ... ça ne sert à rien d'essayer d'utiliser les informations affichées dans les captures d'écran :-)*
 
 En synthèse, ça donne ça :
 
-<img src="/files/hubic007.png" />
+image:/files/hubic007.png[]
 
 Ce qu'on obtient sont :
 
-- le `Client ID` (`api_hubic_ ...`) qui est un ID de l'application "client au sens d'Oauth", c'est à dire une application qui souhaite accéder à l'API Hubic
-- le `Secret Client` est une clé qui va permettre de valider que cette application est bien qui qu'elle prétend être
+* le `Client ID` (`api_hubic_ ...`) qui est un ID de l'application "client au sens d'Oauth", c'est à dire une application qui souhaite accéder à l'API Hubic
+* le `Secret Client` est une clé qui va permettre de valider que cette application est bien qui qu'elle prétend être
 
 A partir de ce moment là, cette application "existe" au sein d'Hubic, et pourrait dans l'absolu être utilisée par tous les utilisateurs du service.
 
@@ -95,26 +97,26 @@ Etablir cette autorisation, c'est le rôle d'OAuth.
 
 Ce "protocole" fonctionne de la manière suivante :
 
-- il délégue au *serveur de resource* (hubic)
-- la tâche de demander au *détenteur de resource* (vous, moi)
-- d'autoriser ou non une *application cliente* (l'application qui veut interagir avec hubic)
-- de faire *certains types d'opérations* (les permissions sont clairement listées)
-- pour le compte du détenteur de resource (agir en votre nom)
-- sur les resources du détenteur (sur vos fichiers)
+* il délégue au *serveur de resource* (hubic)
+* la tâche de demander au *détenteur de resource* (vous, moi)
+* d'autoriser ou non une *application cliente* (l'application qui veut interagir avec hubic)
+* de faire *certains types d'opérations* (les permissions sont clairement listées)
+* pour le compte du détenteur de resource (agir en votre nom)
+* sur les resources du détenteur (sur vos fichiers)
 
 Pour être plus clair, une analogie :
 
-- si Jean demandait à son père la permission de jouer avec les légo de son frère Michel
-- le père répondait "je vais demander à Michel"
-- si Michel accepte, alors le père donnera à Jean un badge
-- Jean pourra jouer avec les légo de Michel s'il a son badge
-- Jean ne pourra pas jouer avec les petites voitures de Michel
-- et Jean ne pourra pas casser les légo de Michel (il ne peut que jouer)
-- de plus, Michel et son père peuvent confisquer le badge de Jean à tout moment
+* si Jean demandait à son père la permission de jouer avec les légo de son frère Michel
+* le père répondait "je vais demander à Michel"
+* si Michel accepte, alors le père donnera à Jean un badge
+* Jean pourra jouer avec les légo de Michel s'il a son badge
+* Jean ne pourra pas jouer avec les petites voitures de Michel
+* et Jean ne pourra pas casser les légo de Michel (il ne peut que jouer)
+* de plus, Michel et son père peuvent confisquer le badge de Jean à tout moment
 
 Dans la pratique, les permissions sont appelées `scope`, et notre application `client_id`. Si l'utilisateur accepte ces permissions, Hubic nous renvoie un "request token" appelé `code` :
 
-<img src="/files/hubic008.png" />
+image:/files/hubic008.png[]
 
 Ce `code` condense en une seule information, qui n'expire pas à moins d'être récusée, le fait qu'un utilisateur ait autorisé telle ou telle opération sur ses données.  En conséquence, l'application pourra le stocker, l'associer à l'utilisateur, et l'utiliser au fur et à mesure des besoins.
 
@@ -122,9 +124,9 @@ Et selon l'analogie ci-dessus, le `code` reçu représente le badge que Jean a r
 
 En résumé, ce badge, en un seul objet simple, représente le fait que Jean a le droit :
 
-- de jouer
-- avec les légos
-- de Michel
+* de jouer
+* avec les légos
+* de Michel
 
 Plutôt élégant non ?
 
@@ -144,23 +146,23 @@ La solution, comme d'habitude, c'est la mise en cache du résultat.
 
 L'idée est donc de ne pas vérifier à chaque accès *avec le code*, mais plutôt de :
 
-- vérifier *une fois* le code de l'utilisateur
-- s'il est bon, générer un jeton d'accès (`access token`) représentant le résultat
-- associer à ce jeton d'accès une durée de vie représentant la durée de vie du résultat
-- stocker ce jeton d'accès et sa durée de vie dans base
-- chaque accès est toujours vérifié, mais via le jeton d'accès plutôt que le code
+* vérifier *une fois* le code de l'utilisateur
+* s'il est bon, générer un jeton d'accès (`access token`) représentant le résultat
+* associer à ce jeton d'accès une durée de vie représentant la durée de vie du résultat
+* stocker ce jeton d'accès et sa durée de vie dans base
+* chaque accès est toujours vérifié, mais via le jeton d'accès plutôt que le code
 
 Les conséquences sont les suivantes :
 
-- l'opération "lourde" de validation du code n'est réalisée qu'une fois par durée de vie de jeton
-- la "petite" base de donnée de jetons ne contient "que" les jetons des requêtes récentes (~20 entrées au lieu de 10M)
+* l'opération "lourde" de validation du code n'est réalisée qu'une fois par durée de vie de jeton
+* la "petite" base de donnée de jetons ne contient "que" les jetons des requêtes récentes (environ 20 entrées au lieu de 10M)
 
 Il devient très rapide et facile de vérifier les accès, sans impact sur les performances.
 
 On conserve la possibilité de refuser les accès à tout moment :
 
-- en supprimant le code associé à l'utilisateur (pour empêcher la génération de novueaux jetons d'accès)
-- en supprimant le jeton d'accès "en cours" de la "petite" base de donnée de vérification des accès
+* en supprimant le code associé à l'utilisateur (pour empêcher la génération de novueaux jetons d'accès)
+* en supprimant le jeton d'accès "en cours" de la "petite" base de donnée de vérification des accès
 
 C'est comme ça qu'on devient capables de contrôler l'accès à l'API.
 
@@ -170,14 +172,14 @@ C'est toujours le protocole OAuth (vu que c'est lui qui a fourni le `code`) qui 
 
 On fournit l'identification du "client" (notre application), on fournit le code de permission obtenu avant (qui est lié à cette application et à l'utilisateur), et on indique ce qu'on veut, c'est à dire qu'on nous donne ("grant") un jeton d'autorisation. Tout ça est visible sur la synthèse ci-après :
 
-<img src="/files/hubic009.png" />
+image:/files/hubic009.png[]
 
 Cet appel nous retourne (sous forme JSON) :
 
-- `access_token` : un jeton jeton d'accès
-- `expires_in` : sa durée de validité (ici, 21600 secondes)
-- `refresh_token` : un jeton de renouvellement
-- `token_type=Bearer` : le type de jeton d'accès ("bearer" = au porteur)
+* `access_token` : un jeton jeton d'accès
+* `expires_in` : sa durée de validité (ici, 21600 secondes)
+* `refresh_token` : un jeton de renouvellement
+* `token_type=Bearer` : le type de jeton d'accès ("bearer" = au porteur)
 
 L'application peut maintenant stocker cet "access token" et l'utiliser pendant 6 heures pour faire des appels à l'API Hubic. C'est "comme si on utilisait directement le `code`", mais en permettant au service Hubic d'être bien plus performant.
 
@@ -189,9 +191,9 @@ Laquelle choisir ? Réfléchissons : d'un côté, passer par le `code` revient �
 
 Grâce à ce jeton d'accès à l'API Hubic, on peut faire dans l'API Hubic toutes les opérations qui nous ont été autorisées :
 
-- récupérer les informations du compte via `/account`
-- récupérer les statistiques d'utilisation du compte via `/account/usage`
-- ... et surtout, demander l'accès à l'API de stockage de fichier.
+* récupérer les informations du compte via `/account`
+* récupérer les statistiques d'utilisation du compte via `/account/usage`
+* ... et surtout, demander l'accès à l'API de stockage de fichier.
 
 *Quoi, il faut encore demander l'accès ?!*
 
@@ -201,12 +203,12 @@ En conséquence, la partie "stockage des fichiers" est une autre fonction, exter
 
 L'accès est contrôlée par la l'API Hubic `/v1/account/credentials`
 
-- on fournit le jeton d'accès à l'API qu'on a obtenu juste avant (et rafraichi en cas de besoin !)
-- on récupère un bout de JSON, qui contient entre autres un `token` et un `endpoint`
+* on fournit le jeton d'accès à l'API qu'on a obtenu juste avant (et rafraichi en cas de besoin !)
+* on récupère un bout de JSON, qui contient entre autres un `token` et un `endpoint`
 
 Ca donne le schémas suivant :
 
-<img src="/files/hubic010.png" />
+image:/files/hubic010.png[]
 
 Si est pas totalement perdus, on se rend compte que ... *c'est exactement ce que retourne la première étape (authentification v1) de Swift, tout au début de cet article !*
 
@@ -218,7 +220,7 @@ On pourrait donc uploader/downloader/supprimer des fichiers de notre compte avec
 
 Après tout ça, après avoir vu chaque étape en détails, on tout réassembler, et dé-zoomer pour voir l'ensemble du processus :
 
-<img src="/files/hubic011.png" />
+image:/files/hubic011.png[]
 
 Impressionnant, non ?
 
@@ -226,15 +228,14 @@ Impressionnant, non ?
 
 Quand on regarde le schémas ci-dessus, on peut condenser le jaune, le vert, et le rose en un seul bloc "bleu" qui résumererait l'authentification Hubic :
 
-<img src="/files/hubic001.png" />
+image:/files/hubic001.png[]
 
 Et quand on compare avec le schémas Swift (Auth v1 + Object Storage v1) du début :
 
-<img src="/files/hubic002.png" />
+image:/files/hubic002.png[]
 
 C'est quasiment pareil !
 
 Et bien une "gateway Hubic/Swift", c'est "juste" un truc qui permet de "faire ce que contient le bleu" quand on utilise des outils qui ne sauraient que "faire du jaune". Ou dit différement, un truc qui fait que Swift et ses copains, ne voient pas tout ce qui est caché par le bleu, et qui vu de l'extérieur leur semble être du jaune.
 
 C'est tout. Plutôt classe, non ?
-

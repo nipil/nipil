@@ -3,6 +3,8 @@ layout: post
 title: Shellshock, c'est passé à un cheveu
 tags: serveur bash
 ---
+:toc:
+:toc-title: Table des matières
 
 Retour à hier matin, jeudi 25/9 matin, 9h05, Paris, France.
 
@@ -30,12 +32,14 @@ Je continue mon chemin et ma journée en pensant "*job's done*" (link:https://we
 Retour à ce matin, vendredi 26/9, 9h20 à Paris. Comme hier, je rafraîchis ma brouette de RSS, et là *ouch*, un autre article link:http://arstechnica.com/security/2014/09/concern-over-bash-vulnerability-grows-as-exploit-reported-in-the-wild/[Arstechnica]. Ils n'ont pas l'habitude de faire plusieurs articles pour le plaisir, alors je l'ouvre tout de suite, ça sent mauvais...
 
 Grand bien me fasse, j'apprends que :
-- le premier patch n'a bouché le trou des variables d'environnement
-- le premier bug est déjà massivement exploité dans la nature
+
+* le premier patch n'a bouché le trou des variables d'environnement
+* le premier bug est déjà massivement exploité dans la nature
 
 Pire encore :
-- il restait deux bugs de link:https://fr.wikipedia.org/wiki/D%C3%A9passement_de_tampon[Buffer overrun] exploitables (qui viennent d'être patchés)
-- je ne sais pas encore si ces deux bugs sont déjà exploités (plus compliqué que le premier, donc j'évalue *a priori* que non)
+
+* il restait deux bugs de link:https://fr.wikipedia.org/wiki/D%C3%A9passement_de_tampon[Buffer overrun] exploitables (qui viennent d'être patchés)
+* je ne sais pas encore si ces deux bugs sont déjà exploités (plus compliqué que le premier, donc j'évalue *a priori* que non)
 
 Il est 9h39, et à nouveau, mes serveurs et VM sont à jour (à nouveau, je commence par les serveurs web). Ca y est, c'est bon le deuxième bug sus-cité est lui aussi patché (link:https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-7169[CVE-2014-7169])
 
@@ -90,11 +94,12 @@ Le troisième attaquant est arrivé ce matin, et était bien plus évolué et of
 Alors là : d'une part il essaie plusieurs URL afin de déclencher un process CGI, et d'autre part il essaie d'infecter sans phase de recensement : en effet, il upload un script perl, l'exécute et nettoie derrière lui. Pour information, le script Perl en question est visible sur link:http://pastebin.com/wZb9L2CW[PasteBin].
 
 Il s'agit d'un client IRC qui permet de
-- récupérer des infos système de la cible
-- flooder/scanner les réseaux voisins
-- de récupérer des fichiers du serveur
-- envoyer du mail
-- et bien sûr exécuter n'importe quel programme
+
+* récupérer des infos système de la cible
+* flooder/scanner les réseaux voisins
+* de récupérer des fichiers du serveur
+* envoyer du mail
+* et bien sûr exécuter n'importe quel programme
 
 Bref, simple mais efficace.
 
@@ -103,8 +108,8 @@ Bref, simple mais efficace.
 J'ai eu de la chance... car il n'aura fallu que 13h après la publication d'une faille et que je voie de vraies tentatives arriver, et j'ai pu patcher entre temps.
 
 Mon conseil ?
-- Même si on y comprend rien, se tenir informé permet de gagner du temps
-- Toujours patcher son système *rapidement*, car "quelques heures" c'est déjà long !
+
+* Même si on y comprend rien, se tenir informé permet de gagner du temps
+* Toujours patcher son système *rapidement*, car "quelques heures" c'est déjà long !
 
 Il existe des outils qui regardent si des mises à jour sont disponibles (link:http://www.debian-administration.org/article/491/Automatic_package_update_nagging_with_apticron[apticron] par exemple) : ils sont extrêmement utiles pour être prévenus des upgrades dispo, **et** pour savoir s'il est urgent ou pas de les installer. C'est bien, mange-en !
-

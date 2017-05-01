@@ -3,6 +3,8 @@ layout: post
 title: Blog accessible via le réseau TOR
 tags: tor
 ---
+:toc:
+:toc-title: Table des matières
 
 Ce blog est maintenant disponible **aussi** via le réseau TOR !
 
@@ -20,15 +22,12 @@ Ensuite, il suffit de se rendre à l'adresse link:http://v43wxiogkhnflac6.onion[
 Pourquoi on appele ça un site caché ?
 
 * parce que l'adresse utilisée pour joindre le site ne permet pas de savoir "à qui" il appartient (par exemple : `http://duskgytldkxiuqc6.onion/`)
-
 * parce que quand on accède à un site on ne connaît aucune des informations réelles permettant de le joindre (notamment on ne connait pas son adresse ip réelle)
 
 Remarques techniques :
 
 * il n'y a pas besoin d'avoir une adresse ip fixe, ni d'autoriser des flux rentrants pour publier un site sur TOR, et ça marche aussi même s'il y a du NAT etc.
-
 * tout se base sur la connection au réseau TOR qui elle est sortante, et donc aussi longtemps qu'on peut s'y connecter, on peut publier un site
-
 * il est même possible de publier un site via la connexion 3G d'un smartphone, avec l'application Android "Orbot" ... la classe non ?
 
 == Test en local sur des VM
@@ -107,7 +106,6 @@ Vérifions maintenant qu'on peut accéder aux sites "TOR-only" (ie les sites "ca
 En résumé :
 
 * pour tous les sites disponibles directement sur internet, on peut y accéder "en clair" par internet, ou "de manière privée" en passant par TOR
-
 * par contre, il n'est possible d'accéder aux sites `.onion` **uniquement via TOR** via le wrapper `torsocks` qiu force l'utilisation du proxy TOR.
 
 == Créer un site caché "Tor-only" sur la VM "serveur"

@@ -3,6 +3,8 @@ layout: post
 title:  "Passage sous Jekyll"
 tags: blog jekyll
 ---
+:toc:
+:toc-title: Table des matières
 
 == Site web, énième tentative
 
@@ -14,20 +16,19 @@ Et on se rend compte qu'on passe environ 10-25% de notre temps à l'édition et 
 
 Aujourd'hui, je reprends une fois de plus ma copie pour l'adapter au mieux à mes besoins. Mais la méthodologie sera radicalement différente cette fois, car l'accent sera mis sur la facilité de produire du contenu plutôt que l'outillage du site.
 
-
 Ensuite, j'importerai un par un tous les anciens contenus issus de mes anciens sites.
 
 === Les fonctionnalités souhaitées
 
 Comme d'habitude, conservera la maitrise complète en gérant en interne, et on commence d'abord par l'habituelle liste des fonctionnalités souhaitées
 
-- entrées blog courtes
-- articles de contenu long
-- pas de modification extérieure possible
-- contenu éditorial sous forme de fichiers textes
-- ouvert aux commentaires mais en évitant le spam
-- informations de formattage facile à écrire et lisibles
-- index et menus générés automatiquement
+* entrées blog courtes
+* articles de contenu long
+* pas de modification extérieure possible
+* contenu éditorial sous forme de fichiers textes
+* ouvert aux commentaires mais en évitant le spam
+* informations de formattage facile à écrire et lisibles
+* index et menus générés automatiquement
 
 Je m'oriente vers du contenu html généré statiquement par un outil, à partir de documents source qui pourront être édités facilement, simplement, par n'importe qui et n'importe quels éditeurs.
 
@@ -108,26 +109,26 @@ Un prochain billet concernera la mise en place des commentaires.
 Si vous éditez souvent sous windows, ou que vous éditez beaucoup de contenu, ça peut être appréciable d'avoir la visualisation du contenu "en temps réel". Pour ce faire, il faut installer Rubys, puis installer les gems, puis installer Jekyll.
 
 Installer Ruby et les RubyGems
-- aller sur la link:http://rubyinstaller.org/downloads/[page de téléchargement de Ruby]
-- télécharger le fichier `Ruby 1.9.3-p...`
-- télécharger le fichier `DevKit-tdm...`
-- installer ruby dans `C:\Ruby193` en cochant les options tcl/path/associate
-- installer le devkit dans `C:\Ruby193\DevKit`
-- ouvrez une ligne de commande `Win+R, cmd, entrée`
-- allez dans le répertoire ruby `cd c:\Ruby193\DevKit`
-- exécuter la commande `ruby dk.rb init`
-- exécuter la commande `ruby dk.rb install`
-- fermer la ligne de commande `exit`
+* aller sur la link:http://rubyinstaller.org/downloads/[page de téléchargement de Ruby]
+* télécharger le fichier `Ruby 1.9.3-p...`
+* télécharger le fichier `DevKit-tdm...`
+* installer ruby dans `C:\Ruby193` en cochant les options tcl/path/associate
+* installer le devkit dans `C:\Ruby193\DevKit`
+* ouvrez une ligne de commande `Win+R, cmd, entrée`
+* allez dans le répertoire ruby `cd c:\Ruby193\DevKit`
+* exécuter la commande `ruby dk.rb init`
+* exécuter la commande `ruby dk.rb install`
+* fermer la ligne de commande `exit`
 
 Installer Jekyll
-- ouvrez une ligne de commande `Win+R, cmd, entrée`
-- exécuter la commande `gem install jekyll`
+* ouvrez une ligne de commande `Win+R, cmd, entrée`
+* exécuter la commande `gem install jekyll`
 
 Lancer la génération en temps réel
-- ouvrez une ligne de commande `Win+R, cmd, entrée`
-- aller dans le répertoire de base de votre blog
-- exécuter la commande `jekyll serve --watch`
-- ouvrir votre navigateur et aller à la page link:http://localhost:4000[localhost:4000]
+* ouvrez une ligne de commande `Win+R, cmd, entrée`
+* aller dans le répertoire de base de votre blog
+* exécuter la commande `jekyll serve --watch`
+* ouvrir votre navigateur et aller à la page link:http://localhost:4000[localhost:4000]
 
 Maintenant, à chaque fois que vous enregistrez un de vos posts, le programme le détecte et génère une copie **locale** de votre blog. Attention, ça ne publie pas votre blog sur internet, ça ne permet que de visualiser le contenu pendant l'édition.
 
@@ -139,11 +140,11 @@ avec le système de template utilisé par Jekyll, ça a vraiment été simple.
 
 Tout d'abord, je n'ai rien inventé, mais j'ai utilisé ce qui existait :
 
-- link:https://github.com/snaptortoise/jekyll-rss-feeds[jekyll-rss-feeds] par
+* link:https://github.com/snaptortoise/jekyll-rss-feeds[jekyll-rss-feeds] par
 snaptortoise, pour le template RSS automatisé
-- et cette link:http://www.rssboard.org/rss-autodiscovery[documentation] pour
+* et cette link:http://www.rssboard.org/rss-autodiscovery[documentation] pour
 l'auto-découverte des flux RSS
-- une icône RSS avec transparence trouvée via google image
+* une icône RSS avec transparence trouvée via google image
 
 Let's go.
 
@@ -219,12 +220,12 @@ Et dans chaque article, j'ai inséré le texte suivant, sur une ligne vide,
 
 Comment ça marche ? Pour générer le flux RSS d'un post :
 
-- jekyll va d'abord regarder s'il contient un `excerpt` : si oui, alors c'est
+* jekyll va d'abord regarder s'il contient un `excerpt` : si oui, alors c'est
 ce que l'excerpt contient qui sera utilisé comme résumé.
-- ensuite, il va regarder si le contenu du post contient le texte
+* ensuite, il va regarder si le contenu du post contient le texte
 `<!--more-->` : si oui, il va prendre uniquement le texte entre le début du
 post et le `<!--more-->` et utiliser ça comme résumé.
-- sinon, il prendra tout le texte du post comme résumé.
+* sinon, il prendra tout le texte du post comme résumé.
 
 De cette manière, pas besoin de dupliquer les infos, mais on peut toujours
 choisir de conserver un résumé défini manuellement, ou de tout prendre.
@@ -250,8 +251,8 @@ Mais en temps normal, mieux vaut laisser cette limite...
 Hier je vous ai montré comment se faire un blog basique mais très efficace, performant et sécurisé, et j'ai conclus succinctement par *"... pousser le contenu du répertoire produit sur le serveur de votre hébergeur préféré"*. Certes.
 
 La méthode *"à la main"* a deux principaux avantages
-- des prérequis logiciels ridicules : chaque personne voulant publier quelque chose n'a besoin en tout et pour tout que d'un link:http://en.wikipedia.org/wiki/Text_editor[éditeur de texte brut], et de clients link:http://en.wikipedia.org/wiki/Apache_Subversion[Subversion] et link:http://en.wikipedia.org/wiki/Secure_Shell[SSH]. Chaque système d'exploitation dispose de ces outils, soit en standard, soit via des applications gratuites.
-- on peut très bien travailler pendant des heures et des jours sans aucune connexion à internet, et profiter d'une poignée de minutes d'accès et du minimum de donnée transférées pour effectivement publier ses mises à jour, ce qui permet de minimaliser les frais de data en 3G ou pire, les tarifs du roaming à l'étranger.
+* des prérequis logiciels ridicules : chaque personne voulant publier quelque chose n'a besoin en tout et pour tout que d'un link:http://en.wikipedia.org/wiki/Text_editor[éditeur de texte brut], et de clients link:http://en.wikipedia.org/wiki/Apache_Subversion[Subversion] et link:http://en.wikipedia.org/wiki/Secure_Shell[SSH]. Chaque système d'exploitation dispose de ces outils, soit en standard, soit via des applications gratuites.
+* on peut très bien travailler pendant des heures et des jours sans aucune connexion à internet, et profiter d'une poignée de minutes d'accès et du minimum de donnée transférées pour effectivement publier ses mises à jour, ce qui permet de minimaliser les frais de data en 3G ou pire, les tarifs du roaming à l'étranger.
 
 Par contre, avec cette méthode, l'utilisateur doit :
 1. faire un `svn update` avant toute modification
@@ -267,7 +268,7 @@ Par contre, avec cette méthode, l'utilisateur doit :
 
 Ca peut faire beaucoup, et même si on se souvient de tout ça, ça fait du temps de perdu, environ 3 minutes à l'instant pour cet article. Face aux 3-10 minutes pour l'écriture d'un billet, ça fait 30-60% de temps perdu. Est-ce que ça vaut la peine d'automatiser ? Et si oui combien de temps y consacrer ?
 
-<a href="http://www.xkcd.com/1205/"><img src="http://imgs.xkcd.com/comics/is_it_worth_the_time.png" /></a>
+link:http://www.xkcd.com/1205/[image:http://imgs.xkcd.com/comics/is_it_worth_the_time.png[]]
 
 Pour se convaincre, regardons le graphe issu de link:http://www.xkcd.com[xkcd] image ci-dessus. Est ce que ça vaut la peine d'automatiser ? En considérant qu'on postera 1 billet par semaine, et qu'on économise 5 minutes à chaque fois, alors oui ça vaut le coup car on économisera 21h de temps utile. Par utilisateur et par post. *C'est énorme*.
 

@@ -3,6 +3,8 @@ layout: post
 title:  Serveur dédié Kimsufi OVH (KS2G)
 tags: server linux debian ovh
 ---
+:toc:
+:toc-title: Table des matières
 
 Aujourd'hui, j'ai reçu les identifiants pour mon serveur dédié chez OVH. Il s'agit d'un serveur perso à faible puissance et à coût ultra-réduit (2.99 euros HT / mois).
 
@@ -13,9 +15,10 @@ Le but de ce post, c'est de faire le tour du propriétaire, à la fois du serveu
 == Premier contact
 
 Dans leur mail, OVH communique trois informations :
-- le nom de domaine du serveur
-- le mot de passe root (12 charactères alphanumériques)
-- le rapport de test de conformité
+
+* le nom de domaine du serveur
+* le mot de passe root (12 charactères alphanumériques)
+* le rapport de test de conformité
 
 Le rapport des tests de conformité est produit par OVH à l'issu des tests de torture (cpu, mem, disque, réseau) qui sont réalisés automatiquement avant la livraison au client.
 
@@ -96,7 +99,7 @@ En résumé, on a un serveur dédié limitée en puissance, qui peut faire plein
 
 Après connexion, on a la bannière suivante qui rappelle les informations relatives au serveur
 
-	Linux ksAAAAAA.kimsufi.com 3.10.9-xxxx-grs-ipv6-64 #1 SMP Wed Aug 21 11:51:59 CEST 2013 x86_64 GNU/Linux
+	Linux ksAAAAAA.kimsufi.com 3.10.9-xxxx-grs-ipv6-64 1 SMP Wed Aug 21 11:51:59 CEST 2013 x86_64 GNU/Linux
 	server    : BBBBB
 	hostname  : ksAAAAAA.kimsufi.com
 	eth0 IPv4 : 91.121.CCC.DDD
@@ -211,23 +214,25 @@ Lors de la commande, on a pas demandé de partitionnement spécifique, ni de LVM
 
 Ce qu'il faut retenir, c'est qu'avec le partitionnement par défaut les data volumineuses **doivent** être stockées dans la partition `home` (de 460go) car la partition racine ne fait "que" 20Go. Par défaut, les deux partitions sont en EXT4 (système de fichier journalisé donc plus résilient aux pannes).
 
-	# lsblk
-	NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
-	sda      8:0    0 465,8G  0 disk
-	|-sda1   8:1    0    20G  0 part /
-	|-sda2   8:2    0 445,3G  0 part /home
-	`-sda3   8:3    0   513M  0 part [SWAP]
+----
+# lsblk
+NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+sda      8:0    0 465,8G  0 disk
+|-sda1   8:1    0    20G  0 part /
+|-sda2   8:2    0 445,3G  0 part /home
+`-sda3   8:3    0   513M  0 part [SWAP]
 
-	# mount
-	/dev/root on / type ext4 (rw,relatime,errors=remount-ro,data=ordered)
-	devtmpfs on /dev type devtmpfs (rw,relatime,size=999968k,nr_inodes=249992,mode=755)
-	tmpfs on /run type tmpfs (rw,nosuid,noexec,relatime,size=200100k,mode=755)
-	tmpfs on /run/lock type tmpfs (rw,nosuid,nodev,noexec,relatime,size=5120k)
-	proc on /proc type proc (rw,nosuid,nodev,noexec,relatime)
-	sysfs on /sys type sysfs (rw,nosuid,nodev,noexec,relatime)
-	tmpfs on /dev/shm type tmpfs (rw,nosuid,nodev,noexec,relatime,size=505240k)
-	devpts on /dev/pts type devpts (rw,nosuid,noexec,relatime,gid=5,mode=620)
-	/dev/sda2 on /home type ext4 (rw,relatime,data=ordered)
+# mount
+/dev/root on / type ext4 (rw,relatime,errors=remount-ro,data=ordered)
+devtmpfs on /dev type devtmpfs (rw,relatime,size=999968k,nr_inodes=249992,mode=755)
+tmpfs on /run type tmpfs (rw,nosuid,noexec,relatime,size=200100k,mode=755)
+tmpfs on /run/lock type tmpfs (rw,nosuid,nodev,noexec,relatime,size=5120k)
+proc on /proc type proc (rw,nosuid,nodev,noexec,relatime)
+sysfs on /sys type sysfs (rw,nosuid,nodev,noexec,relatime)
+tmpfs on /dev/shm type tmpfs (rw,nosuid,nodev,noexec,relatime,size=505240k)
+devpts on /dev/pts type devpts (rw,nosuid,noexec,relatime,gid=5,mode=620)
+/dev/sda2 on /home type ext4 (rw,relatime,data=ordered)
+----
 
 On a donc largement assez de place pour stocker les fichiers d'un site web, d'un échange de photos, les fichiers d'une base de données, ou les systèmes de téléchargements.
 
@@ -246,9 +251,9 @@ Les sources n'incluent que la branche "main", donc il faudra rajouter manuelleme
 	deb-src http://security.debian.org/ wheezy/updates main
 
 Dans le répertoire home du root, je vois 3 fichiers que je ne connais pas :
-- `.email` : l'email du compte client
-- `.mdg` : le numéro du serveur affiché dans la bannière
-- `.ovhrc` : des infos OVH sous forme de variable du shell
+* `.email` : l'email du compte client
+* `.mdg` : le numéro du serveur affiché dans la bannière
+* `.ovhrc` : des infos OVH sous forme de variable du shell
 
 Le fichier `.ovhrc` contient les infos suivantes
 
@@ -269,11 +274,11 @@ Dans les tâches cron on retrouve l'appel à l'outil OVH de supervision, RTM. Il
 	*/1 * * * * root /usr/local/rtm/bin/rtm 9 > /dev/null 2> /dev/null
 
 Cette Debian "OVH" est donc une Debian standard, si ce n'est:
-- le kernel 3.10.9 maison avec les patchs link:http://grsecurity.net/[grsec] au lieu du kernel wheezy (3.2.46-1+deb7u1)
-- le daemon de monitoring RTM, lancé toutes les minutes
-- le daemon Bind9 (en loopback uniquement) pour la résolution des noms
-- GnuPG déjà installé (mais rien dans le keyring, même pas de clé publique)
-- et un daemon `mdadm` (gestion du RAID soft sous Linux) ce que je trouve curieux vu qu'on a qu'un seul disque dans les KS2G. En fait c'est logique, le process d'install OVH doit fonctionner pour tous les serveurs. On pourra arrêter ce daemon dans notre cas.
+* le kernel 3.10.9 maison avec les patchs link:http://grsecurity.net/[grsec] au lieu du kernel wheezy (3.2.46-1+deb7u1)
+* le daemon de monitoring RTM, lancé toutes les minutes
+* le daemon Bind9 (en loopback uniquement) pour la résolution des noms
+* GnuPG déjà installé (mais rien dans le keyring, même pas de clé publique)
+* et un daemon `mdadm` (gestion du RAID soft sous Linux) ce que je trouve curieux vu qu'on a qu'un seul disque dans les KS2G. En fait c'est logique, le process d'install OVH doit fonctionner pour tous les serveurs. On pourra arrêter ce daemon dans notre cas.
 
 Bref, pas de surcouche à la noix, c'est parfait.
 
@@ -288,14 +293,14 @@ Dans tous les cas, les link:http://guides.ovh.net[guides] sont là pour mieux co
 === Manager v3
 
 Dans le link:https://www.ovh.com/managerv3/[manager v3] on retrouvera les informations "externes"
-- un résumé des infos du serveur (DC, baie, numéro du serveur)
-- la fonction de monitoring "à la sauce OVH" via un soft maison appelé RTM
-- le formulaire pour configurer les reverse DNS de nos adresse IPv4/IPv6
+* un résumé des infos du serveur (DC, baie, numéro du serveur)
+* la fonction de monitoring "à la sauce OVH" via un soft maison appelé RTM
+* le formulaire pour configurer les reverse DNS de nos adresse IPv4/IPv6
 
 Pour la gestion du serveur lui même on retiendra surtout
-- une fonction reboot hard (donc "pas propre" et à utiliser le moins posible)
-- choix de la méthode de boot (disque, netboot, ou recovery qui permet d'avoir un accès pour corriger les problèmes de password ou de partition ou pour faire des backups, etc etc)
-- réinstaller/changer d'OS, tout en partitionnant comme on le souhaite
+* une fonction reboot hard (donc "pas propre" et à utiliser le moins posible)
+* choix de la méthode de boot (disque, netboot, ou recovery qui permet d'avoir un accès pour corriger les problèmes de password ou de partition ou pour faire des backups, etc etc)
+* réinstaller/changer d'OS, tout en partitionnant comme on le souhaite
 
 Il y a tout ce qu'il faut pour faire ce dont j'aurai besoin. Tout au plus l'encryption du disque manque à l'appel, si on ne peut pas la créer/gérer manuellement dans le LVM post-installation, mais c'est juste pour le principe.
 
@@ -312,9 +317,9 @@ Dans ce manager, on peut configurer les règles du firewall, activer ou désacti
 L'link:http://api.ovh.com[API OVH] est l'épine dorsale sur laquelle vont au final se greffer toutes les fonctions des managers.
 
 Elle permet
-- d'accéder de manière programmée simple aux fonctions OVH, pour automatiser des tâches par exemple
-- d'utiliser les fonctions en cours de bêta et pour lesquelles le(s) managers ne seraient pas encore à jour
-- de mieux comprendre et tracer l'état et le fonctionnement des services OVH
+* d'accéder de manière programmée simple aux fonctions OVH, pour automatiser des tâches par exemple
+* d'utiliser les fonctions en cours de bêta et pour lesquelles le(s) managers ne seraient pas encore à jour
+* de mieux comprendre et tracer l'état et le fonctionnement des services OVH
 
 Actuellement l'API permet de gérer : le CDN, le PCA/PCS, les NAS, les serveurs dédiés, les VPS, le VRACK, les noms de domaine, les emails, les IP failover, les blocs RIPE, l'anti-ddos, les comptes SMS, les infos de contact, de facturation, les commandes, et les liaisons DSL. Et elle s'étoffe au fur et à mesure.
 
@@ -323,5 +328,3 @@ Actuellement l'API permet de gérer : le CDN, le PCA/PCS, les NAS, les serveurs 
 Je suis très content de ce petit serveur, qui me permettra de faire tout ce que je faisais déjà sur mon serveur à la maison, avec du CPU en plus, de la mémoire en plus, et surtout plus de bande passante.
 
 Merci OVH pour cette superbe offre.
-
-

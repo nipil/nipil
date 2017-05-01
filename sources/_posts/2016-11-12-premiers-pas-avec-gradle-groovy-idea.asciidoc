@@ -3,6 +3,8 @@ layout: post
 title: Premiers pas avec Gradle, Groovy et IDEA
 tags: programmation groovy gradle idea
 ---
+:toc:
+:toc-title: Table des matières
 
 Depuis que j'ai changé de job il y a un an et demi, je fais beaucoup de "catch-up" (rattrapage) technologique, cf link:/2016/10/17/velib-stats-consultation-des-statistiques-velib.html[article précédent].
 
@@ -18,16 +20,16 @@ Prenez une boisson chaude, et des petits gateaux, et allons y relax...
 
 De quoi on parle :
 
-- Groovy est un langage de programmation basé sur Java
-- Java est un langage de programmation orienté objet
-- Java (et ses dérivés, dont Groovy) est compilés en bytecode
-- ce bytecode s'exécute sur une machine virtuelle multiplateforme
+* Groovy est un langage de programmation basé sur Java
+* Java est un langage de programmation orienté objet
+* Java (et ses dérivés, dont Groovy) est compilés en bytecode
+* ce bytecode s'exécute sur une machine virtuelle multiplateforme
 
 Ok ? Mais alors, pourquoi Groovy ?
 
-- Groovy vise à *simplifier* et à "*dé-rigidifier" Java
-- Groovy évite le "boilerplate" qui n'apporte rien et qui ne sert qu'à faire "que ça marche"
-- Groovy permet de faire des "scripts" java (ie) et de faire du "typage optionnel"
+* Groovy vise à *simplifier* et à "dé-rigidifier" Java
+* Groovy évite le "boilerplate" qui n'apporte rien et qui ne sert qu'à faire "que ça marche"
+* Groovy permet de faire des "scripts" java (ie) et de faire du "typage optionnel"
 
 Première illustration :
 
@@ -45,18 +47,18 @@ Je sais pas vous, mais moi il y en a clairement un que je préfère...
 
 Trois choses sont à noter dans cet exemple :
 
-- les `;` en fin de ligne sont optionnels
-- on a un script "principal" et non pas une méthode class/méthode "main", ce qui élimine du code "boilerplate" qui n'apporte rien. En interne, l'outil va *générer* une classe et va prendre le code du script et tout coller dans une fonction `main` générée à la volée. Bref, c'est équivalent, mais plus simple.
-- on a pas besoin de mettre le chemin de package des trucs les plus souvent utilisés, un certain nombre d'import sont faits automatiquement
-- la fonction `println` opère par défaut sur stdout, sans qu'on ait besoin de préciser qu'on println sur la sortie standard `System.out`
-- pour les commandes de "**premier** niveau", les parenthèses sont facultatives, ie on aurait pu écrire `println("toto")` mais on peut écrire `println "toto"`. De la même manière, on écrirait `f a, b` au lieu d'écrire `f(a, b)`.
+* les `;` en fin de ligne sont optionnels
+* on a un script "principal" et non pas une méthode class/méthode "main", ce qui élimine du code "boilerplate" qui n'apporte rien. En interne, l'outil va *générer* une classe et va prendre le code du script et tout coller dans une fonction `main` générée à la volée. Bref, c'est équivalent, mais plus simple.
+* on a pas besoin de mettre le chemin de package des trucs les plus souvent utilisés, un certain nombre d'import sont faits automatiquement
+* la fonction `println` opère par défaut sur stdout, sans qu'on ait besoin de préciser qu'on println sur la sortie standard `System.out`
+* pour les commandes de "**premier** niveau", les parenthèses sont facultatives, ie on aurait pu écrire `println("toto")` mais on peut écrire `println "toto"`. De la même manière, on écrirait `f a, b` au lieu d'écrire `f(a, b)`.
 
 Bref, l'objectif c'est de faire pareil, en plus simple, pour se concentrer sur le fond plutôt que la forme.
 
 Tout groovy est fait sur ce principe, deux autres exemples :
 
-- les types sont optionnels : `def a = new ArrayList<String>()` plutôt que `ArrayList<String> a = new ArrayList<String>()` donc on évite la répétition
-- les nulls sont gérés de manière plus sécuritaire : `class A { String s; }; A a=null; b=a?.s` on aura `b==null` plutôt qu'une NullPointerException, sans avoir à tester avant d'accéder !
+* les types sont optionnels : `def a = new ArrayList<String>()` plutôt que `ArrayList<String> a = new ArrayList<String>()` donc on évite la répétition
+* les nulls sont gérés de manière plus sécuritaire : `class A { String s; }; A a=null; b=a?.s` on aura `b==null` plutôt qu'une NullPointerException, sans avoir à tester avant d'accéder !
 
 Pour finir, un script groovy ça s'exécute de la manière suivante :
 
@@ -74,35 +76,35 @@ Il a des tonnes d'autres trucs que je suis loin de maîtriser, mais la link:http
 
 De quoi on parle :
 
-- Gradle est ce un "task-runner", écrit en Groovy
-- un task-runner, c'est un machin qui fait des boulots
-- les boulots peuvent être liés entre eux (A dépend de B), ou pas
-- un boulot n'est à refaire que quand c'est nécessaire (on bosse pas pour rien)
-- un task-runner s'appuie sur un script qui lui dit ce qu'il doit faire
-- le script dit comment faire chaque tâche
-- dans le cas de Gradle, le script est écrit en Groovy
+* Gradle est ce un "task-runner", écrit en Groovy
+* un task-runner, c'est un machin qui fait des boulots
+* les boulots peuvent être liés entre eux (A dépend de B), ou pas
+* un boulot n'est à refaire que quand c'est nécessaire (on bosse pas pour rien)
+* un task-runner s'appuie sur un script qui lui dit ce qu'il doit faire
+* le script dit comment faire chaque tâche
+* dans le cas de Gradle, le script est écrit en Groovy
 
 Quand on parle de tâches, on peut déjà penser aux tâches suivantes :
 
-- compiler du code
-- exécuter une application avec des paramètres par défaut
-- générer de la documentation
-- produire un fichier 'zip' de l'application pour distribution
-- pousser un site web vers un serveur
-- lancer une campagne de tests automatisés
-- poster un tweet
-- faire le café
+* compiler du code
+* exécuter une application avec des paramètres par défaut
+* générer de la documentation
+* produire un fichier 'zip' de l'application pour distribution
+* pousser un site web vers un serveur
+* lancer une campagne de tests automatisés
+* poster un tweet
+* faire le café
 
 *Un task-runner, c'est un truc qui automatise une chaine de tâches répétitives.*
 
 Si vous avez déjà programmé un jour dans votre vie, vous avez sûrement du voir l'un ou l'autre des trucs suivants :
 
-- `build.bat`
-- `make` avec un `Makefile` manuel ou généré par `./configure`
-- `grunt` et `gulp` pour du javascript
-- `ant`, `maven` et`gradle` pour du java
-- `Robo` pour PHP
-- et plein d'autres ...
+* `build.bat`
+* `make` avec un `Makefile` manuel ou généré par `./configure`
+* `grunt` et `gulp` pour du javascript
+* `ant`, `maven` et`gradle` pour du java
+* `Robo` pour PHP
+* et plein d'autres ...
 
 Ben voilà, ces trucs là, c'est sous une forme ou l'autre, des task-runners, qui utilisent un script d'une forme ou d'une autre pour définir leurs tâches et qui exécutent ensuite les tâches demandées, en plus de celles qui sont nécessaires
 
@@ -112,9 +114,9 @@ On peut se poser la question. La réponse ? La simplification, comme pour Groovy
 
 L'idée derrière Gradle, part du constat que :
 
-- un script Makefile (link:https://www.gnu.org/software/make/manual/html_node/Simple-Makefile.html[exemple]) décrit explicitement toutes les actions attendues
-- un script Ant (link:https://ant.apache.org/manual/using.html[exemple]) décrit explicitement toutes les actions attendues
-- un script Maven (link:https://maven.apache.org/pom.html[exemple]) décrit explicitement toutes les actions attendues
+* un script Makefile (link:https://www.gnu.org/software/make/manual/html_node/Simple-Makefile.html[exemple]) décrit explicitement toutes les actions attendues
+* un script Ant (link:https://ant.apache.org/manual/using.html[exemple]) décrit explicitement toutes les actions attendues
+* un script Maven (link:https://maven.apache.org/pom.html[exemple]) décrit explicitement toutes les actions attendues
 
 En comparaison avec les scripts donnés en exemple ci-dessus, un script Gradle se contente de **décrire ce qui change de la norme**.
 
@@ -140,17 +142,17 @@ La force de Gradle réside dans le fait que ces fameuses conventions que l'on a 
 
 Un plugin, c'est ni plus ni moins constitué :
 
-- d'une "liste de tâches" automatiquement importées au chargement du plugin
-- d'éléments de configuration, avec des valeurs par défaut
-- de convention sur l'organisation, reflétées dans les actions et la config
-- de dépendance sur d'autres plugins éventuels
+* d'une "liste de tâches" automatiquement importées au chargement du plugin
+* d'éléments de configuration, avec des valeurs par défaut
+* de convention sur l'organisation, reflétées dans les actions et la config
+* de dépendance sur d'autres plugins éventuels
 
 Avoir des conventions, qui sont implicites (mais documentées !) plutôt qu'explicite permet d'avoir par exemple :
 
-- un script gradle "vide" qui dispose déjà de tâches standard (init, tasks, wrapper ...) sans qu'on ait besoin de les définir !
-- on configure simplement les dépendances de code utilisées (les librairies via le paramètre `dependencies`) et où il ira les chercher (via le paramètre `repositories`)
-- le plugin pour un langage 'X' définit l'arborescence par défaut à suivre pour l'emplacement des fichiers sources X (`src/main/X`), des tests X (`src/test/X`)
-- un plugin 'A' va appliquer automatiquement un plugin 'B' parce que sa fonctionnalité est utile/nécessaire à l'utilisateur du plugin 'A'
+* un script gradle "vide" qui dispose déjà de tâches standard (init, tasks, wrapper ...) sans qu'on ait besoin de les définir !
+* on configure simplement les dépendances de code utilisées (les librairies via le paramètre `dependencies`) et où il ira les chercher (via le paramètre `repositories`)
+* le plugin pour un langage 'X' définit l'arborescence par défaut à suivre pour l'emplacement des fichiers sources X (`src/main/X`), des tests X (`src/test/X`)
+* un plugin 'A' va appliquer automatiquement un plugin 'B' parce que sa fonctionnalité est utile/nécessaire à l'utilisateur du plugin 'A'
 
 Tout ça en ayant toujours à l'idée, que *tout ce qui respecte les conventions prises n'a pas besoin d'être spécifié dans le script du task-runner*, ce qui économise du temps, des problèmes et des emmerdes au développeur.
 
@@ -189,33 +191,34 @@ Vous avez un nouveau projet tout beau. Vous voulez utiliser les dernières versi
 
 Je passe sur la problématique (vu qu'on ne la rencontrera pas), mais résumons par les faits avérés suivants :
 
-- on peut utiliser une autre version de *gradle* pour le projet que celle qui est installée nativement
-- on peut utiliser une autre version de *groovy* pour le projet que celle qui est installée nativement
-- gradle se chargera de récupérer les versions nécessaires
-- gradle utilisera automatiquement les versions demandées
-- on pourrait même au final désinstaller les versions natives !
+* on peut utiliser une autre version de *gradle* pour le projet que celle qui est installée nativement
+* on peut utiliser une autre version de *groovy* pour le projet que celle qui est installée nativement
+* gradle se chargera de récupérer les versions nécessaires
+* gradle utilisera automatiquement les versions demandées
+* on pourrait même au final désinstaller les versions natives !
 
 Comment on fait cette magie ? En générant un `wrapper`.
 
 Un `wrapper` (enrobeur en français) ça fait ça :
-- truc prend un bidule, et s'emballe autour
-- truc reçoit un machin
-- truc adapte machin à bidule
-- truc transmet le machin adapté à bidule
-- bidule bidouille
-- bidulle donne son résultat à truc
-- truc dés-adapte le résultat
-- truc donne le résultat adapté à qui lui avait fourni
+
+* truc prend un bidule, et s'emballe autour
+* truc reçoit un machin
+* truc adapte machin à bidule
+* truc transmet le machin adapté à bidule
+* bidule bidouille
+* bidulle donne son résultat à truc
+* truc dés-adapte le résultat
+* truc donne le résultat adapté à qui lui avait fourni
 
 *En résumé, un `wrapper` fait l'interface et masque ce qu'il contient*
 
 Le wrapper de Gradle fait exactement ça :
 
-- il prend les commandes qu'on lui donne
-- il prend les informations configurées (ie les versions requises)
-- il récupère les trucs nécessaires (si pas déjà récupérées)
-- il transmet les commandes aux outils dans la version demandées
-- il redonne le résultat
+* il prend les commandes qu'on lui donne
+* il prend les informations configurées (ie les versions requises)
+* il récupère les trucs nécessaires (si pas déjà récupérées)
+* il transmet les commandes aux outils dans la version demandées
+* il redonne le résultat
 
 Et ça permet donc d'utiliser n'importe quelle version de Gradle pour le projet, sans avoir à installer, ni gérer quoi que ce soit sur la machine.
 
@@ -287,12 +290,12 @@ On lance ce wrapper pour voir la version :
 
 On voit alors les choses suivantes :
 
-- on a simplement appelé le wrapper
-- il a téléchargé la version de gradle demandée (ie la version 3.1)
-- la version récupérée est dans sa variante "bin" (on verra ça plus tard)
-- il a installé la version *hors du dossier du projet* (ie dans `$HOME/.gradle`)
-- le gradle 3.1 récupéré inclus une version 2.4.7
-- la version affichée est 3.1, le wrapper utilise bien la version demandée au lieu du gradle natif (2.10)
+* on a simplement appelé le wrapper
+* il a téléchargé la version de gradle demandée (ie la version 3.1)
+* la version récupérée est dans sa variante "bin" (on verra ça plus tard)
+* il a installé la version *hors du dossier du projet* (ie dans `$HOME/.gradle`)
+* le gradle 3.1 récupéré inclus une version 2.4.7
+* la version affichée est 3.1, le wrapper utilise bien la version demandée au lieu du gradle natif (2.10)
 
 Et pour finir, on retrouve dans le dossier de travail les fichiers de travail de la version 3.1 en plus des fichiers de travail de la 2.10:
 
@@ -308,8 +311,8 @@ Tout fonctionne correctement.
 
 Si je résume les points importants :
 
-- notre projet utilise gradle 3.1 aussi longtemps qu'on utilise le wrapper
-- les gens utilisent le wrapper, récupérent et utilisent la bonne version
+* notre projet utilise gradle 3.1 aussi longtemps qu'on utilise le wrapper
+* les gens utilisent le wrapper, récupérent et utilisent la bonne version
 
 Personne n'aura "besoin" d'avoir gradle installé nativement.
 
@@ -340,14 +343,15 @@ Cette tâche a généré deux fichiers :
 
 Le fichier `build.gradle`
 
-- sera chargé par défaut par gradle à chaque appel du wrapper
-- il contiendra toutes les tâches et le paramétrage gradle du projet
-- pour l'instant, tout est commenté, il est *virtuellement* vide.
+* sera chargé par défaut par gradle à chaque appel du wrapper
+* il contiendra toutes les tâches et le paramétrage gradle du projet
+* pour l'instant, tout est commenté, il est *virtuellement* vide.
 
 Le fichier `settings.gradle`
-- contient le nom du projet via le paramètre `rootProject.name`
-- le nom par défaut est "le nom du répertoire du projet"
-- vous pouvez bien sûr le modifier
+
+* contient le nom du projet via le paramètre `rootProject.name`
+* le nom par défaut est "le nom du répertoire du projet"
+* vous pouvez bien sûr le modifier
 
 Ajoutez ces deux fichiers à votre gestionnaire de code source.
 
@@ -357,13 +361,13 @@ On va maintenant gérer les dépôts et les dépendances.
 
 Mais tout d'abord, quelques faits/rappels ou choses nouvelles :
 
-- java dispose d'un dépôt de librairies appelé "maven central"
-- on peut y récupérer tout ce qu'on souhaite
-- groovy est basé sur java
-- groovy peut être publié sur "maven central"
-- on récupèrera logiquement groovy depuis "maven central" :-)
-- on a vu qu'on peut utiliser la version qu'on veut de gradle
-- on utilisera logiquement la version qu'on veut de groovy
+* java dispose d'un dépôt de librairies appelé "maven central"
+* on peut y récupérer tout ce qu'on souhaite
+* groovy est basé sur java
+* groovy peut être publié sur "maven central"
+* on récupèrera logiquement groovy depuis "maven central" :-)
+* on a vu qu'on peut utiliser la version qu'on veut de gradle
+* on utilisera logiquement la version qu'on veut de groovy
 
 Comment on fait tout ça ? On va le voir maintenant, ouvrez le fichier `build.gradle` et videz le (ou modifiez le contenu).
 
@@ -373,10 +377,10 @@ On fait du gradle, qui est une sorte de java. On va donc avoir besoin du plugin 
 
 Cette commande :
 
-- charge le plugin java de gradle
-- donne accès au paramètre `repositories`
-- donne accès au paramètre `dependencies`
-- ajoute des tâches, notamment `build` et `clean`, et `javadoc`
+* charge le plugin java de gradle
+* donne accès au paramètre `repositories`
+* donne accès au paramètre `dependencies`
+* ajoute des tâches, notamment `build` et `clean`, et `javadoc`
 
 On va ensuite ajouter un dépôt de code aux `repositories` :
 
@@ -419,9 +423,9 @@ On aura le fichier suivant :
 
 Là j'ai mis la version 2.3.1 de groovy, pour bien montrer :
 
-- qu'on peut choisir la version qu'on veut !
-- qu'elle peut être différente de la version installée nativement (2.4.5, voir début de l'article)
-- qu'elle peut être différente de la version apportée par la version gradle utilisée (groovy 2.4.7 apportée par gradle 3.1)
+* qu'on peut choisir la version qu'on veut !
+* qu'elle peut être différente de la version installée nativement (2.4.5, voir début de l'article)
+* qu'elle peut être différente de la version apportée par la version gradle utilisée (groovy 2.4.7 apportée par gradle 3.1)
 
 On verifiera que les dépendances sont bien importées :
 
@@ -485,8 +489,8 @@ Mais la documentation indique que ce plugin importe automatiquement le plugin 'j
 
 Le plugin ajoute notamment les éléments suivants :
 
-- des tâches de compilation comme `compileGroovy` et de génération de documentation `groovydoc`
-- définit la structure par défaut du code source (les `sourceSets`)
+* des tâches de compilation comme `compileGroovy` et de génération de documentation `groovydoc`
+* définit la structure par défaut du code source (les `sourceSets`)
 
 A nouveau, on retrouve la notion de convention : si on respecte la convention, on a rien à spécifier. C'est seulement si la convention n'est pas respectée (*ie* qu'on met les fichiers ailleurs, alors il faut spécifier quelque chose)
 
@@ -541,9 +545,9 @@ On trouvera dans le répertoire `build` (encore une convention) les fichiers sui
 
 Parmi ces éléments, on notera :
 
-- le fichier groovy `Main.groovy` compilé en bytecode java `Main.class`
-- un fichier `.jar` utilisant le nom du projet (cf `settings.gradle`)
-- ce fichier jar contient tous les `.class` de notre projet
+* le fichier groovy `Main.groovy` compilé en bytecode java `Main.class`
+* un fichier `.jar` utilisant le nom du projet (cf `settings.gradle`)
+* ce fichier jar contient tous les `.class` de notre projet
 
 Le reste, je ne sais pas encore trop à quoi ça sert mais pour l'instant on s'en fiche un peu :-)
 
@@ -559,13 +563,13 @@ Ajouter le plugin Gradle 'application' (link:https://docs.gradle.org/current/use
 
 Ce plugin fournit les éléments suivants :
 
-- le paramètre `mainClassName` qui définit la classe principale (le nom du script, dans le cas d'un script groovy)
-- la tâches `run` qui exécute le programme sans paramètres
+* le paramètre `mainClassName` qui définit la classe principale (le nom du script, dans le cas d'un script groovy)
+* la tâches `run` qui exécute le programme sans paramètres
 
 Le plus important ici est ce paramètre `mainClassName`, il s'agira
 
-- soit de la classe qui contient la méthode "static main"
-- soit du nom du script groovy "principal"
+* soit de la classe qui contient la méthode "static main"
+* soit du nom du script groovy "principal"
 
 *Attention, dans les deux cas, le nom de la classe doit être le nom complet en incluant le package !*
 
@@ -613,15 +617,15 @@ On peut alors lancer l'application (sans paramètres) via gradle :
 
 On constate :
 
-- qu'on peut lancer notre application
-- qu'on a bien la version de groovy qu'on a demandé à utiliser
+* qu'on peut lancer notre application
+* qu'on a bien la version de groovy qu'on a demandé à utiliser
 
 C'est pas génial tout ça ?!
 
 Pour finir, le plugin 'application' applique automatiquement le plugin 'distribution' (link:https://docs.gradle.org/current/userguide/distribution_plugin.html[doc]) qui fournit les éléments suivants :
 
-- générer une archive (`distZip` et `distTar`) pour distribution)
-- `installDist` qui installe localement l'application
+* générer une archive (`distZip` et `distTar`) pour distribution)
+* `installDist` qui installe localement l'application
 
 On utilisera la tâche `installDist` pour installer notre programme, ainsi que toutes ses dépendances, dans un répertoire local.
 
@@ -651,8 +655,8 @@ Puis on la lance à la main (on peut y passer des paramètres)
 
 Comme tout à l'heure avec `run`, on constate :
 
-- qu'on peut lancer notre application
-- qu'on a bien la version de groovy qu'on a demandé à utiliser
+* qu'on peut lancer notre application
+* qu'on a bien la version de groovy qu'on a demandé à utiliser
 
 *Whouhouuuu ça y est on est montés sur la première marche, on a tout ce qu'il faut côté gradle et environnement, pour se lancer dans la programmation de notre application !*
 
@@ -680,15 +684,15 @@ Comment logger ? Il existe des dizaines de framework, mais link:[Slf4j]+link:[Lo
 
 Commen ça se présente :
 
-- une interface API commune (Slf4j) qui définit l'interface
-- une implémentation réelle du logger (Logback) qui fait le taf
-- l'intégration facile du logger à notre code (annotation groovy Slf4j)
+* une interface API commune (Slf4j) qui définit l'interface
+* une implémentation réelle du logger (Logback) qui fait le taf
+* l'intégration facile du logger à notre code (annotation groovy Slf4j)
 
 Pour les utiliser, c'est super simple :
 
-- on va ajouter les dépendances Slf4j et Logback à notre `build.gradle`
-- on va importer l'annotation groovy @Slf4j dans nos fichiers
-- on applique l'annotation à toutes les classes où on veut logger
+* on va ajouter les dépendances Slf4j et Logback à notre `build.gradle`
+* on va importer l'annotation groovy @Slf4j dans nos fichiers
+* on applique l'annotation à toutes les classes où on veut logger
 
 Simple non ? On y va !
 
@@ -706,10 +710,10 @@ Pour rappel, on a retrouvé les groupes, les noms, et les versions pour construi
 
 Ensuite, dans notre script principal :
 
-- on définit une classe "bidon"
-- on définit la classe comme "loggueuse" à l'aide de l'annotation
-- l'annotation injectera un logger dans la classe
-- on utilise le logger pour logguer un message d'info
+* on définit une classe "bidon"
+* on définit la classe comme "loggueuse" à l'aide de l'annotation
+* l'annotation injectera un logger dans la classe
+* on utilise le logger pour logguer un message d'info
 
 Ça donne ça :
 
@@ -729,11 +733,11 @@ Ensuite, dans notre script principal :
 
 Ici, le simple fait d'avoir mis l'annotation, va avoir pour effet :
 
-- un logger dont le nom est celui de la classe va être créé
-- il sera  injecté dans la classe en tant que membre de classe nommé `log`
-- chaque message qu'on lui envoie sera formaté "proprement" et affiché
+* un logger dont le nom est celui de la classe va être créé
+* il sera  injecté dans la classe en tant que membre de classe nommé `log`
+* chaque message qu'on lui envoie sera formaté "proprement" et affiché
 
-*Rappel : toujours dans une logique de simplification, le mot clé `this` semble optionnel en groovy lorsqu'on souhaite accéder aux membres d'une classe depuis celle-ci, quand ça n'est pas ambigü :
+*Rappel* : _toujours dans une logique de simplification, le mot clé `this` semble optionnel en groovy lorsqu'on souhaite accéder aux membres d'une classe depuis celle-ci, quand ça n'est pas ambigü_ :
 
 Donc d'après ci-dessous, on écrit plutôt le premier que le deuxième
 
@@ -766,19 +770,19 @@ IDEA est une interface de développement intégrée (comme Eclipse, Visual Studi
 
 On l'installe :
 
-- link:https://www.jetbrains.com/idea/[télécharger] IDEA d'Intellij
-- décompresser dans son $HOME
-- lancer avec `bin/idea.sh`
+* link:https://www.jetbrains.com/idea/[télécharger] IDEA d'Intellij
+* décompresser dans son $HOME
+* lancer avec `bin/idea.sh`
 
 IDEA peut interagir avec nos projets Gradle/Groovy de deux manières :
 
-- en utilisant les fichiers "idea" générés par gradle
-- en important le fichier build.gradle
+* en utilisant les fichiers "idea" générés par gradle
+* en important le fichier build.gradle
 
 Dans les faits, on utilisera les deux :
 
-- on "ouvrira" le projet en utilisant les fichiers idea générés par gradle
-- on "importera" le projet en utilisant le fichier `build.gradle`
+* on "ouvrira" le projet en utilisant les fichiers idea générés par gradle
+* on "importera" le projet en utilisant le fichier `build.gradle`
 
 Tout d'abord, on va générer les fichiers de projets pour IDEA. On commence par ajouter le plugin 'idea' au fichier `build.gradle` :
 
@@ -802,7 +806,7 @@ Ensuite on génèrera les fichiers concernés :
 
 Il télécharge le nécessaire et créé trois fichiers.
 
-*Remarque : on voit qu'il a téléchargé la variante '-all' de groovy, telle qu'on la définie dans les dépendances. Il existe deux variantes '-bin' et '-all', et la variante '-all' est plus utile dans le cas où on utilise un IDE, car elle permet d'avoir l'autocomplétion complète.*
+*Remarque* : _on voit qu'il a téléchargé la variante '-all' de groovy, telle qu'on la définie dans les dépendances. Il existe deux variantes '-bin' et '-all', et la variante '-all' est plus utile dans le cas où on utilise un IDE, car elle permet d'avoir l'autocomplétion complète_.
 
 Il utilise le nom du projet (cf `settings.gradle`) pour nommer les fichiers :
 
@@ -827,11 +831,11 @@ On constate une première fenêtre pop-up, qui nous dit un truc du genre :
 
 On s'empressera de cliquer le lien ! On choisira :
 
-- `Use auto-import`
-- `Create directories for empty content roots automatically`
-- `Create separate module per source set`
-- `Use default gradle wrapper`
-- on confirmera par `OK`
+* `Use auto-import`
+* `Create directories for empty content roots automatically`
+* `Create separate module per source set`
+* `Use default gradle wrapper`
+* on confirmera par `OK`
 
 Si vous avez loupé le lien pour importer le projet gradle et que vous ne le retrouvez plus, allez dans `File` / `New` / `Files from existing sources` / `Import project from external model` / `Gradle` puis on fait la liste ci-dessus.
 
@@ -839,10 +843,10 @@ L'import du projet `build.gradle` déclenche l'activation de la fenêtre accessi
 
 On y retrouve :
 
-- toutes les tâches du projet
-- toutes les propriétés du projet
-- les sourceSets et les dépendances
-- la possibilité de lancer une tâche à la main
+* toutes les tâches du projet
+* toutes les propriétés du projet
+* les sourceSets et les dépendances
+* la possibilité de lancer une tâche à la main
 
 La link:https://www.jetbrains.com/help/idea/2016.2/gradle-tool-window.html[documentation] est disponible sur le site de l'éditeur.
 

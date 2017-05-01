@@ -3,6 +3,8 @@ layout: post
 title:  Gestionnaire de mots de passe
 tags: sécurité internet mot-de-passe
 ---
+:toc:
+:toc-title: Table des matières
 
 Pourquoi faire ce billet ?
 
@@ -24,9 +26,9 @@ Bref. Pour vos comptes sur internet, il existe une solution extrêmement efficac
 
 Si vous ne deviez retenir que ça, ce sont ces trois points :
 
-- utilisez un link:http://keepass.info[gestionnaire de mots de passe]
-- utilisez le pour avoir des mot de passe différent pour chaque site
-- utilisez le pour générer des password sécurisés (aléatoires, complexes et longs)
+* utilisez un link:http://keepass.info[gestionnaire de mots de passe]
+* utilisez le pour avoir des mot de passe différent pour chaque site
+* utilisez le pour générer des password sécurisés (aléatoires, complexes et longs)
 
 *Franchement, faites le vraiment, là tout de suite, c'est pour votre bien*.
 
@@ -37,18 +39,19 @@ Sinon, le jour où vous vous ferez avoir, la déception sera link:http://www.wir
 Chaque internaute link:https://www.microsoft.com/en-us/research/publication/a-large-scale-study-of-web-password-habits/[possède] en moyenne *25 comptes en ligne*, mais on utilise en moyenne que *6.5 mots de passe* pour ces 25 comptes. Pourquoi ? Parce qu'on a tendance à choisir des mots de passe mémorisables et qu'on réutilise souvent tout ou partie des password utilisés ailleurs.
 
 D'autre part, la réalité du terrain montre que les sites web se font régulièrement hacker et des millions de mots de passe sont publiés à chaque fois :
-- link:http://en.wikipedia.org/wiki/PlayStation_Network_outage[Sony PSN] : 77 millions de comptes
-- link:http://arstechnica.com/security/2013/04/why-livingsocials-50-million-password-breach-is-graver-than-you-may-think/[LivingSocial] : 50 millions de comptes
-- link:http://arstechnica.com/security/2013/03/evernote-resets-all-user-passwords-after-coordinated-breach-attempt/[Evernote] : 50 millions de comptes
-- link:http://arstechnica.com/security/2010/01/32-million-passwords-show-most-users-careless-about-security/[RockYou] : 32 millions de comptes
-- link:http://arstechnica.com/security/2013/03/dating-site-zoosk-resets-some-user-accounts-following-password-dump/[Zoosk] : 29 millions de comptes
-- link:http://arstechnica.com/security/2012/06/8-million-leaked-passwords-connected-to-linkedin/[LinkedIn] : 6.5 millions de comptes
-- link:http://www.theregister.co.uk/2010/12/13/gawker_hacked/[Gawker] : 1.3 millions de comptes
-- link:http://news.cnet.com/8301-1009_3-57471178-83/yahoos-password-leak-what-you-need-to-know-faq/[Yahoo] : 450 000 comptes
-- link:http://arstechnica.com/security/2013/02/twitter-detects-and-shuts-down-password-data-hack-in-progress/[Twitter] : 250 000 comptes
-- link:http://www.ehackingnews.com/2012/11/security-breach-hits-amazoncouk-628.html[Amazon] : 628 comptes
-- link:http://www.inquisitr.com/398517/skype-security-breach-forces-microsoft-to-suspend-password-resets/[Skype] : récupération de compte à volonté
-- link:http://www.cryptzone.com/news/article.aspx?category=Email-security&title=Google-reveals-data-security-breach-on-Gmail&id=800565910[Google] : écoute des correspondances
+
+* link:http://en.wikipedia.org/wiki/PlayStation_Network_outage[Sony PSN] : 77 millions de comptes
+* link:http://arstechnica.com/security/2013/04/why-livingsocials-50-million-password-breach-is-graver-than-you-may-think/[LivingSocial] : 50 millions de comptes
+* link:http://arstechnica.com/security/2013/03/evernote-resets-all-user-passwords-after-coordinated-breach-attempt/[Evernote] : 50 millions de comptes
+* link:http://arstechnica.com/security/2010/01/32-million-passwords-show-most-users-careless-about-security/[RockYou] : 32 millions de comptes
+* link:http://arstechnica.com/security/2013/03/dating-site-zoosk-resets-some-user-accounts-following-password-dump/[Zoosk] : 29 millions de comptes
+* link:http://arstechnica.com/security/2012/06/8-million-leaked-passwords-connected-to-linkedin/[LinkedIn] : 6.5 millions de comptes
+* link:http://www.theregister.co.uk/2010/12/13/gawker_hacked/[Gawker] : 1.3 millions de comptes
+* link:http://news.cnet.com/8301-1009_3-57471178-83/yahoos-password-leak-what-you-need-to-know-faq/[Yahoo] : 450 000 comptes
+* link:http://arstechnica.com/security/2013/02/twitter-detects-and-shuts-down-password-data-hack-in-progress/[Twitter] : 250 000 comptes
+* link:http://www.ehackingnews.com/2012/11/security-breach-hits-amazoncouk-628.html[Amazon] : 628 comptes
+* link:http://www.inquisitr.com/398517/skype-security-breach-forces-microsoft-to-suspend-password-resets/[Skype] : récupération de compte à volonté
+* link:http://www.cryptzone.com/news/article.aspx?category=Email-security&title=Google-reveals-data-security-breach-on-Gmail&id=800565910[Google] : écoute des correspondances
 
 D'après vous, est ce que les mots de passe `momof3g8kids`, `qeadzcwrsfxv1331`, `k1araj0hns0n`, `Apr!l221973`, `Qbesancon321`, et `tmdmmj17` sont des mots de passe sécurisés ?
 
@@ -62,7 +65,7 @@ Mais malheureusement il indique aussi que les autres mots de passe sont "forts" 
 
 C'est ce qu'ils utilisent pour arriver à cracker 70-90% des mots de passe récupérés, après ils arrêtent car ça n'est plus "rentable".
 
-La morale ? Un bon mot de passe doit être *aléatoire* (et long et complexe), c'est la seule chose qui permet de garantir de faire partie des ~10-30% qui n'ont pas été crackés rapidement.
+La morale ? Un bon mot de passe doit être *aléatoire* (et long et complexe), c'est la seule chose qui permet de garantir de faire partie des 10-30% qui n'ont pas été crackés rapidement.
 
 == Pourquoi je suis vraiment concerné
 
@@ -89,6 +92,7 @@ Il sera vous, mais il fera ce qu'il veut.
 == Réagissons !
 
 Sécuriser sa vie numérique tient en 5 points :
+
 1. utiliser un gestionnaire de mot de passe sécurisés
 2. protéger sa messagerie, car c'est la clé de voute de votre vie numérique
 3. faire l'inventaire de tous vos comptes en ligne
@@ -104,11 +108,12 @@ Pourquoi ne pas simplement utiliser le gestionnaire de mots de passe de votre na
 J'ai commencé par le choix d'un outil de gestion de mots de passe : link:http://keepass.info[KeePass]. Il est multi-plateforme vu qu'il est écrit en link:http://en.wikipedia.org/wiki/C_Sharp_(programming_language[C#] et il existe une version portable, ce qui permet de l'avoir toujours avec soi sur une clé USB. Et il est disponible en français.
 
 Primo-configuration :
-- lancer le logiciel
-- créer une nouvelle base de donnée
-- choisir et confirmer un mot de passe maître
-- aller dans l'onglet "Securité" et cliquer le lien bleu "Délai 1 seconde"
-- terminer en cliquant ok.
+
+* lancer le logiciel
+* créer une nouvelle base de donnée
+* choisir et confirmer un mot de passe maître
+* aller dans l'onglet "Securité" et cliquer le lien bleu "Délai 1 seconde"
+* terminer en cliquant ok.
 
 *Ne chochez pas "utilisez le compte windows", car sinon vous serez emmerdés quand vous serez en déplacement sur un autre windows, ou si vous vous retrouvez temporairement sur un macintosh ou un linux.*
 
@@ -139,14 +144,15 @@ A cet inventaire initial, j'ai prévu d'ajouter toutes les autres infos à ma po
 === Mise à jour de vos mots de passe
 
 Pour chacun des sites de votre inventaire dans le répertoire "todo" :
-- aller sur le site
-- copier-coller l'adresse du site dans le champs URL de keepass
-- tenter de se connecter avec vos identifiants connus
-- si vous ne les connaissez plus, faite une "récupération de mot de passe"
-- copier-coller l'identifiant dans le champs idoine de keepass
-- connectez vous au site, cherchez la fonction "changer de mot de passe"
-- utilisez le mot de passe donné par keepass comme nouveau password
-- enregistrer les modifications dans Keepass après chaque site concerné
+
+* aller sur le site
+* copier-coller l'adresse du site dans le champs URL de keepass
+* tenter de se connecter avec vos identifiants connus
+* si vous ne les connaissez plus, faite une "récupération de mot de passe"
+* copier-coller l'identifiant dans le champs idoine de keepass
+* connectez vous au site, cherchez la fonction "changer de mot de passe"
+* utilisez le mot de passe donné par keepass comme nouveau password
+* enregistrer les modifications dans Keepass après chaque site concerné
 
 Si le site *ne permet pas du tout* de changer son mot de passe (j'en ai eu 11 sur 165)  il faut remplacer dans l'outil le mot de passe généré, par celui que vous utilisez réellement. Et pour identifier aisément ces sites "mauvais élèves", changez l'icone pour un truc style "panneau avertissement".
 
@@ -159,10 +165,11 @@ Ce travail fastidieux n'est à faire qu'une fois. Après c'est que du bonheur.
 === Conclusions
 
 Maintenant que je l'ai fait, quelques statistiques :
-- 42 comptes utilisaient exactement le même mot de passe
-- 97 comptes avaient une variations minime de ce même mot de passe
-- 25 avaient conservé le mot de passe par défaut fourni lors de l'inscription
-- 1 seul mot de passe était "robuste" (mais mémorisable donc "pas parfait")
+
+* 42 comptes utilisaient exactement le même mot de passe
+* 97 comptes avaient une variations minime de ce même mot de passe
+* 25 avaient conservé le mot de passe par défaut fourni lors de l'inscription
+* 1 seul mot de passe était "robuste" (mais mémorisable donc "pas parfait")
 
 Et de tous ceux-ci, le seul mot de passe solide était `zjelp3agy9`, ce qui n'est pas un "bon" mot de passe, mais qui reste mémorisable ... et devinez à quoi il servait ? A ma messagerie Google.
 
@@ -171,16 +178,18 @@ Oui, ça veut dire que le mot de passe de mon compte Paypal n'était pas "bon". 
 Pourtant, je connais les implications de ces mauvais choix de mots de passe, puisque je tente de vous les expliquer ici. Mais pendant des années, je n'ai pas fait l'effort de passer par dessus ma flemme. J'ai eu de la chance de ne pas avoir eu de problèmes entre temps ... Ou alors j'ai eu des problèmes mais je ne m'en suis jamais rendu compte !
 
 Mais tout ça c'est du passé, car maintenant :
-- je sais exactement où j'ai des comptes en ligne
-- j'ai un mot de passe différent pour chaque compte
-- j'ai un mot de passe solide pour chaque compte
+
+* je sais exactement où j'ai des comptes en ligne
+* j'ai un mot de passe différent pour chaque compte
+* j'ai un mot de passe solide pour chaque compte
 
 Pour les choses vraiment importantes (mes comptes de messagerie) ou pour tout ce qui donne accès à mon argent (Paypal, Amazon 1-click, Battle.net, etc) j'ai augmenté la qualité du mot de passe pour atteindre 300+ bits d'entropie. Pourquoi ? Parce que ça coûte rien, et que ces sites le permettent, contrairement à la majorité des autres standards.
 
 Ca m'aura coûté 10 heures pour appliquer cette méthode et réaliser le travail de modification initial, mais dorénavant je peux être serein. En effet :
-- si un site web sur lequel je suis enregistré se fait attaquer, le fait d'avoir un mot de passe complexe me permet de ne pas faire partie des comptes les plus rapidement crackés quand un site est corrompu
-- si un site web sur lequel je suis enregistré se fait attaquer, et que mon mot de passe est effectivement cracké, il ne sera d'aucune utilité à l'attaquant pour tenter de prendre le contrôle d'un autre compte qui m'appartient
-- je n'ai plus besoin de me rappeler tous mes mots de passe, ni de se souvenir si c'était `Sardines`, `$4rd1n35` ou `sardine0123*`. Je ne dois mémoriser qu'un seul et unique mot de passe.
+
+* si un site web sur lequel je suis enregistré se fait attaquer, le fait d'avoir un mot de passe complexe me permet de ne pas faire partie des comptes les plus rapidement crackés quand un site est corrompu
+* si un site web sur lequel je suis enregistré se fait attaquer, et que mon mot de passe est effectivement cracké, il ne sera d'aucune utilité à l'attaquant pour tenter de prendre le contrôle d'un autre compte qui m'appartient
+* je n'ai plus besoin de me rappeler tous mes mots de passe, ni de se souvenir si c'était `Sardines`, `$4rd1n35` ou `sardine0123*`. Je ne dois mémoriser qu'un seul et unique mot de passe.
 
 *Bref, je sais maintenant que dans la savane numérique, je cours plus vite que les autres, et que le lion attrapera quelqu'un d'autre avant moi...*
 
@@ -191,13 +200,14 @@ Debian "stable" (wheezy) inclus `xdotool` en version `1:2.20100701.2961-3+deb7u3
 On va donc configurer notre distribution pour être "hybride" : par défaut tous les paquets seront ceux de stable et seront gérés comme tel pour les upgrades, mais on permet aussi l'installation ou l'upgrade de paquets issus de testing, qui seront mis à jour comme tels.
 
 Pour ce faire :
-- éditer le fichier `/etc/apt/apt.conf`
-- ajouter la ligne `APT::Default-Release "wheezy";`
-- éditer le fichier `/etc/apt/sources.list`
-- dupliquer toutes les lignes présentes
-- remplacer `wheezy` par `jessie` dans ces nouvelles lignes
-- effacer les lignes qui contiendraient éventuellement `jessie-updates`
-- sauvegarder et lancer un `sudo aptitude update`
+
+* éditer le fichier `/etc/apt/apt.conf`
+* ajouter la ligne `APT::Default-Release "wheezy";`
+* éditer le fichier `/etc/apt/sources.list`
+* dupliquer toutes les lignes présentes
+* remplacer `wheezy` par `jessie` dans ces nouvelles lignes
+* effacer les lignes qui contiendraient éventuellement `jessie-updates`
+* sauvegarder et lancer un `sudo aptitude update`
 
 Finalement mettre à jour `xdotool` via `sudo aptitude upgrade -t jessie xdotool`.
 

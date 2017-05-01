@@ -3,6 +3,8 @@ layout: post
 title: Renouvellement certificats serveurs (Heartbleed & annuel)
 tags: serveur ssl
 ---
+:toc:
+:toc-title: Table des matières
 
 En avril dernier la librairie OpenSSL a subit la catastrophique faille link:http://heartbleed.com[Heartbleed].
 
@@ -13,8 +15,9 @@ Outre les "autres failles" (link:https://www.openssl.org/news/vulnerabilities.ht
 La faille permet à un attaquant de récupérer la clé privée du certificat serveur.
 
 Qu'est ce que ça signifie ?
-- que notre serveur n'est plus le seul au monde à pouvoir se présenter sous le nom "nipil.org" et être reconnu de manière absolue comme "nous"
-- que n'importe qui (employeur, FAI, hébergeur, wifi ouvert, etc) ayant pu enregistrer tout ou partie du traffic peut déchiffrer tout le trafic passé (ie pas de Perfect Forward Secrecy par défaut)
+
+* que notre serveur n'est plus le seul au monde à pouvoir se présenter sous le nom "nipil.org" et être reconnu de manière absolue comme "nous"
+* que n'importe qui (employeur, FAI, hébergeur, wifi ouvert, etc) ayant pu enregistrer tout ou partie du traffic peut déchiffrer tout le trafic passé (ie pas de Perfect Forward Secrecy par défaut)
 
 En résumé, le pire du pire est arrivé, et il faut faire du "damage control" additionnel après avoir mis à jour la librairie OpenSSL de nos machines/VM : renouveler nos clés privées et nos certificats.
 
@@ -25,15 +28,16 @@ Commençons déjà par regarder dans quelle mesure on est concernés. Il s'agit 
 	apt-cache rdepends openssl | grep  '^ ' | xargs dpkg -l 2>/dev/null | grep '^ii'
 
 Dans la liste, on recherche les "serveurs", et on trouve en vrac :
-- exim4-base (envoi/réception email)
-- lighttpd (serveur web)
-- openvpn (tunnel crypto SSL)
-- dovecot (consultation email)
-- bind9-host (résolution de noms)
-- openssh-server (administration à distance)
-- transmission-daemon (partage peer-to-peer)
-- ntp (synchronisation d'horloge)
-- freeradius + racoon (tunnel crypto IPSEC)
+
+* exim4-base (envoi/réception email)
+* lighttpd (serveur web)
+* openvpn (tunnel crypto SSL)
+* dovecot (consultation email)
+* bind9-host (résolution de noms)
+* openssh-server (administration à distance)
+* transmission-daemon (partage peer-to-peer)
+* ntp (synchronisation d'horloge)
+* freeradius + racoon (tunnel crypto IPSEC)
 
 Tous ces serveurs utilisent donc la librairie OpenSSL. Trois d'entre eux ont été configurés pour utiliser un certificat "reconnu" sur nos machines (exim/dovecot/lighttpd). On doit donc renouveler le certificat de chaque machine
 
@@ -42,6 +46,7 @@ A noter que je n'ai pas révoqué mes certificats car d'une part c'est payant, d
 == Renouvellement des certificats auprès de StartSSL
 
 J'utilise les services gratuits de StartSSL, et comme beaucoup de services fournissant des certificats, il existe deux méthodes pour en créer un :
+
 1. générer la clé privée *sur notre propre serveur*, puis générer une requête de signature de certificat (CSR) puis faire signer cette CSR par le fournisseur, qui nous donne ensuite un certificat "nu" (ie sans clé privée)
 2. faire générer la clé privée *sur le site du fournisseur*, puis récupérer un certificat "complet" contenant aussi la clé privée.
 
@@ -123,15 +128,16 @@ On va maintenant envoyer ces informations au fournisseur de certificats
 === Génération du certificat
 
 Se connecter au panneau de contrôle StartSSL, et d'abord valider le domaine si ça n'a pas encore été fait. Ensuite :
-- Cliquer dans "Certificates Wizard"
-- Sélectionner "Web Server SSL/TLS Certificate"
-- Cliquer "Skip" comme on a généré une clé et une CSR
-- copier-coller le bloc de texte de la CSR (de *begin certificate request* à *end certificate request* inclus)
-- si pas de message d'erreur, alors on continue
-- sélectionner le domaine du certificat (pour moi, nipil.org) puis "continue"
-- entrer le nom de l'hôte du serveur (par exemple fantasio.nipil.org)
-- vérifier les information, et confirmer
-- copier-coller le bloc de texte (de *begin certificate* à *end certificate* inclus) dans un fichier `fantasio.crt` sur notre serveur
+
+* Cliquer dans "Certificates Wizard"
+* Sélectionner "Web Server SSL/TLS Certificate"
+* Cliquer "Skip" comme on a généré une clé et une CSR
+* copier-coller le bloc de texte de la CSR (de *begin certificate request* à *end certificate request* inclus)
+* si pas de message d'erreur, alors on continue
+* sélectionner le domaine du certificat (pour moi, nipil.org) puis "continue"
+* entrer le nom de l'hôte du serveur (par exemple fantasio.nipil.org)
+* vérifier les information, et confirmer
+* copier-coller le bloc de texte (de *begin certificate* à *end certificate* inclus) dans un fichier `fantasio.crt` sur notre serveur
 
 Consulter les informations du certificat généré par StartSSL
 
@@ -264,11 +270,12 @@ On place un lien vers la clé privée dans le répertoire de lighttpd
 	ln -s /root/certs/fantasio-2014-06-10T15\:47\:27.key /etc/lighttpd/server.pem
 
 Si ça n'a pas déjà été fait par le passé, activer le SSL au niveau de lighttpd
-- éditer le fichier `/etc/lighttpd/conf-available/10-ssl.conf`
-- localiser la ligne `ssl.pemfile = "/etc/lighttpd/server.pem"`
-- ajouter en dessous la ligne `ssl.ca-file = "/etc/lighttpd/authority.pem"`
-- sauvegarder les modifications et quitter l'éditeur
-- activer la configuration via `lighty-enable-mod ssl`
+
+* éditer le fichier `/etc/lighttpd/conf-available/10-ssl.conf`
+* localiser la ligne `ssl.pemfile = "/etc/lighttpd/server.pem"`
+* ajouter en dessous la ligne `ssl.ca-file = "/etc/lighttpd/authority.pem"`
+* sauvegarder les modifications et quitter l'éditeur
+* activer la configuration via `lighty-enable-mod ssl`
 
 On recharge la configuration de lighttpd (`/var/log/lighttpd/error.log` en cas de besoin)
 
@@ -324,6 +331,3 @@ Maintenant, tous les relais qui voudraient nous envoyer des emails choisiront l'
 Il est possible de "refuser" catégoriquement la transmission en clair quand TLS n'est pas supporté, mais ça dépendra de votre contexte : refuser de recevoir des emails non chiffrés vous empêchera d'envoyer/recevoir des mails vers/depuis certaines destinations... Bref vous risquez de "perdre des mails" !
 
 A vous de voir si ça vous convient, il n'y a malheureusement pas de solution miracle pour le chiffrement des emails.
-
-
-

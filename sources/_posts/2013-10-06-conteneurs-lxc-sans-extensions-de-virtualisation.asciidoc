@@ -3,6 +3,8 @@ layout: post
 title:  Conteneurs LXC sans extension de virtualisation
 tags: server linux debian ovh
 ---
+:toc:
+:toc-title: Table des matières
 
 La virtualisation est utile pour isoler ou mutualiser des choses entre elles. Il existe plusieurs technologies pour faire de la virtualisation sous Linux. Chacune a ses spécificités, mais il y a quand même deux types principale : celles qui nécessitent les extensions CPU de virtualisation (KVM, QEmu, VMware...) et celles qui n'en ont pas besoin (OpenVZ, LXC...)
 
@@ -11,20 +13,22 @@ Ces extensions sont disponibles sur toutes les machines récentes, mais pas sur 
 == Isoler pour mieux rêgner
 
 Mais même sur ces petites machines on ne fait pas de virtualisation pour "rentabiliser" les ressources matérielles, elles sont néamoins super utiles :
-- pour isoler une application seule (un apache par exemple) pour éviter que la corruption d'une d'elles permette de corrompre tout le système
-- pour segmenter la partie "réseau", car chaque guest/conteneur a sa propre table de routage
-- voire même les deux en même temps !
+
+* pour isoler une application seule (un apache par exemple) pour éviter que la corruption d'une d'elles permette de corrompre tout le système
+* pour segmenter la partie "réseau", car chaque guest/conteneur a sa propre table de routage
+* voire même les deux en même temps !
 
 Sous debian, deux possibilités dans ce cas : OpenVZ et LXC. Or depuis la dernière release (wheezy/7) OpenVZ n'est plus supporté par Debian, même s'il reste tout à fait possible de l'utiliser via les kernels spécifiques générés par link:http://download.openvz.org/debian/[OpenVZ] et ne reste donc que la solution LXC.
 
-**Update 2013-10-17** : Je viens de découvrir qu'OpenVZ link:https://blog.ipredator.se/2013/06/why-data-collection-should-be-opt-in-and-not-opt-out.html[collecte des infos internes de vos serveurs] sans demander votre avis, et en envoyant en plus tout ça en clair, et à une machine située aus USA... Je n'ai jamais utilisé OpenVZ, donc je ne sais pas si Debian pose la question concernant les stats. Dans le doute, gare à vous selon ce que vous répondez, et attention si vous utilisez une distrib qui de toute façon ne pose pas de questions lors de l'install.
+*Update 2013-10-17* : Je viens de découvrir qu'OpenVZ link:https://blog.ipredator.se/2013/06/why-data-collection-should-be-opt-in-and-not-opt-out.html[collecte des infos internes de vos serveurs] sans demander votre avis, et en envoyant en plus tout ça en clair, et à une machine située aus USA... Je n'ai jamais utilisé OpenVZ, donc je ne sais pas si Debian pose la question concernant les stats. Dans le doute, gare à vous selon ce que vous répondez, et attention si vous utilisez une distrib qui de toute façon ne pose pas de questions lors de l'install.
 
 Les link:http://lxc.sourceforge.net/[LXC] sont appelés "link:http://en.wikipedia.org/wiki/Linux_Containers[Linux Containers]" et permettent de faire tourner des applications ou un OS complet dans un conteneur isolé du reste du système, tant sur l'utilisation de la mémoire, du CPU, du dique etc, tout en conservant côté hôte le contrôle et la limitation des ressources utilisées.
 
 On aura quelques problèmes annexes à résoudre en chemin :
-- Debian a décidé de ne pas inclure par défaut le point de montages des link:http://en.wikipedia.org/wiki/Cgroups[groupe de contrôle] et il faudra qu'on le monte nous même
-- il y a un bug dans les scripts Debian (utilisation du paquet `live-debconfig` qui n'existe pas dans wheezy) : on va soit récupérer le script de jessie/testing pour l'utiliser dans wheezy/stable, ou installer directement le paquet LXC de jessie/testing (c'est ce que je préfère faire)
-- si on est pas sur un kernel Debian standard, et par exemple sur un KS2G chez l'hébergeur OVH, il se peut qu'ils n'aient pas activé toutes les extensions nécessaires et qu'on doive recompiler le kernel
+
+* Debian a décidé de ne pas inclure par défaut le point de montages des link:http://en.wikipedia.org/wiki/Cgroups[groupe de contrôle] et il faudra qu'on le monte nous même
+* il y a un bug dans les scripts Debian (utilisation du paquet `live-debconfig` qui n'existe pas dans wheezy) : on va soit récupérer le script de jessie/testing pour l'utiliser dans wheezy/stable, ou installer directement le paquet LXC de jessie/testing (c'est ce que je préfère faire)
+* si on est pas sur un kernel Debian standard, et par exemple sur un KS2G chez l'hébergeur OVH, il se peut qu'ils n'aient pas activé toutes les extensions nécessaires et qu'on doive recompiler le kernel
 
 Mais on verra ça en temps voulu.
 
@@ -215,13 +219,14 @@ Et si jamais on devait recommencer le tout, au lieu de lancer le `make menuconfi
 	patch .config < ../config-3.10.9-xxxx-grs-ipv6-64-lxc.patch
 
 Bref, en synthèse les changements qu'on a réalisés dans la config sont les suivants :
-- `CONFIG_CGROUP_SCHED` + `CONFIG_FAIR_GROUP_SCHED`
-- `CONFIG_PID_NS`
-- `CONFIG_USER_NS` + `CONFIG_UIDGID_CONVERTED` + `CONFIG_UIDGID_STRICT_TYPE_CHECKS`
-- `CONFIG_MACVLAN` + `CONFIG_MACVTAP`
-- `CONFIG_VETH`
-- `CONFIG_DEVPTS_MULTIPLE_INSTANCES`
-- et bien sûr la suppression d'XFS mais que j'utilise pas de toute façon
+
+* `CONFIG_CGROUP_SCHED` + `CONFIG_FAIR_GROUP_SCHED`
+* `CONFIG_PID_NS`
+* `CONFIG_USER_NS` + `CONFIG_UIDGID_CONVERTED` + `CONFIG_UIDGID_STRICT_TYPE_CHECKS`
+* `CONFIG_MACVLAN` + `CONFIG_MACVTAP`
+* `CONFIG_VETH`
+* `CONFIG_DEVPTS_MULTIPLE_INSTANCES`
+* et bien sûr la suppression d'XFS mais que j'utilise pas de toute façon
 
 A noter que les extensions `CONFIG_CGROUP_MEM_RES_CTLR` ont été renommées à partir du kernel 3.6 en `CONFIG_MEMCG`, qui sont d'ailleurs activées par défaut dans le kernel 3.10.9
 
@@ -230,9 +235,10 @@ Au final on lance la compilation (ça m'a pris 75 minutes sur un KS2G qui ne fai
 	time nice make KDEB_PKGVERSION=1.0 deb-pkg
 
 On obtient 3 fichiers dans le répertoire **parent** du répertoire courant
-- (8,3M) `linux-headers-3.10.9-grsec-xxxx-grs-ipv6-64-lxc_1.0_amd64.deb`
-- (7,4M) `linux-image-3.10.9-grsec-xxxx-grs-ipv6-64-lxc_1.0_amd64.deb`
-- (924K) `linux-libc-dev_1.0_amd64.deb` (qu'on installera pas)
+
+* (8,3M) `linux-headers-3.10.9-grsec-xxxx-grs-ipv6-64-lxc_1.0_amd64.deb`
+* (7,4M) `linux-image-3.10.9-grsec-xxxx-grs-ipv6-64-lxc_1.0_amd64.deb`
+* (924K) `linux-libc-dev_1.0_amd64.deb` (qu'on installera pas)
 
 On installe ce kernel
 
@@ -264,29 +270,32 @@ On installe ce kernel
 
 On regarde quelle sera l'entrée choisie par défaut par grub, et la liste des kernels détectés
 
-	grep GRUB_DEFAULT /etc/default/grub
-	GRUB_DEFAULT=0
+----
+grep GRUB_DEFAULT /etc/default/grub
+GRUB_DEFAULT=0
 
-	egrep '(menuentry|BEGIN)' /boot/grub/grub.cfg
-	### BEGIN /etc/grub.d/00_header ###
-	### BEGIN /etc/grub.d/05_debian_theme ###
-	### BEGIN /etc/grub.d/06_OVHkernel ###
-	menuentry "Debian GNU/Linux, OVH kernel 3.10.9-xxxx-grs-ipv6-64" {
-	### BEGIN /etc/grub.d/10_linux ###
-	menuentry 'Debian GNU/Linux, with Linux 3.10.9-grsec-xxxx-grs-ipv6-64-lxc' --class debian --class gnu-linux --class gnu --class os {
-	menuentry 'Debian GNU/Linux, with Linux 3.10.9-grsec-xxxx-grs-ipv6-64-lxc (recovery mode)' --class debian --class gnu-linux --class gnu --class os {
-	### BEGIN /etc/grub.d/20_linux_xen ###
-	### BEGIN /etc/grub.d/30_os-prober ###
-	### BEGIN /etc/grub.d/40_custom ###
-	### BEGIN /etc/grub.d/41_custom ###
+egrep '(menuentry|BEGIN)' /boot/grub/grub.cfg
+### BEGIN /etc/grub.d/00_header ###
+### BEGIN /etc/grub.d/05_debian_theme ###
+### BEGIN /etc/grub.d/06_OVHkernel ###
+menuentry "Debian GNU/Linux, OVH kernel 3.10.9-xxxx-grs-ipv6-64" {
+### BEGIN /etc/grub.d/10_linux ###
+menuentry 'Debian GNU/Linux, with Linux 3.10.9-grsec-xxxx-grs-ipv6-64-lxc' --class debian --class gnu-linux --class gnu --class os {
+menuentry 'Debian GNU/Linux, with Linux 3.10.9-grsec-xxxx-grs-ipv6-64-lxc (recovery mode)' --class debian --class gnu-linux --class gnu --class os {
+### BEGIN /etc/grub.d/20_linux_xen ###
+### BEGIN /etc/grub.d/30_os-prober ###
+### BEGIN /etc/grub.d/40_custom ###
+### BEGIN /etc/grub.d/41_custom ###
+----
 
 Du coup ça veut dire qu'en l'état on rebooterait de toute façon sur le premier menu-entry, et donc sur le kernel OVH. Il faut donc qu'on change ça, ce qui peut être fait de deux manières :
+
 1. configurer `GRUB_DEFAULT=1` dans `/etc/default/grub` pour utiliser l'entrée numéro 1 (la 2ème `menuentry`, vu qu'elles sont numérotées en partant de zéro)
 2. changer l'ordre de priorité des différents templates (`06_OVHkernel`, `10_linux`, `20_linux_xen`, `30_os-prober`) pour que la partie "linux" soit avant la partie OVHKernel
 
 On pourrait penser que la solution 1 est la mieux, car moins intrusive. L'inconvénient c'est que lors de l'update d'un kernel, l'ajout ou la suppression, on pourrait booter sur "la mauvaise". Mais comme ça n'arrive pas souvent (et encore moins automatiquement) de changer de kernel, avec des précautions et vérifications il n'y a pas de risque réel.
 
-A titre personnel je préfère la méthode 2), car elle permet que la machine boot en priorité sur les kernels "perso" plutôt que le kernel OVH. Et s'il n'y a aucun plus aucun "perso", elle booter d'office sur le kernel OVH, sans avoir à modifier `/etc/default/grub`à chaque fois.
+A titre personnel je préfère la méthode 2), car elle permet que la machine boot en priorité sur les kernels "perso" plutôt que le kernel OVH. Et s'il n'y a aucun plus aucun "perso", elle booter d'office sur le kernel OVH, sans avoir à modifier `/etc/default/grub` à chaque fois.
 
 	mv /etc/grub.d/06_OVHkernel /etc/grub.d/16_OVHkernel
 
@@ -298,21 +307,23 @@ A titre personnel je préfère la méthode 2), car elle permet que la machine bo
 
 L'autre avantage est que par un simple changement dans le manager OVH (et non sur la machine), je peux booter sur le kernel OVH par netboot, et en local sur le kernel modifié : si il y a un problème, pas besoin de passer en recovery, un simple boot netboot suffira.
 
-	egrep '(menuentry|BEGIN)' /boot/grub/grub.cfg
-	### BEGIN /etc/grub.d/00_header ###
-	### BEGIN /etc/grub.d/05_debian_theme ###
-	### BEGIN /etc/grub.d/10_linux ###
-	menuentry 'Debian GNU/Linux, with Linux 3.10.9-grsec-xxxx-grs-ipv6-64-lxc' --class debian --class gnu-linux --class gnu --class os {
-	menuentry 'Debian GNU/Linux, with Linux 3.10.9-grsec-xxxx-grs-ipv6-64-lxc (recovery mode)' --class debian --class gnu-linux --class gnu --class os {
-	### BEGIN /etc/grub.d/16_OVHkernel ###
-	menuentry "Debian GNU/Linux, OVH kernel 3.10.9-xxxx-grs-ipv6-64" {
-	### BEGIN /etc/grub.d/20_linux_xen ###
-	### BEGIN /etc/grub.d/30_os-prober ###
-	### BEGIN /etc/grub.d/40_custom ###
-	### BEGIN /etc/grub.d/41_custom ###
+----
+egrep '(menuentry|BEGIN)' /boot/grub/grub.cfg
+### BEGIN /etc/grub.d/00_header ###
+### BEGIN /etc/grub.d/05_debian_theme ###
+### BEGIN /etc/grub.d/10_linux ###
+menuentry 'Debian GNU/Linux, with Linux 3.10.9-grsec-xxxx-grs-ipv6-64-lxc' --class debian --class gnu-linux --class gnu --class os {
+menuentry 'Debian GNU/Linux, with Linux 3.10.9-grsec-xxxx-grs-ipv6-64-lxc (recovery mode)' --class debian --class gnu-linux --class gnu --class os {
+### BEGIN /etc/grub.d/16_OVHkernel ###
+menuentry "Debian GNU/Linux, OVH kernel 3.10.9-xxxx-grs-ipv6-64" {
+### BEGIN /etc/grub.d/20_linux_xen ###
+### BEGIN /etc/grub.d/30_os-prober ###
+### BEGIN /etc/grub.d/40_custom ###
+### BEGIN /etc/grub.d/41_custom ###
 
-	grep GRUB_DEFAULT /etc/default/grub
-	GRUB_DEFAULT=0
+grep GRUB_DEFAULT /etc/default/grub
+GRUB_DEFAULT=0
+----
 
 Et on est sur le "bon" kernel, donc on peut mainteant rebooter, en croisant les doigts, mais tout devrait être "bon", et après un reboot on devrait avoir `uname -r` qui donne `3.10.9-grsec-xxxx-grs-ipv6-64-lxc` et tout est donc OK !
 
@@ -332,7 +343,7 @@ Sinon, si un jour on voulait supprimer ce kernel spécifique :
 
 Mais il n'y a pas de raison réelles de le faire, si ce n'est économiser de la place (quelques dizaines de méga, tout au plus)
 
-## Vérification LXC du kernel OVH
+=== Vérification LXC du kernel OVH
 
 On a installé la version "stable" de LXC, qui est donc adaptée au kernel Debian, qui lui est en 3.2.0.
 
@@ -360,7 +371,7 @@ On a installé la version "stable" de LXC, qui est donc adaptée au kernel Debia
 	Vlan: enabled
 	File capabilities: enabled
 
-On retrouve "Cgroup namespace: `CONFIG_CGROUP_NS`missing" comme on a eu le "problème" plus haut pour le noyau Debian, on résoudra le soucis de la même manière, c'est à dire en montant le système de fichier `cgroup` dédié à cette fonction.
+On retrouve "Cgroup namespace: `CONFIG_CGROUP_NS` missing" comme on a eu le "problème" plus haut pour le noyau Debian, on résoudra le soucis de la même manière, c'est à dire en montant le système de fichier `cgroup` dédié à cette fonction.
 
 Reste le problème du "Cgroup memory controller: missing", alors qu'on avait bien les extensions mémoires et swap activées. L'explication est simple : la version de LXC de "stable" utilise un kernel inférieur à 3.6, et donc le script `lxc-checkconfig` recherche les extensions `CONFIG_CGROUP_MEM_RES_CTLR` au lieu de `CONFIG_MEMCG` qui est disponible dans notre kernel, et forcément il ne peut les trouver, vu qu'elles ont été renommées entre temps.
 
@@ -374,7 +385,7 @@ Et ensuite installer la version "testing" de LXC.
 
 	aptitude install lxc -t jessie -V
 	The following NEW packages will be installed:
-	libapparmor1{a} [2.8.0-1+b2]  libcap2-bin{a} [1:2.22-1.2]  libpam-cap{a} [1:2.22-1.2]  lxc [0.9.0~alpha3-2+deb8u1]
+	libapparmor1{a} [2.8.0-1+b2]  libcap2-bin{a} [1:2.22-1.2]  libpam-cap{a} [1:2.22-1.2]  lxc [0.9.0 alpha3-2+deb8u1]
 
 *BINGO*, maintenant `lxc-checkconfig` nous dit bien "enabled" partout !
 
@@ -405,6 +416,7 @@ Maintenant, on va montrer comment on peut configurer la partie réseau pour que 
 Pour donner accès aux machine virtuelles un pont (bridge) est d'abord créé pour collecter/transmettre les flux des guests/conteneurs, que ça soit pour les échanges entre eux ou pour les échanges vers l'extérieurs.
 
 Pour transmettre ensuite ces flux vers le reste du réseau, il y a deux méthodes :
+
 1. lier ce pont à l'interface physique réelle sur serveur, et les guests/conteneurs dialoguent directement de manière "externe", via la même gateway que l'hôte, et ils ont directement joignables
 2. donner une adresse à l'hôte sur ce pont, activer le routage sur l'hôte, et les guests/conteneurs dialoguent au travers de l'hôte, et doivent être nattés (en IPv4) pour être joints depuis l'extérieur
 
@@ -431,44 +443,47 @@ On commence par installer les outils préliminaires
 	aptitude install bridge-utils iptables
 
 On va créer une DMZ
-- elle sera numérotée "100"
-- elle aura pour adressage 192.168.100.0/24 pour l'IPv4
-- et 2xxx:xxxx:xxxx:xxxx::100:0/112 pour l'IPv6
+
+* elle sera numérotée "100"
+* elle aura pour adressage 192.168.100.0/24 pour l'IPv4
+* et 2xxx:xxxx:xxxx:xxxx::100:0/112 pour l'IPv6
 
 J'ai pris un /112 pour l'IPv6 alors qu'un /120 aurait suffit pour garder l'adéquation numérique du dernier octet du host, mais avec un /112 ça me permet de caser le numéro de la DMZ dans l'avant dernier bloc de l'adresse IPv6, mais aussi de noter 192.168.100.38 == 2xxx:xxxx:xxxx:xxxx::100:38 même si ça n'est pas "réellement" identique, car l'IPv6 est en hexa et 38d != 38h.
 
 On créé et on active sur l'hôte le bridge/pont qui permettra aux machines de la DMZ de causer entre elles et de joindre l'hôte qui servira de passerelle. On donne à l'hôte l'adresse "1" de chaque subnet rattaché à cette DMZ. Comme on va créer plusieurs DMZ plutôt que de laisser la possibilité aux conteneurs de dialoguer par le réseau sans filtrage, autant faire un script plutôt que des copier-collers à modifier. On l'appellera `dmz-create`, on le placera dans `/usr/local/sbin` et on fera un `chmod +x` dessus pour pouvoir l'exécuter
 
-	#!/bin/bash
+----
+#!/bin/bash
 
-	if [ -z $1 ]
-	then
-		exit
-	fi
+if [ -z $1 ]
+then
+	exit
+fi
 
-	cat <<EOF >> /etc/network/interfaces
+cat <<EOF >> /etc/network/interfaces
 
-	auto lxc-br-$1
-	iface lxc-br-$1 inet static
-		# bridge configuration
-		bridge_ports none
-		bridge_stp off
-		bridge_waitport 0
-		bridge_fd 0
-		# ipv4 config
-		address 192.168.$1.1
-		netmask 255.255.255.0
-		# ipv6 config
-		post-up /sbin/ip -f inet6 addr add 2xxx:xxxx:xxxx:xxxx::$1:1/112 dev lxc-br-$1
-		pre-down /sbin/ip -f inet6 addr del 2xxx:xxxx:xxxx:xxxx::$1:1/112 dev lxc-br-$1
+auto lxc-br-$1
+iface lxc-br-$1 inet static
+	# bridge configuration
+	bridge_ports none
+	bridge_stp off
+	bridge_waitport 0
+	bridge_fd 0
+	# ipv4 config
+	address 192.168.$1.1
+	netmask 255.255.255.0
+	# ipv6 config
+	post-up /sbin/ip -f inet6 addr add 2xxx:xxxx:xxxx:xxxx::$1:1/112 dev lxc-br-$1
+	pre-down /sbin/ip -f inet6 addr del 2xxx:xxxx:xxxx:xxxx::$1:1/112 dev lxc-br-$1
 
-	EOF
+EOF
 
-	echo "net eth0 detect tcpflags,nosmurfs,routefilter,logmartians" >> /etc/shorewall/interfaces
-	echo "net ipv4" >> /etc/shorewall/zones
+echo "net eth0 detect tcpflags,nosmurfs,routefilter,logmartians" >> /etc/shorewall/interfaces
+echo "net ipv4" >> /etc/shorewall/zones
 
-	echo "net eth0 detect tcpflags,nosmurfs" >> /etc/shorewall/interfaces
-	echo "net ipv6" >> /etc/shorewall/zones
+echo "net eth0 detect tcpflags,nosmurfs" >> /etc/shorewall/interfaces
+echo "net ipv6" >> /etc/shorewall/zones
+----
 
 Ensuite on peut créer des DMZ simplement `dmz-add NUMERO_DE_DMZ`
 
@@ -487,9 +502,10 @@ On recompile les règles des firewall IPv4/IPv6
 	shorewall restart
 	shorewall6 restart
 
-On a de quoi maintenant de quoi accueillir le réseau des guests. On pourrait passer l'étape suivante et se contenter de ce qu'on a en proxifiant au niveau de l'hôte tous les dialogues des guests (via proxy squid, et autres). Mais
-- ça ne serait pas sécuritaire car sur une gateway (l'hôte) on ne fait tourner que le minimum de services
-- ça ne serait pas satisfaisant car ça serait mieux que chaque guest ait une connectivité réseau complète
+On a de quoi maintenant de quoi accueillir le réseau des guests. On pourrait passer l'étape suivante et se contenter de ce qu'on a en proxifiant au niveau de l'hôte tous les dialogues des guests (via proxy squid, et autres). Mais :
+
+* ça ne serait pas sécuritaire car sur une gateway (l'hôte) on ne fait tourner que le minimum de services
+* ça ne serait pas satisfaisant car ça serait mieux que chaque guest ait une connectivité réseau complète
 
 On va donc travailler pour avoir un réseau direct, mais filtré, pour chaque guest.
 
@@ -515,9 +531,10 @@ On finit par activer la prise en compte du NDP proxy par le kernel, via les vari
 	EOF
 
 **Attention** :
-- activer le routage IPv6 au niveau de la machine, aura pour conséquence que le serveur arrêtera d'écouter et de prendre en compte les annonces RA (Router Advertisement) qui sont émises soit par votre box, soit par le routeur auquel est rattaché votre serveur chez l'hébergeur : en conséquence, le serveur "perdra" sa route par défaut IPv6 si elle n'a pas été configurée en dur dans la configuration réseau.
-- il faudra donc la configurer, soit sur la base de la documentation de l'opérateur/hébergeur (c'est le mieux), soit sur la base de la route par défaut détectée via les RA
-- A noter qu'il est quand même préférable d'un point de vue de sécurité de configurer cette route statique "en dur" plutôt que de se baser sur les RA, car ceux-ci ne sont pas authentifiés, et donc n'importe quel autre host du réseau pourrait se faire passer pour le routeur, et nous "forcer" à envoyer les flux vers lui plutôt que le routeur.
+
+* activer le routage IPv6 au niveau de la machine, aura pour conséquence que le serveur arrêtera d'écouter et de prendre en compte les annonces RA (Router Advertisement) qui sont émises soit par votre box, soit par le routeur auquel est rattaché votre serveur chez l'hébergeur : en conséquence, le serveur "perdra" sa route par défaut IPv6 si elle n'a pas été configurée en dur dans la configuration réseau.
+* il faudra donc la configurer, soit sur la base de la documentation de l'opérateur/hébergeur (c'est le mieux), soit sur la base de la route par défaut détectée via les RA
+* A noter qu'il est quand même préférable d'un point de vue de sécurité de configurer cette route statique "en dur" plutôt que de se baser sur les RA, car ceux-ci ne sont pas authentifiés, et donc n'importe quel autre host du réseau pourrait se faire passer pour le routeur, et nous "forcer" à envoyer les flux vers lui plutôt que le routeur.
 
 Une fois qu'on a pris nos précautions, on active ces modifications sans attendre un redémarrage
 
@@ -560,10 +577,11 @@ A noter qu'on peut aussi configurer le NDP via le fichier `/etc/shorewall6/proxy
 == Création du conteneur LXC
 
 Quelques informations sur la localisation des différents répertoires leurs fonctions :
-- `/usr/share/lxc/templates` : les scripts qui servent à créer des machines de différents types
-- `/var/lib/lxc/*/` : le répertoire contenant la `config` et le `rootfs` de chaque conteneur
-- `/var/cache/lxc/*/` : le répertoire où une copie "prête à servir" est stockée pour la création ultérieure de conteneurs du même type
-- `/etc/lxc.conf` : les éléments communs à la configuration de tous les conteneurs
+
+* `/usr/share/lxc/templates` : les scripts qui servent à créer des machines de différents types
+* `/var/lib/lxc/.../` : le répertoire contenant la `config` et le `rootfs` de chaque conteneur
+* `/var/cache/lxc/.../` : le répertoire où une copie "prête à servir" est stockée pour la création ultérieure de conteneurs du même type
+* `/etc/lxc.conf` : les éléments communs à la configuration de tous les conteneurs
 
 La première étape consiste à donner un nom au conteneur, ce nom désignera à la fois le hostname de la machine, l'endroit où les fichiers seront stockés, et le nom par lequel lancer/arrêter ce conteneur, et servira même à la "console".
 
@@ -587,7 +605,7 @@ On réactive les sécurités qu'on avait désactivées
 	sysctl kernel.grsecurity.chroot_deny_mount=1
 	sysctl kernel.grsecurity.chroot_deny_chmod=1
 
-Normalement tout est sensé bien se passer, mais si ça n'est pas le cas, un fichier de log est sensé être visible dans `/var/cache/lxc/debian/partial-*/debootstrap/debootstrap.log`, comme indiqué par le message d'erreur.
+Normalement tout est sensé bien se passer, mais si ça n'est pas le cas, un fichier de log est sensé être visible dans `/var/cache/lxc/debian/partial-.../debootstrap/debootstrap.log`, comme indiqué par le message d'erreur.
 
 Sauf que le script `/usr/share/lxc/templates/lxc-debian` fait un `cleanup` qui supprime tout en cas de problème... et donc on voit rien sauf si on commente la ligne `trap cleanup EXIT SIGHUP SIGINT SIGTERM` dans ce fichier. Mais après faut nettoyer à la main le répertoire `/var/cache/lxc/` après chaque plantage... mais ça permet de debugger.
 
@@ -596,8 +614,9 @@ On a maintenant un rootfs "template", stocké dans `/var/cache/lxc/debian` (whee
 Dans le répertoire `/var/lib/lxc` se trouvent les répertoires pour chacun des conteneurs.
 
 Dans chaque répertoire, on voit :
-- un sous-répertoire représentant le rootfs du conteneur
-- le fichier `config` de configuration du conteneur.
+
+* un sous-répertoire représentant le rootfs du conteneur
+* le fichier `config` de configuration du conteneur.
 
 En conséquence, côté sécurité, l'hôte a un accès complet aux fichiers des conteneurs.
 
@@ -681,10 +700,12 @@ Une fois qu'on est satisfait du conteneur, on configure l'auto-start
 
 Il y a un link:http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=723131[bug debian] actuellement dans jessie/sid (fixé dans 0.9.0-20, uppé dans experimental le 2013-09-03) et qui bloque le démarrage automatique. Il suffit pour le résoudre d'ici à ce que ça arrive dans jessie, de supprimer/commenter quelques lignes au début du fichier `/etc/init.d/lxc`
 
-	#if [ ! -x /usr/bin/lxc ]
-	#then
-	#       exit 0
-	#fi
+----
+#if [ ! -x /usr/bin/lxc ]
+#then
+#       exit 0
+#fi
+----
 
 Et là les conteneurs référencés démarreront automatiquement à chaque reboot.
 
@@ -704,8 +725,9 @@ Et le fichier `/dev/net/tun` est créé mais comme simple fichier, et non pas un
 	-rw-r--r-- 1 root root 0 oct.  17 08:13 /dev/net/tun
 
 Ce comportement est parfaitement logique, car le programme dans le conteneur se heurte :
-- aux restrictions "grsecurity", qui interdit les `mknod` depuis un `chroot`, car `sysctl` dit que `kernel.grsecurity.chroot_deny_mknod = 1` : il faudra créer le device hors du conteneur pour contourner le blocage
-- aux restrictions "cgroups" qui n'autorisent pas le conteneu à lire/écrire ce type de device : il faudra qu'on autorise explicitement le conteneur à y accéder pour contourner ce deuxième blocage
+
+* aux restrictions "grsecurity", qui interdit les `mknod` depuis un `chroot`, car `sysctl` dit que `kernel.grsecurity.chroot_deny_mknod = 1` : il faudra créer le device hors du conteneur pour contourner le blocage
+* aux restrictions "cgroups" qui n'autorisent pas le conteneu à lire/écrire ce type de device : il faudra qu'on autorise explicitement le conteneur à y accéder pour contourner ce deuxième blocage
 
 On commence par arrêter complètement le conteneur (via `shutdown`/`poweroff`) puis on supprime le fichier device inutilisable
 
@@ -743,10 +765,10 @@ Il est possible de limiter l'utilisation de tout et n'importe quoi concernant le
 	via fichier de config: "lxc.cgroup.<cgroup-name> = <value>"
 
 Pour limiter la consommation des conteneurs :
-- mémoire `lxc.cgroup.memory.limit_in_bytes = 256M`
-- swap `lxc.cgroup.memory.memsw.limit_in_bytes = 1G`
-- pour assigner des coeurs CPU `lxc.cgroup.cpuset.cpus = 0-1,3`
-- pour donner plus ou moins de CPU (chacun a 1024 de base) il s'agit de `lxc.cgroup.cpu.shares = 512`, et ici on donne deux fois moins de CPU à ce conteneur qu'aux autres
+
+* mémoire `lxc.cgroup.memory.limit_in_bytes = 256M`
+* swap `lxc.cgroup.memory.memsw.limit_in_bytes = 1G`
+* pour assigner des coeurs CPU `lxc.cgroup.cpuset.cpus = 0-1,3`
+* pour donner plus ou moins de CPU (chacun a 1024 de base) il s'agit de `lxc.cgroup.cpu.shares = 512`, et ici on donne deux fois moins de CPU à ce conteneur qu'aux autres
 
 Plus de documentation sur la limitation activable via `cgroups` on ira voir link:https://www.kernel.org/doc/Documentation/cgroup-v2.txt[la documentation kernel].
-

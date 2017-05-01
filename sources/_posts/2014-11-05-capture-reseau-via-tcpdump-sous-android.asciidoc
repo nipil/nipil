@@ -3,6 +3,8 @@ layout: post
 title: Capture réseau via tcpdump ... sous android !
 tags: android reseau
 ---
+:toc:
+:toc-title: Table des matières
 
 On peut faire des captures réseau sur son téléphone... Ok, mais pourquoi faire ?
 
@@ -209,9 +211,9 @@ Par exemple chez moi j'ai 3 interfaces qui ont une adresse ip :
 
 Ici, on peut comprendre que :
 
-- `lo` est l'interface de *loopback*, qui sert à la communication interne au téléphone
-- `wlan0` est l'interface Wi-Fi (quand on est associé à une box par exemple)
-- `rmnet0` est l'interface liée à la connexion mobile
+* `lo` est l'interface de *loopback*, qui sert à la communication interne au téléphone
+* `wlan0` est l'interface Wi-Fi (quand on est associé à une box par exemple)
+* `rmnet0` est l'interface liée à la connexion mobile
 
 Ca c'est sur mon téléphone, les noms seront peut-être (sûrement ?) différent chez d'autres.
 
@@ -230,4 +232,3 @@ Pour arrêter la capture, faire un Control-C (maintenir le bouton "volume bas", 
 Tout ce qui est capturé est stocké dans un fichier avec extension `.pcap`. Il vous suffit de copier les fichiers `.pcap` sur votre PC depuis la carte SD, et de l'ouvrir avec l'analyseur réseau link:https://www.wireshark.org/[Wireshark]
 
 Maintenant, c'est à vous de jouer :-)
-

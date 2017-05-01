@@ -3,10 +3,9 @@ layout: post
 title:  "Iago, petit chaton trognon"
 tags: chats
 ---
-
 Ce matin, nous sommes allés à link:https://maps.google.com/maps?q=annet+sur+marne&ie=UTF8&client=ubuntu&channel=fs&oe=utf-8&hnear=Annet-sur-Marne,+Seine-et-Marne,+%C3%8Ele-de-France,+France&t=m&z=13[Annet-sur-Marne], chez une famille d'accueil de l'association link:http://asso-sauvade.forumactif.org[Sauvade], où nous avons pu rencontrer le petit Iago.
 
-<a href="/files/chats-iago-bebe.jpg"><img src="/files/chats-iago-bebe_small.jpg" /></a>
+link:/files/chats-iago-bebe.jpg[image:/files/chats-iago-bebe_small.jpg[]]
 
 == Une nouvelle frippouille est dans la place !
 

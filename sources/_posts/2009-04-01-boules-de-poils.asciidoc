@@ -8,7 +8,7 @@ Aujourd'hui, on a concrétisé une envie longue de plusieurs années pour Cécil
 
 Pour dire les choses clairement, on a jeté notre dévolu sur des chattons qui ont été recueillis par l'association link:http://www.lechatkrem.com/[Le Chat Kremlinois] située au Kremlin-Bicêtre, association découverte sur internet.
 
-<a href='/files/chats-isis-vala-bebes.jpg'><img src='/files/chats-isis-vala-bebes_small.jpg' /></a>
+link:/files/chats-isis-vala-bebes.jpg[image:/files/chats-isis-vala-bebes_small.jpg[]]
 
 == Elles sont arrivées... !
 

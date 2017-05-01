@@ -3,6 +3,8 @@ layout: post
 title:  Certificats gratuits
 tags: sécurité serveur certificat
 ---
+:toc:
+:toc-title: Table des matières
 
 Je pensais qu'il fallait payer pour avoir des certificats reconnus par les navigateurs ? Et bien en fait ça n'est pas le cas, grâce à link:https://www.startssl.com[StartSSL], qui délivre *gratuitement* des certificats.
 
@@ -11,8 +13,9 @@ Je pensais qu'il fallait payer pour avoir des certificats reconnus par les navig
 Un certificat est comme une carte d'identité, qui a été validée par quelqu'un "de confiance". Ca permet de décider de faire confiance à celui qui présente sa carte, dans la limite de ce qui a été vérifié.
 
 Deux types de certificats gratuits sont disponibles :
-- "email" (appelé aussi S/MIME, ou certificat client)
-- "nom de domaine" (appelé certificat serveur)
+
+* "email" (appelé aussi S/MIME, ou certificat client)
+* "nom de domaine" (appelé certificat serveur)
 
 Dans un certificat "email", seule l'adresse email est vérifiée. Cette vérification est faite via l'habituel mail de confirmation et le lien à cliquer. Aucune autre information n'est vérifiée (ni le nom, ni le prénom, ni rien)
 
@@ -33,9 +36,10 @@ Ils vous demandent donc vos infos (nom, prénom, adresse, téléphone et email),
 On reçoit un email avec un code de confirmation à entrer sur leur site, on attend une dizaine de minute, et on reçoit un second email avec un deuxième lien à cliquer pour rentrer un deuxième code de confirmation.
 
 Ensuite, le site :
-- génère une clé privée sur votre ordinateur que vous seul connaissez
-- créé un certificat, basé sur cette clé, et le signe de leur autorité
-- installe ce certificat dans votre navigateur
+
+* génère une clé privée sur votre ordinateur que vous seul connaissez
+* créé un certificat, basé sur cette clé, et le signe de leur autorité
+* installe ce certificat dans votre navigateur
 
 Ce premier certificat ne sert qu'à une chose : vous identifier auprès du service StartSSL, en lieu et place des habituels identifiants/mot de passe. Ils ont raison, c'est mieux. La contrepartie, c'est qu'il faut extraire et sauvegarder ce certificat pour l'archiver, et pour pouvoir se connecter au site StartSSL depuis un autre navigateur (même si c'est sur le même PC !)
 
@@ -48,21 +52,23 @@ En regardant ce fichier, on voit que la seule information qu'il contient est l'a
 Si vous voulez créer un autre certificat pour une autre adresse email, il faut d'abord valider cette autre adresse mail, et ensuite générer un certificat basé sur cette identité.
 
 Pour valider une adresse mail :
-- se connecter au site link:https://www.startssl.com[StartSSL]
-- aller dans l'onglet "validation wizard"
-- sélectionner "email address validation"
-- entrer l'adresse mail à vérifier
-- attendez de recevoir le mail
-- entrez le code de confirmation
-- terminer la vérification
+
+* se connecter au site link:https://www.startssl.com[StartSSL]
+* aller dans l'onglet "validation wizard"
+* sélectionner "email address validation"
+* entrer l'adresse mail à vérifier
+* attendez de recevoir le mail
+* entrez le code de confirmation
+* terminer la vérification
 
 Pour générer un certificat "email" basé sur une identité :
-- aller dans l'onglet "certificates wizard"
-- selectionner "S/mime and authentication certificate"
-- selectionner "high grade"
-- selectionner votre adresse email et sélectionner "SHA1 (default)"
-- cliquer terminer, le certificat est installé dans votre navigateur
-- exportez le et sauvegardez le comme auparavant
+
+* aller dans l'onglet "certificates wizard"
+* selectionner "S/mime and authentication certificate"
+* selectionner "high grade"
+* selectionner votre adresse email et sélectionner "SHA1 (default)"
+* cliquer terminer, le certificat est installé dans votre navigateur
+* exportez le et sauvegardez le comme auparavant
 
 A noter que n'importe quel certificat d'identité créé sur le site permet de s'authentifier auprès de StartSSL, vu qu'ils ont tous été générés par le même "compte".
 
@@ -79,15 +85,17 @@ Pour chacun des comptes que vous souhaitez protéger, allez dans la section séc
 On vous demande alors si vous voulez utiliser le même certificat pour chiffrer les messages envoyés ou déchiffrer les messages qui vous ont été envoyés chiffrés, répondez "oui". Vérifier pour chacun des comptes que par défaut, on n'encrypte jamais "par défaut" les emails envoyés.
 
 Ensuite gérez votre messagerie comme d'habitude :
-- et quand vous voulez signer un message (pour garantir son authenticité et le fait qu'il n'ait pas été modifié) utilisez l'option "signer numeriquement ce message" de la barre d'action ou bien du menu option
-- et quand vous voulez chiffrer un message (pour garantir sa confidentialité) utilisez l'option "chiffrer ce message" de la barre d'action ou bien du menu option
+
+* et quand vous voulez signer un message (pour garantir son authenticité et le fait qu'il n'ait pas été modifié) utilisez l'option "signer numeriquement ce message" de la barre d'action ou bien du menu option
+* et quand vous voulez chiffrer un message (pour garantir sa confidentialité) utilisez l'option "chiffrer ce message" de la barre d'action ou bien du menu option
 
 Lors de la réception et de la relecture de messages envoyés, on voit que c'est signé grâce à l'enveloppe cachetée affichée dans la barre d'outil, et on voit que c'est chiffré grâce au cadenas dans la barre d'outil. Ou les deux si c'est signé et chiffré.
 
 A noter que
-- la ligne "sujet" du message n'est **jamais** chiffrée !
-- c'est *votre* certificat qui est utilisé pour signer
-- c'est le certificat du *destinataire* qui est utilisé pour chiffrer
+
+* la ligne "sujet" du message n'est **jamais** chiffrée !
+* c'est *votre* certificat qui est utilisé pour signer
+* c'est le certificat du *destinataire* qui est utilisé pour chiffrer
 
 Maintenant on a une messagerie sûre (authentifiée, non-modifiable et confidentielle).
 
@@ -98,24 +106,26 @@ Une remarque importante : StartSSL ne permet de valider des zones directes (exem
 Pour créer un certificat serveur, il faut d'abord valider que vous ayez accès au nom de domaine, puis générer un ou plusieurs certificats serveurs correspondant aux besoins de ce domaine.
 
 Pour valider l'accès au domaine :
-- se connecter au site link:https://www.startssl.com[StartSSL]
-- aller dans l'onglet "validation wizard"
-- sélectionner "domain name validation"
-- entrer le nom de votre domaine et son extension
-- sélectionner une des adresses mail à laquelle vous avez accès
-- entrer le code de confirmation reçu
+
+* se connecter au site link:https://www.startssl.com[StartSSL]
+* aller dans l'onglet "validation wizard"
+* sélectionner "domain name validation"
+* entrer le nom de votre domaine et son extension
+* sélectionner une des adresses mail à laquelle vous avez accès
+* entrer le code de confirmation reçu
 
 Pour générer un certificat "serveur" basé sur un domaine
-- aller dans l'onglet "certificates wizard"
-- selectionner "web server ssl/tls certificate"
-- selectionner un *bon* mot de passe et confirmez le
-- sélectionner 4096 pour la key size
-- selectionner SHA1 pour le "secure hash algorithm"
-- cliquez "continue" et patientez
-- copier/coller le texte fourni dans un fichier "xyz.key"
-- sélectionner le nom de domaine qui contient le serveur (example.com)
-- sélectionner le nom d'hôte de la machine cible prévue (www.example.com)
-- copier/coller le texte fourni dans un fichier "xyz.crt"
+
+* aller dans l'onglet "certificates wizard"
+* selectionner "web server ssl/tls certificate"
+* selectionner un *bon* mot de passe et confirmez le
+* sélectionner 4096 pour la key size
+* selectionner SHA1 pour le "secure hash algorithm"
+* cliquez "continue" et patientez
+* copier/coller le texte fourni dans un fichier "xyz.key"
+* sélectionner le nom de domaine qui contient le serveur (example.com)
+* sélectionner le nom d'hôte de la machine cible prévue (www.example.com)
+* copier/coller le texte fourni dans un fichier "xyz.crt"
 
 Sauvegarder les certificats racines et intermédiaire de l'autorité (enregistrer-sous)
 des deux liens "intermediate" et "root", pour qu'il puissent être référencés dans le daemon qui utilisera votre certificat, au besoin.
@@ -131,5 +141,3 @@ A noter qu'il est bon de mettre les bonnes authorisations d'accès à cette clé
 Pour info lors de la génération d'un certificat serveur, c'est le site qui a généré la clé privée secrête (c'est pour ça qu'il nous a demandé un mot de passe). Donc dans l'absolu il peut la stocker, et la réutiliser à de mauvaises fins, même si on peut logiquement lui faire confiance.
 
 Pour être parfaitement confidentiel, il faudrait plutôt générer la clé privée sur notre serveur, créer à partir de celle-ci une "requête de signature de certificat" (CSR), et utiliser ce CSR pour demander la génération du certificat (ce que le site permet). De cette manière, la clé privée ne sort jamais de chez nous, et donc personne ne peut la prendre à moins de pénétrer notre serveur ou de faire une erreur de gestion.
-
-

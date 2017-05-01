@@ -3,6 +3,8 @@ layout: post
 title:  Et pourquoi pas SQLite ?
 tags: linux
 ---
+:toc:
+:toc-title: Table des matières
 
 Intéresons nous aujourd'hui à link:http://www.sqlite.org/[SQLite]. En effet, il semblerait que j'ai un train de retard ce coup ci : l'habitude de déployer toujours du MySQL, et le fait que j'ai déjà un service link:http://en.wikipedia.org/wiki/SQL[SQL] qui tourne m'a détourné du droit chemin de la curiosité. Corrigeons ça tout de suite !
 
@@ -13,20 +15,22 @@ Il existe link:http://en.wikipedia.org/wiki/Comparison_of_relational_database_ma
 == SQLite, pour et contre
 
 Avantages
-- facile à installer, zéro configuration ou presque
-- peut être inclus directement dans une application
-- développement et mise en oeuvre très rapide
-- utilisable pour des sites web qui reçoivent environ 100,000 hits/jour
-- permet de remplacer tout stockage du style fopen/fread/fwrite/fclose
+
+* facile à installer, zéro configuration ou presque
+* peut être inclus directement dans une application
+* développement et mise en oeuvre très rapide
+* utilisable pour des sites web qui reçoivent environ 100,000 hits/jour
+* permet de remplacer tout stockage du style fopen/fread/fwrite/fclose
 
 Inconvénients
-- impossible de faire des restrictions d'accès fines type grant/revoke
-- impossible de faire une architecture client-serveur
-- pas de métriques permettant l'analyse fine des performances
-- pas super pour les bases volumineuses
-- pas super s'il y a beaucoup d'écritures concurrentes
-- les tables ne sont pas évolutives à par ajout/renommage de colonnes
-- pas de procédures stockés
+
+* impossible de faire des restrictions d'accès fines type grant/revoke
+* impossible de faire une architecture client-serveur
+* pas de métriques permettant l'analyse fine des performances
+* pas super pour les bases volumineuses
+* pas super s'il y a beaucoup d'écritures concurrentes
+* les tables ne sont pas évolutives à par ajout/renommage de colonnes
+* pas de procédures stockés
 
 Bref, pour tout ce qui consisterait à stocker et accéder à des données sans qu'elles soient modifiées trop souvent par trop de personnes en même temps, c'est parfait. En résumé : s'il n'y a pas eu besoin de faire du tuning de performances pour votre application qui utilise un autre système de gestion de bases de données, alors vous pouvez utiliser SQLite à la place.
 
@@ -35,9 +39,10 @@ C'est tellement parfait pour certaines choses, que même Google, Adobe, Mozilla,
 == Installation
 
 Comme d'habitude, sous Debian, c'est simple :
-- installation `aptitude install sqlite3`
-- pour le support PHP `aptitude install php5-sqlite`
-- redémarrer le serveur web
+
+* installation `aptitude install sqlite3`
+* pour le support PHP `aptitude install php5-sqlite`
+* redémarrer le serveur web
 
 Tester que ça marche en créant une page PHP
 
@@ -55,8 +60,9 @@ Accéder à cette page depuis votre navigateur devrait valider le bon foncitonne
 Un tour dans la link:http://www.sqlite.org/docs.html[documentation] et la page `man sqlite3`, et vous saurez sur l'outil en ligne de commande qui permet la gesiton des bases, leur création, modifications, et sauvegarde.
 
 Exemples en ligne de commande :
-- crée/ouvrir une base appelée "toto" : `sqlite3 toto.db` (l'extention est au choix)
-- sauvegarder : `sqlite3 toto.db '.backup bkp_toto.db'` (les guillemets sont importants)
+
+* crée/ouvrir une base appelée "toto" : `sqlite3 toto.db` (l'extention est au choix)
+* sauvegarder : `sqlite3 toto.db '.backup bkp_toto.db'` (les guillemets sont importants)
 
 Idem, en PHP, un tour dans la link:http://www.php.net/manual/fr/class.sqlite3.php[documentation] pour le format et la liste des fonctions.
 
