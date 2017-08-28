@@ -5,7 +5,7 @@ title: Installation LXD sur Ubuntu 16.04
 :toc:
 :toc-title: Table des matières
 
-Ce post est un mémo pour l'installation d'un hyperviseur LXD sur un serveur dédié fonctionnant sous Ubuntu Xenial, et utilisant OpenVSwitch et Shorewall pour la partie réseau.
+Ce post est un mémo pour l'installation d'un hyperviseur LXD sur un serveur dédié fonctionnant sous Ubuntu Xenial, et utilisant bridge-utils et Shorewall pour la partie réseau.
 
 Beaucoup de temps a passé depuis mon billet sur link:/2013/10/06/conteneurs-lxc-sans-extensions-de-virtualisation.html[les conteneurs LXC] mais au final les choses n'ont pas changé tant que ça, elles se sont surtout simplifiées.
 
@@ -14,7 +14,7 @@ Beaucoup de temps a passé depuis mon billet sur link:/2013/10/06/conteneurs-lxc
 Les divers outils :
 
 ----
-sudo apt-get install openvswitch-switch
+sudo apt-get install bridge-utils
 sudo apt-get install thin-provisioning-tools
 sudo apt-get install shorewall
 sudo apt-get install shorewall6
@@ -48,7 +48,7 @@ lxc profile device add default root disk path=/ pool=lvm
 
 == Scripts utilitaires
 
-Récuperer les link:https://github.com/nipil/lxd-mgt-tools[scripts de gestion]. Ils servent à gérer les bridge OpenVSwitch (1 bridge = 1 vlan = 1 dmz) et les fichiers `interfaces` portant leur configuration IP.
+Récuperer les link:https://github.com/nipil/lxd-mgt-tools[scripts de gestion]. Ils servent à gérer les bridge (1 bridge = 1 vlan = 1 dmz) et les fichiers `interfaces` portant leur configuration IP.
 
 == Topologie réseau
 
