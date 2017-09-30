@@ -78,7 +78,7 @@ Tester l'exécution de commandes via sudo
 == Utils
 
 ----
-apt-get -y install screen htop ncdu iftop nload tcpdump
+apt-get -y install screen git htop ncdu iftop nload tcpdump
 ----
 
 == Resolver
