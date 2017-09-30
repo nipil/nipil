@@ -75,26 +75,6 @@ Tester la connexion vers l'utilisateur non privilégié
 
 Tester l'exécution de commandes via sudo
 
-== Mises à jour
-
-----
-cat << EOF > /usr/local/bin/apt-up
-#! /usr/bin/env sh
-apt-get update && \
-  apt-get upgrade && \
-  apt-get dist-upgrade && \
-  apt-get autoremove && \
-  apt-get clean
-EOF
-chmod +x /usr/local/bin/apt-up
-----
-
-Mettre à jour le système :
-
-----
-apt-up
-----
-
 == Utils
 
 ----
@@ -147,6 +127,26 @@ On initialise ces partitions en PV :
 
 ----
 pvcreate --verbose --pvmetadatacopies 2 /dev/sda{5..22}
+----
+
+== Mises à jour
+
+----
+cat << EOF > /usr/local/bin/apt-up
+#! /usr/bin/env sh
+apt-get update && \
+  apt-get upgrade && \
+  apt-get dist-upgrade && \
+  apt-get autoremove && \
+  apt-get clean
+EOF
+chmod +x /usr/local/bin/apt-up
+----
+
+Mettre à jour le système :
+
+----
+apt-up
 ----
 
 Et maintenant on peut en faire ce qu'on veut !
