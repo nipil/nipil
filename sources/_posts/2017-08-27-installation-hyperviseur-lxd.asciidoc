@@ -9,15 +9,24 @@ Ce post est un mémo pour l'installation d'un hyperviseur LXD sur un serveur dé
 
 Beaucoup de temps a passé depuis mon billet sur link:/2013/10/06/conteneurs-lxc-sans-extensions-de-virtualisation.html[les conteneurs LXC] mais au final les choses n'ont pas changé tant que ça, elles se sont surtout simplifiées.
 
+== Variables
+
+----
+export LXD_IPV4=votre_ip_v4_externe
+export LXD_PORT=12345
+export LXD_PASSWD=yourverysecuredpassword
+----
+
 == Paquets système
 
 Les divers outils :
 
 ----
-sudo apt-get install bridge-utils
-sudo apt-get install thin-provisioning-tools
-sudo apt-get install shorewall
-sudo apt-get install shorewall6
+sudo apt-get install \
+  bridge-utils \
+  thin-provisioning-tools \
+  shorewall \
+  shorewall6
 ----
 
 On utilise la version `backport` pour la fonctionnalité `network` de LXD :
@@ -33,60 +42,52 @@ On initialise avec un backend de stockage `directory` mais c'est juste pour simp
 ----
 sudo lxd init --auto \
   --storage-backend dir \
-  --network-address your_ipv4_address \
-  --network-port 12345 \
-  --trust-password yourverysecuredpassword
+  --network-address $LXD_IPV4 \
+  --network-port $LXD_PORT\
+  --trust-password $LXD_PASSWD
 ----
 
-On pré-configurera un groupe virtuel `vg`, on définit un nouveau stockage de type LVM qui s'appuie dessus, et on le définit comme stockage dans le profil par défaut :
+On affiche le fingerprint :
 
 ----
-lxc storage create lvm lvm source=vg
+lxc info | grep certificate_fingerprint
+----
+
+On pré-configurera un groupe virtuel `vglxd` :
+
+----
+sudo vgcreate --verbose --vgmetadatacopies all vglxd /dev/sdaXXX
+----
+
+On définit un nouveau stockage de type LVM qui s'appuie dessus, et on le définit comme stockage dans le profil par défaut :
+
+----
+lxc storage create lvm lvm source=vglxd
 lxc profile device remove default root
 lxc profile device add default root disk path=/ pool=lvm
 ----
 
 == Scripts utilitaires
 
-Récuperer les link:https://github.com/nipil/lxd-mgt-tools[scripts de gestion]. Ils servent à gérer les bridge (1 bridge = 1 vlan = 1 dmz) et les fichiers `interfaces` portant leur configuration IP.
+Récuperer les link:https://github.com/nipil/lxd-mgt-tools[scripts de gestion]. Ils servent à gérer les bridge (1 bridge = 1 vlan = 1 dmz) et les fichiers `interfaces` portant leur configuration IP :
+
+----
+git clone https://github.com/nipil/lxd-mgt-tools.git
+----
+
+Lire la documentation et ajouter la ligne nécessaire à `/etc/network/interface`
 
 == Topologie réseau
 
 Mes hyperviseurs n'ont qu'un adresse IP externe (1 IPv4 + 1 IPv4) et tous les flux transiteront par l'hyperviseur. Celui-ci disposera donc de plusieurs interfaces IP, et un routage interne ainsi qu'un filtrage seront effectués entre celles-ci.
 
-La configuration réseau de l'hyperviseur :
-
-* dans `/etc/network/interfaces`
-** l'interface externe `eth0` est définie en statique
-** ajouter une ligne `source /etc/network/interfaces.d/*.conf`, si elle n'y est pas,
-* dans `/etc/network/interfaces.d/`
-** les interfaces des DMZ seront dans les fichiers `/etc/network/interfaces.d/*.conf`
-
-== Routage
-
-Créer l'interface `vlan18` de la DMZ 18 :
+À l'aide des scripts ci-dessus, on créera 256 DMZ :
 
 ----
-sudo ./dmz-create.sh 18
-----
-
-Voilà le résultat (avec l'adressage utilisé) :
-
-----
-35: vlan18: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN group default
-    link/ether WW:ZZ:ZZ:ZZ:ZZ:ZZ brd ff:ff:ff:ff:ff:ff
-    inet 10.0.18.254/24 brd 10.0.18.255 scope global vlan18
-       valid_lft forever preferred_lft forever
-    inet6 fd00::12:ffff:ffff:ffff:fffe/64 scope global
-       valid_lft forever preferred_lft forever
-    inet6 fe80::ZZZZ:ZZff:feZZ:ZZZZ/64 scope link
-       valid_lft forever preferred_lft forever
-----
-
-On la supprimera avec :
-
-----
-sudo ./dmz-delete.sh 18
+for DMZ in {0..255}
+do
+  ./dmz-create.sh $DMZ
+done
 ----
 
 == Firewall
@@ -95,7 +96,7 @@ On utilisera le fichier `params` de shorewall/shorewall6 pour définir des _rêg
 
 J'ai choisi de conserver les configurations réseau dans un dépôt Git, qui sera clôné dans le répertoire `/root` de chaque hyperviseur : on utilisera la même configuration de firewall pour tous les hyperviseurs afin de permettre d'industrialiser l'ajout, ou le remplacement d'hyperviseurs
 
-Les fichiers dans `/etc/shorewall*/` seront en réalité des liens symboliques vers les fichiers de ce dépôt clôné, ce qui permet d'assurer une identité de tous les paramétrages
+Les fichiers de ce dépôt seront répliqués au bon endroit sur chaque hyperviseur, ce qui permet d'assurer une identité de tous les paramétrages
 
 == Création des VM
 
