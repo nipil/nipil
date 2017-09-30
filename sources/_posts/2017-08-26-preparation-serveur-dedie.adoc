@@ -1,0 +1,152 @@
+---
+layout: post
+title: Préparation d'un serveur dédié OVH
+---
+:toc:
+:toc-title: Table des matières
+
+Ce post est un mémo pour la préparation de chaque serveur physique, qui sera ensuite configuré comme un hyperviseur pour héberger des VM.
+
+À la base, les serveurs dédiés que j'utilise sont des serveurs fournis par OVH, dont l'installation initiale n'est pas configurable (à part le partitionnement). Du coup il y a un ensemble de choses à faire pour le mettre dans l'état standard, sur lequel se base le reste de mes outils.
+
+== Installation
+
+Distribution :
+
+* Ubuntu 16.04 LTS
+* Français
+* installation personnalisée
+
+Partitionnement :
+
+* pas de partition boot
+* une partition racine de 20G
+* une partition swap de la taille de la mémoire
+* pas de partition home
+* laisser le reste de l'espace disque libre
+
+Paramétrage :
+
+* définir le hostname (host.domain.ext)
+* choisir une clé ssh
+* ne pas utiliser le noyau de la distribution
+
+Netboot
+
+* Stable kernel, vanilla - 64bit
+* Root device : `/dev/sda1`
+* se connecter en ssh et redémarrer
+
+== Variables
+
+----
+export SSHPORT=12345
+export USERNAME=monuser
+----
+
+== SSH
+
+Editer `/etc/ssh/sshd_config` :
+
+----
+Port $SSHPORT
+PasswordAuthentication no
+----
+
+Recharger la configuration ssh :
+
+----
+systemctl restart ssh
+----
+
+Sans se déconnecter, re-tester la connexion root.
+
+== Utilisateurs
+
+----
+adduser $USERNAME
+usermod -a -G sudo $USERNAME
+sudo -i -u $USERNAME ssh localhost -p $SSHPORT -o StrictHostKeyChecking=no
+cat ~root/.ssh/authorized_keys2 > /home/$USERNAME/.ssh/authorized_keys
+chown $USERNAME:$USERNAME /home/$USERNAME/.ssh/authorized_keys
+----
+
+Tester la connexion vers l'utilisateur non privilégié
+
+Tester l'exécution de commandes via sudo
+
+== Mises à jour
+
+----
+cat << EOF > /usr/local/bin/apt-up
+#! /usr/bin/env sh
+apt-get update && \
+  apt-get upgrade && \
+  apt-get dist-upgrade && \
+  apt-get autoremove && \
+  apt-get clean
+EOF
+chmod +x /usr/local/bin/apt-up
+----
+
+Mettre à jour le système :
+
+----
+apt-up
+----
+
+== Utils
+
+----
+apt-get -y install screen htop ncdu iftop nload tcpdump
+----
+
+== Resolver
+
+----
+echo "nameserver 213.186.33.99" > /etc/resolv.conf
+apt-get -y purge bind9
+----
+
+== Packages
+
+S'il n'y a pas de RAID logiciel, supprimer `mdadm`
+
+----
+apt-get -y purge mdadm
+----
+
+== LVM
+
+On créé un paquet de partitions :
+
+----
+parted --align=optimal --script /dev/sda \
+  mkpart extended 10% 100% \
+  mkpart logical 10% 15% \
+  mkpart logical 15% 20% \
+  mkpart logical 20% 25% \
+  mkpart logical 25% 30% \
+  mkpart logical 30% 35% \
+  mkpart logical 35% 40% \
+  mkpart logical 40% 45% \
+  mkpart logical 45% 50% \
+  mkpart logical 50% 55% \
+  mkpart logical 55% 60% \
+  mkpart logical 60% 65% \
+  mkpart logical 65% 70% \
+  mkpart logical 70% 75% \
+  mkpart logical 75% 80% \
+  mkpart logical 80% 85% \
+  mkpart logical 85% 90% \
+  mkpart logical 90% 95% \
+  mkpart logical 95% 100%
+----
+
+On initialise ces partitions en PV :
+
+----
+pvcreate --verbose --pvmetadatacopies 2 /dev/sda{5..22}
+----
+
+Et maintenant on peut en faire ce qu'on veut !
