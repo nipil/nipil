@@ -65,6 +65,9 @@ Sans se déconnecter, re-tester la connexion root.
 
 ----
 adduser $USERNAME
+----
+
+----
 usermod -a -G sudo $USERNAME
 sudo -i -u $USERNAME ssh localhost -p $SSHPORT -o StrictHostKeyChecking=no
 cat ~root/.ssh/authorized_keys2 > /home/$USERNAME/.ssh/authorized_keys
@@ -121,6 +124,12 @@ parted --align=optimal --script /dev/sda \
   mkpart logical 85% 90% \
   mkpart logical 90% 95% \
   mkpart logical 95% 100%
+----
+
+On vérifie les partitions :
+
+----
+lsblk
 ----
 
 On initialise ces partitions en PV :
