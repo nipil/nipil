@@ -44,6 +44,20 @@ export SSHPORT=12345
 export USERNAME=monuser
 ----
 
+== Networking
+
+Selon la configuration IPv6 générée par l'installeur, et l'effet de la topologie réseau, il se peut qu'il y ait du flapping de route par défaut, ou une perte de celle-ci.
+
+Dans ces cas là, se connecter en IPv4, et modifier le fichier de configuration. Remplacer `add` par `replace` dans la configuration de l'interface réseau externe :
+
+----
+Avant: /sbin/ip -family inet6 route add default via ...
+
+Après: /sbin/ip -family inet6 route replace default via ...
+----
+
+Passer la commande modifiée tout de suite, pour éviter de devoir redémarrer encore une fois
+
 == SSH
 
 Editer `/etc/ssh/sshd_config` :
