@@ -92,11 +92,17 @@ done
 
 == Firewall
 
-On utilisera le fichier `params` de shorewall/shorewall6 pour définir des _rêgles qui puissent être identiques_ pour les deux parties du firewall (IPv4/IPv6)
+J'utilise un outil pour me simplifie la vie et avoir facilement une link:https://github.com/nipil/shorewall-merged[identicité entre IPv4 et IPv6] :
 
-J'ai choisi de conserver les configurations réseau dans un dépôt Git, qui sera clôné dans le répertoire `/root` de chaque hyperviseur : on utilisera la même configuration de firewall pour tous les hyperviseurs afin de permettre d'industrialiser l'ajout, ou le remplacement d'hyperviseurs
+----
+git clone https://github.com/nipil/shorewall-merged.git
+----
 
-Les fichiers de ce dépôt seront répliqués au bon endroit sur chaque hyperviseur, ce qui permet d'assurer une identité de tous les paramétrages
+Ce qui est commun sera dans commun, ce qui est spécifique à IPv4 sera dans ipv4 (pareil pour ipv6) et les noms associés aux IP sont partagés et distribués automatiquement entre IPv6 et IPv4.
+
+Ça permet aussi de pousser la conf finalisée aux firewall distant, que ça soit en mode "full" (shorewall et shorewall6 installé sur le firewall) ou en mode "light" (compilé par shorewall et shorewall6 en local, puis poussé et exécuté sur le firewall via shorewall-light et shorewall6-light)
+
+Et comme nos hyperviseurs sont banalisés, les fichiers seront répliqués au bon endroit sur chaque hyperviseur, ce qui permet d'assurer une identité de tous les paramétrages sur chaque hyperviseur !
 
 == Création des VM
 
