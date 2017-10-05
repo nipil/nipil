@@ -1,0 +1,83 @@
+export DOMAIN=nipil.org
+
+mkdir -p /etc/bind/keys/${DOMAIN}
+cd /etc/bind/keys/${DOMAIN}
+
+dnssec-keygen -a RSASHA512 -b 4096 ${DOMAIN}
+dnssec-keygen -a RSASHA512 -b 4096 -f KSK ${DOMAIN}
+
+assurer que les clés sont lisibles de l'utilisateur bind
+
+sudo -u bind md5sum /etc/bind/keys/${DOMAIN}/* >&- && echo "OK: can read keys" || echo "ERROR: cannot read keys"
+
+Si ça n'est pas le cas, s'en assurer en permettant au user bind de les lire :
+
+chown -v :bind /etc/bind/keys/${DOMAIN}/*
+chmod g+r /etc/bind/keys/${DOMAIN}/*
+---
+layout: post
+title: Installation LXD sur Ubuntu 16.04
+---
+:toc:
+:toc-title: Table des matières
+
+
+== Documentation
+
+*
+* link:https://www.isc.org/downloads/bind/doc/[Bind9 documentation ]
+*
+* link:https://ftp.isc.org/isc/pubs/tn/isc-tn-2002-2.html[How to configure and authorative-only nameserver]
+* link:https://ftp.isc.org/isc/dnssec-guide/html/dnssec-guide.html[How to configure DNSSEC guide]
+* link:https://tools.ietf.org/html/rfc6781[DNSSEC best practices IETF]
+* link:https://www.enisa.europa.eu/publications/gpgdnssec[DNSSEC best practices ENISA (eu)]
+* link:https://csrc.nist.gov/publications/detail/sp/800-81/rev-1/archive/2010-04-30[DNSSEC best practices NIST (us)]]
+
+== Serveur autoritaire
+
+== Serveur master/slave
+
+== Fonctionnalité DNSSEC
+
+Et revérifier à l'aide de la commande précédente
+
+Pour information, le serial de la version signée transmise aux slaves est en avance sur le serial de la version non-signée, on le voit dans le log bind sur le master :
+
+named[8251]: zone nipil.org/IN (signed): serial 17 (unsigned 14)
+
+on vérifie que tout est bon au niveau de notre serveur master :
+
+export ZONEKEYFILE=$(grep -L 'zone-signing key' /etc/bind/keys/${DOMAIN}/*.key | head -n1)
+
+grep DNSKEY ${ZONEKEYFILE} | sed -r -e 's|(\S+)\s\S+\s\S+\s(\S+)\s(\S+)\s(\S+)\s(.*)|trusted-keys { \1 \2 \3 \4 "\5"; };|' > /tmp/test-${DOMAIN}.key
+
+delv @localhost -a /tmp/test-${DOMAIN}.key +root=${DOMAIN} ${DOMAIN}. SOA +multiline
+
+; fully validated
+nipil.org.      10800 IN SOA nipil.org. hostmaster.nipil.org. (
+                17         ; serial
+                10800      ; refresh (3 hours)
+                3600       ; retry (1 hour)
+                604800     ; expire (1 week)
+                10800      ; minimum (3 hours)
+                )
+nipil.org.      10800 IN RRSIG SOA 10 2 10800 (
+                20171103054442 20171004044442 10310 nipil.org.
+                rRON8kNgP9O69IPa1urmsvvymI/iNxs6UD7KtNA9b+y7
+                6/rkm0UGFFPed/6a84m+4pkjQNT5Kq7B4AorWcCqRHFa
+                nvSyXmbL3p/g7vXp7BktzAJyYRi0cV1n0q4BdBUZ2x+K
+                f/aum5tBLlDOmnsrtPXES/Ax+8T6n4ifN4jKbDW4NYip
+                b6TZAcr5YLfP+DOD9SNp71j6iySLx7UgQtnbP0Dkzhon
+                fXhJz8hJ4qjbAiAk1giI/6Shz9DLoR/1epLVwh+Lkry0
+                wMHl2PXR/4As7GZ49wJpHcA0Da3225VFpTDza9uniYmo
+                4Ju6Pq6FOLsntEFmeFeSYAqzp8k3vIHcGlTicBDeOeF6
+                yxx+K8IF1GpNFxq65QspuvR9q5EUrf5HQpVQDPiiIG9O
+                8XOz81ADDlnt/PRAh0arroMDlhkX8z6EKenJexVMCm+D
+                AbFy0LGZ5t2SOtoaNQkVoq/t2IeEUWihKV5Ad6ubQtOs
+                Tqgre65TH1eY7U11M+oxNnLZjWnzJWV2nz1KYjToRHY7
+                G0CadqVGsONcwZU+kPxucuytouTe89fr+g9VHDLr891x
+                UT4TziP/e8UxehGPVRLPMgnGlfKXis5Bz22KioQkesFy
+                /1GnxmnGpIwp9zcZAdy91jA6D1kWqWmLjF9WcPOwq20H
+                O45I9oEKiJSbAx4do0f+NKc= )
+
+Maintenant que tout est OK, on doit effectuer la dernière action : construire la chaine de confiance, en fournissant à notre registrar (à qui on paie le nom de domaine) les éléments nécessaires pour établie la "chain of trust".
