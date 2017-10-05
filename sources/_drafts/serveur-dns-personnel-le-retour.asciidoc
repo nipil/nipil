@@ -1,20 +1,146 @@
----
+--
 layout: post
 title: Serveur DNS personnel, le retour !
----
+--
 :toc:
 :toc-title: Table des matières
 
+Cet article est un mémo permettant de configurer des serveurs DNS faisant authorité sur une ou plusieurs zones, et qui seront utilisés à la place des serveurs du fournisseur de nom de domaine. À noter qu'il est important de respecter l'ordre des étapes et des vérifications.
 
-export DOMAIN=nipil.org
+== Pre-requis
 
-mkdir -p /etc/bind/keys/${DOMAIN}
-cd /etc/bind/keys/${DOMAIN}
+Matériel
 
-Ici on suivra les link:https://ftp.isc.org/isc/dnssec-guide/html/dnssec-guide.html#signing-easy-start-generate-keys[bonnes pratiques du guide DNSSEC de l'ISC] (Internet Systems Consortium, les mainteneurs de Bind) concernant les algorithmes de signature et la longueur des clés :
+* disposer de _deux_ hôtes Linux au minimum
+* chacun disposant :
+** d'une adresse IPv4 externe _fixe_
+** joignable depuis internet sur les ports UDP 53 et TCP 53
+** pouvant se joindre entre eux sur les même ports
+** disposant d'une adresse IPv6 fixe
+** ayant configuré les "reverse-DNS" IPv4 et IPv6 pour qu'ils soient des noms appartenant à votre domaine
 
-dnssec-keygen -a RSASHA256 -b 1024 ${DOMAIN}
-dnssec-keygen -a RSASHA256 -b 2048 -f KSK ${DOMAIN}
+Noms de domaine
+
+* disposer d'un (ou plusieurs) noms de domaines
+* le(s) registrar(s) auxquels sont loués les noms de domaine doivent
+**  permettrent d'utiliser ses propres serveurs DNS
+** permettrent de positionner nos singatures DNSSEC ("DS records") dans la hiérarchie DNS
+
+Informations annexes
+
+* j'utilise OVH comme fournisseur de nom de domaine ("registrar")
+* j'utilise la distribution Ubuntu 16.04 LTS
+
+Logiciels
+
+* installer le package `bind9` sur chaque serveur
+
+La suite s'appuie sur l'ensemble des points ci-dessus. Si votre situation diffère, à vous de faire le nécessaire pour adapter.
+
+== Variables
+
+Dans toute la suite, on remplacera bien sûr les variables par les valeurs réelles correspondantes pour votre environnement :
+
+* IPV4_MASTER : l'adresse IPv4 externe du serveur qui sera maître (pour moi, `37.187.7.187`)
+* IPV6_MASTER : l'adresse IPv6 externe du serveur qui sera maître (pour moi, `2001:41d0:a:7bb::1`)
+* IPV4_MASTER_PTR : récupéré par `dig -x IPV4_MASTER` (pour moi, `axis.nipil.org`)
+* IPV6_MASTER_PTR : récupéré par `dig -x IPV6_MASTER` (pour moi, `axis.nipil.org`)
+* IPV4_SLAVE : l'adresse IPv4 externe du serveur qui sera esclave (pour moi, `91.121.167.150`)
+* IPV6_SLAVE : l'adresse IPv6 externe du serveur qui sera esclave (pour moi, `2001:41d0:1:e896::1`)
+* IPV4_SLAVE_PTR : récupéré par `dig -x IPV4_SLAVE` (pour moi, `isis.nipil.org`)
+* IPV6_SLAVE_PTR : récupéré par `dig -x IPV6_SLAVE` (pour moi, `isis.nipil.org`)
+* DOMAIN : nom de domaine (pour moi, `nipil.org`)
+
+== Serveur master
+
+On suivra les link:https://ftp.isc.org/isc/dnssec-guide/html/dnssec-guide.html#signing-easy-start-generate-keys[bonnes pratiques du guide DNSSEC de l'ISC] (Internet Systems Consortium, les mainteneurs de Bind) concernant les algorithmes de signature et la longueur des clés.
+
+Pour chaque DOMAIN (par ex, `example.com`) on générera des clés :
+
+----
+mkdir -p /etc/bind/keys/DOMAIN
+cd /etc/bind/keys/DOMAIN
+dnssec-keygen -a RSASHA256 -b 1024 DOMAIN
+dnssec-keygen -a RSASHA256 -b 2048 -f KSK DOMAIN
+----
+
+.named.conf.options
+----
+options {
+  directory "/var/cache/bind";
+  dnssec-validation auto;
+  auth-nxdomain no; # conform to RFC1035
+  listen-on-v6 { any; };
+  allow-query     { any; };
+  allow-transfer  {
+    localhost;
+    IPV4_SLAVE; IPV6_SLAVE;
+  };
+  recursion no;
+};
+----
+
+.named.conf.local
+----
+zone "DOMAIN" {
+  type master;
+  file "/var/cache/bind/db.DOMAIN";
+  key-directory "/etc/bind/keys/DOMAIN";
+  inline-signing yes;
+  auto-dnssec maintain;
+};
+----
+
+On configure chaque zone de manière minimale :
+
+./var/cache/bind/db.DOMAIN
+----
+$TTL 3H
+@ IN SOA ${IPV4_MASTER_PTR}. hostmaster.nipil.org. (
+  56   ; serial
+  4H   ; refresh
+  1H   ; retry
+  1W   ; expire
+  3H ) ; minimum
+@            IN   NS     IPV4_MASTER_PTR.
+@            IN   NS     IPV4_SLAVE_PTR.
+axis         IN   A      37.187.7.187
+axis         IN   AAAA   2001:41d0:a:7bb::1
+isis         IN   A      91.121.167.150
+isis         IN   AAAA   2001:41d0:1:e896::1
+----
+
+
+
+On redémarre bind, et on vérifie ce que ça donne :
+
+
+
+
+
+
+
+
+
+== Vérification master
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Attention : chez OVH, la link:https://docs.ovh.com/fr/fr/web/domains/generalites-serveurs-dns/[documentation] dit explicitement que "Toutes modifications de vos serveurs DNS peut prendre jusqu’à 48h"
+
+
 
 Pour info, le premier chiffre dans le nom correspond à la représentation de l'algorithme utilisé, le deuxième est l'empreinte de la clé.
 
@@ -31,13 +157,13 @@ chmod g+r /etc/bind/keys/${DOMAIN}/*
 
 == Documentation
 
-* link:https://www.isc.org/downloads/bind/doc/[Bind9 documentation ]
-* link:https://ftp.isc.org/isc/pubs/tn/isc-tn-2002-2.html[How to configure and authorative-only nameserver]
-* link:https://ftp.isc.org/isc/dnssec-guide/html/dnssec-guide.html[How to configure DNSSEC guide]
-* link:https://tools.ietf.org/html/rfc6781[DNSSEC best practices IETF]
-* link:https://www.enisa.europa.eu/publications/gpgdnssec[DNSSEC best practices ENISA (eu)]
-* link:https://csrc.nist.gov/publications/detail/sp/800-81/rev-1/archive/2010-04-30[DNSSEC best practices NIST (us)]
-* link:https://linux.die.net/man/8/dnssec-keygen[Man page de dnssec-keygen]
+ link:https://www.isc.org/downloads/bind/doc/[Bind9 documentation ]
+ link:https://ftp.isc.org/isc/pubs/tn/isc-tn-2002-2.html[How to configure and authorative-only nameserver]
+ link:https://ftp.isc.org/isc/dnssec-guide/html/dnssec-guide.html[How to configure DNSSEC guide]
+ link:https://tools.ietf.org/html/rfc6781[DNSSEC best practices IETF]
+ link:https://www.enisa.europa.eu/publications/gpgdnssec[DNSSEC best practices ENISA (eu)]
+ link:https://csrc.nist.gov/publications/detail/sp/800-81/rev-1/archive/2010-04-30[DNSSEC best practices NIST (us)]
+ link:https://linux.die.net/man/8/dnssec-keygen[Man page de dnssec-keygen]
 
 == Serveur autoritaire
 
@@ -108,20 +234,20 @@ $ dig nipil.org +trace
 
 ; <<>> DiG 9.10.3-P4-Ubuntu <<>> nipil.org +trace
 ;; global options: +cmd
-.                       454727  IN      NS      e.root-servers.net.
-.                       454727  IN      NS      j.root-servers.net.
-.                       454727  IN      NS      k.root-servers.net.
-.                       454727  IN      NS      a.root-servers.net.
-.                       454727  IN      NS      d.root-servers.net.
-.                       454727  IN      NS      i.root-servers.net.
-.                       454727  IN      NS      h.root-servers.net.
-.                       454727  IN      NS      m.root-servers.net.
-.                       454727  IN      NS      c.root-servers.net.
-.                       454727  IN      NS      l.root-servers.net.
-.                       454727  IN      NS      f.root-servers.net.
-.                       454727  IN      NS      g.root-servers.net.
-.                       454727  IN      NS      b.root-servers.net.
-.                       518385  IN      RRSIG   NS 8 0 518400 20171018050000 20171005040000 46809 . Gqx4rurS7g34OaTMZuVqeULR0YKkHJSDbeq6MhUrf2Zs9k4S+EfYYTun 9qcns+xkDlrHkcrPYMQpOjRTLHXasaZnWcnr+t2ok7MlGefnLT8OCZBh UDcDw0gO/0V4oPn6R9dkTA7l2ZOaQl5UdHh1E6GRynr5JDaqZp5R0iX3 PZaaR9oL9GxvTW5cED4C5auIVt4TCOLSuaeotMyuuNKlVUXZkAXGHKtz Nqpzj0cm+NWMATzqOHT1yJzh9BoB1POZdMNIhsksyyX3idDu4VAQIrwR zeQdHPIZhrJ4Hc+7JVEkLC6tXI56GVb+eBlFY1Q6q0M1zWi7+DjcGJJU fjsVzA==
+                       454727  IN      NS      e.root-servers.net.
+                       454727  IN      NS      j.root-servers.net.
+                       454727  IN      NS      k.root-servers.net.
+                       454727  IN      NS      a.root-servers.net.
+                       454727  IN      NS      d.root-servers.net.
+                       454727  IN      NS      i.root-servers.net.
+                       454727  IN      NS      h.root-servers.net.
+                       454727  IN      NS      m.root-servers.net.
+                       454727  IN      NS      c.root-servers.net.
+                       454727  IN      NS      l.root-servers.net.
+                       454727  IN      NS      f.root-servers.net.
+                       454727  IN      NS      g.root-servers.net.
+                       454727  IN      NS      b.root-servers.net.
+                       518385  IN      RRSIG   NS 8 0 518400 20171018050000 20171005040000 46809 . Gqx4rurS7g34OaTMZuVqeULR0YKkHJSDbeq6MhUrf2Zs9k4S+EfYYTun 9qcns+xkDlrHkcrPYMQpOjRTLHXasaZnWcnr+t2ok7MlGefnLT8OCZBh UDcDw0gO/0V4oPn6R9dkTA7l2ZOaQl5UdHh1E6GRynr5JDaqZp5R0iX3 PZaaR9oL9GxvTW5cED4C5auIVt4TCOLSuaeotMyuuNKlVUXZkAXGHKtz Nqpzj0cm+NWMATzqOHT1yJzh9BoB1POZdMNIhsksyyX3idDu4VAQIrwR zeQdHPIZhrJ4Hc+7JVEkLC6tXI56GVb+eBlFY1Q6q0M1zWi7+DjcGJJU fjsVzA==
 ;; Received 525 bytes from 127.0.1.1#53(127.0.1.1) in 9 ms
 
 org.                    172800  IN      NS      b0.org.afilias-nst.org.
@@ -144,6 +270,22 @@ nipil.org.              86400   IN      RRSIG   DS 7 2 86400 20171022152331 2017
 nipil.org.              60      IN      A       91.121.167.150
 nipil.org.              60      IN      RRSIG   A 7 2 60 20171104062210 20171005062210 45578 nipil.org. uuoidYbJPncbXkJaENPgO/YYfwk+wyxX7HgQ+vbyeQ7fwVvM39NWL7DG jQRwmKmHw1aL8Pc51p5eM4srkmt7hTXIT3V65sock8XxGH/Pr5Y8mh6z EPD21ErqiuN8ULEn/1pn7XFU+L9Enl5oyMURP5iE0gNOks5ON37sjoyv vRM=
 ;; Received 223 bytes from 2001:41d0:1:1998::1#53(ns108.ovh.net) in 7 ms
+
+
+dig org. ns
+
+org.                    28843   IN      NS      c0.org.afilias-nst.info.
+org.                    28843   IN      NS      b0.org.afilias-nst.org.
+org.                    28843   IN      NS      b2.org.afilias-nst.org.
+org.                    28843   IN      NS      a2.org.afilias-nst.info.
+org.                    28843   IN      NS      d0.org.afilias-nst.org.
+org.                    28843   IN      NS      a0.org.afilias-nst.info.
+
+dig @a0.org.afilias-nst.info nipil.org ns
+
+;; AUTHORITY SECTION:
+nipil.org.              86400   IN      NS      dns108.ovh.net.
+nipil.org.              86400   IN      NS      ns108.ovh.net.
 
 
 
@@ -182,4 +324,41 @@ https://docs.ovh.com/fr/fr/web/domains/securiser-votre-domaine-avec-dnssec/
 37.187.7.187 2001:41d0:a:7bb::1
 
 
+Le script suivant permet de vérifier l'état des serveurs de la zone à laquelle est rattachée notre nom de domaine
 
+[source]
+====
+#!/bin/bash
+ROOTSERVER=e.root-servers.net
+function get_zone {
+  local __DOMAIN=${1}
+  echo ${__DOMAIN} | sed -e 's/^[^.]*\.//'
+}
+function get_ns_from {
+  local __SERVER=${1}
+  local __DOMAIN=${2}
+  dig @${__SERVER} ${__DOMAIN}. ns \
+    | egrep "^${__DOMAIN}\.\s+\w+\s+IN\s+NS\s+" \
+    | awk '{ print $5 }'
+}
+function check_domain {
+  local __DOMAIN=${1} __ZONE __ZONESERVERS __ZONESERVER
+  __ZONE=$(get_zone ${__DOMAIN})
+  __ZONESERVERS=$(get_ns_from ${ROOTSERVER} ${__ZONE} )
+  for __ZONESERVER in ${__ZONESERVERS}
+  do
+    echo ${__ZONESERVER}
+    get_ns_from ${__ZONESERVER} ${__DOMAIN}
+  done
+}
+# params
+[ ${#} -eq 1 ] || { echo "Usage: ${0} domain.ext"; exit 1; }
+# run
+date
+check_domain ${1}
+====
+
+Avant la demande,
+
+
+Après la demande
