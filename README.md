@@ -33,7 +33,7 @@ For production
 
 For development
 
-  bundler exec jekyll serve --source sources/
+  bundler exec jekyll serve --drafts --source sources/
 
 For production
 
