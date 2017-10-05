@@ -23,11 +23,14 @@ Les divers outils :
 
 ----
 sudo apt-get install \
+  haveged \
   bridge-utils \
   thin-provisioning-tools \
   shorewall \
   shorewall6
 ----
+
+Remarque : `haveged` sert à générer plus d'entropie, et est à installer sur le host, pour que l'effet soit disponible dans les conteneurs. Il n'affaiblit pas la sécurité de la cryptographie, au contraire (link:http://www.issihosts.com/haveged/[source])
 
 On utilise la version `backport` pour la fonctionnalité `network` de LXD :
 
