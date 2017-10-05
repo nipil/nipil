@@ -1,10 +1,23 @@
+---
+layout: post
+title: Serveur DNS personnel, le retour !
+---
+:toc:
+:toc-title: Table des matières
+
+
 export DOMAIN=nipil.org
 
 mkdir -p /etc/bind/keys/${DOMAIN}
 cd /etc/bind/keys/${DOMAIN}
 
-dnssec-keygen -a RSASHA512 -b 4096 ${DOMAIN}
-dnssec-keygen -a RSASHA512 -b 4096 -f KSK ${DOMAIN}
+Ici on suivra les link:https://ftp.isc.org/isc/dnssec-guide/html/dnssec-guide.html#signing-easy-start-generate-keys[bonnes pratiques du guide DNSSEC de l'ISC] (Internet Systems Consortium, les mainteneurs de Bind) concernant les algorithmes de signature et la longueur des clés :
+
+dnssec-keygen -a RSASHA256 -b 1024 ${DOMAIN}
+dnssec-keygen -a RSASHA256 -b 2048 -f KSK ${DOMAIN}
+
+Pour info, le premier chiffre dans le nom correspond à la représentation de l'algorithme utilisé, le deuxième est l'empreinte de la clé.
+
 
 assurer que les clés sont lisibles de l'utilisateur bind
 
@@ -14,24 +27,17 @@ Si ça n'est pas le cas, s'en assurer en permettant au user bind de les lire :
 
 chown -v :bind /etc/bind/keys/${DOMAIN}/*
 chmod g+r /etc/bind/keys/${DOMAIN}/*
----
-layout: post
-title: Installation LXD sur Ubuntu 16.04
----
-:toc:
-:toc-title: Table des matières
 
 
 == Documentation
 
-*
 * link:https://www.isc.org/downloads/bind/doc/[Bind9 documentation ]
-*
 * link:https://ftp.isc.org/isc/pubs/tn/isc-tn-2002-2.html[How to configure and authorative-only nameserver]
 * link:https://ftp.isc.org/isc/dnssec-guide/html/dnssec-guide.html[How to configure DNSSEC guide]
 * link:https://tools.ietf.org/html/rfc6781[DNSSEC best practices IETF]
 * link:https://www.enisa.europa.eu/publications/gpgdnssec[DNSSEC best practices ENISA (eu)]
-* link:https://csrc.nist.gov/publications/detail/sp/800-81/rev-1/archive/2010-04-30[DNSSEC best practices NIST (us)]]
+* link:https://csrc.nist.gov/publications/detail/sp/800-81/rev-1/archive/2010-04-30[DNSSEC best practices NIST (us)]
+* link:https://linux.die.net/man/8/dnssec-keygen[Man page de dnssec-keygen]
 
 == Serveur autoritaire
 
@@ -54,30 +60,126 @@ grep DNSKEY ${ZONEKEYFILE} | sed -r -e 's|(\S+)\s\S+\s\S+\s(\S+)\s(\S+)\s(\S+)\s
 delv @localhost -a /tmp/test-${DOMAIN}.key +root=${DOMAIN} ${DOMAIN}. SOA +multiline
 
 ; fully validated
-nipil.org.      10800 IN SOA nipil.org. hostmaster.nipil.org. (
-                17         ; serial
-                10800      ; refresh (3 hours)
-                3600       ; retry (1 hour)
-                604800     ; expire (1 week)
-                10800      ; minimum (3 hours)
-                )
-nipil.org.      10800 IN RRSIG SOA 10 2 10800 (
-                20171103054442 20171004044442 10310 nipil.org.
-                rRON8kNgP9O69IPa1urmsvvymI/iNxs6UD7KtNA9b+y7
-                6/rkm0UGFFPed/6a84m+4pkjQNT5Kq7B4AorWcCqRHFa
-                nvSyXmbL3p/g7vXp7BktzAJyYRi0cV1n0q4BdBUZ2x+K
-                f/aum5tBLlDOmnsrtPXES/Ax+8T6n4ifN4jKbDW4NYip
-                b6TZAcr5YLfP+DOD9SNp71j6iySLx7UgQtnbP0Dkzhon
-                fXhJz8hJ4qjbAiAk1giI/6Shz9DLoR/1epLVwh+Lkry0
-                wMHl2PXR/4As7GZ49wJpHcA0Da3225VFpTDza9uniYmo
-                4Ju6Pq6FOLsntEFmeFeSYAqzp8k3vIHcGlTicBDeOeF6
-                yxx+K8IF1GpNFxq65QspuvR9q5EUrf5HQpVQDPiiIG9O
-                8XOz81ADDlnt/PRAh0arroMDlhkX8z6EKenJexVMCm+D
-                AbFy0LGZ5t2SOtoaNQkVoq/t2IeEUWihKV5Ad6ubQtOs
-                Tqgre65TH1eY7U11M+oxNnLZjWnzJWV2nz1KYjToRHY7
-                G0CadqVGsONcwZU+kPxucuytouTe89fr+g9VHDLr891x
-                UT4TziP/e8UxehGPVRLPMgnGlfKXis5Bz22KioQkesFy
-                /1GnxmnGpIwp9zcZAdy91jA6D1kWqWmLjF9WcPOwq20H
-                O45I9oEKiJSbAx4do0f+NKc= )
+nipil.org.              10800 IN SOA nipil.org. hostmaster.nipil.org. (
+                                52         ; serial
+                                10800      ; refresh (3 hours)
+                                3600       ; retry (1 hour)
+                                604800     ; expire (1 week)
+                                10800      ; minimum (3 hours)
+                                )
+nipil.org.              10800 IN RRSIG SOA 8 2 10800 (
+                                20171104064746 20171005054746 26493 nipil.org.
+                                DdQzLqi4G7217EATJwcoDHKZTEnkx7AJLmtI272FNBGj
+                                XZ7yaANan0stQhFvrKC4rd0Stf14U63n6nZ1IUJdBWkA
+                                cXRPwFHPpg2efTy3NifjFYnxIMWm4MxDQCTS34mxuaaC
+                                G3Enr5d6S0jx9N9H1RXGLomN+JOZ8WmlX06eRtw= )
+
 
 Maintenant que tout est OK, on doit effectuer la dernière action : construire la chaine de confiance, en fournissant à notre registrar (à qui on paie le nom de domaine) les éléments nécessaires pour établie la "chain of trust".
+
+
+
+
+$TTL 3600
+@       IN SOA dns108.ovh.net. tech.ovh.net. (2017091200 86400 3600 3600000 300)
+                                  IN NS     ns108.ovh.net.
+                                  IN NS     dns108.ovh.net.
+                                  IN MX 1   mx1.ovh.net.
+                                  IN MX 100 mxb.ovh.net.
+                                  IN MX 5   mx2.ovh.net.
+                               60 IN A      91.121.167.150
+                               60 IN AAAA   2001:41d0:1:e896::1
+                                  IN TXT    "google-site-verification=TVJXmi4nS4cuWfsgYujfQ3MjT0h9b1_MG1sIYROam7w"
+                              600 IN TXT    "v=spf1 include:mx.ovh.com -all"
+2016-06-13._domainkey.isis     60 IN TXT    "k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDxEIFLzsFqLNlqiIluZkn0TxgBo74d5y0szafcdIGB7bJgCFUyMtvKX6xDk7AmvkFrqy7357rpM8d3lqiBTb8Z9Rs+xSuTk50TmxXFrPswm1ah2CQJUc+gaiCPgu97vU5Q3S57nNai0XEFMk7aHzpblLe5hAheGJt+SGzvDbfQVwIDAQAB"
+_dmarc                            IN TXT    "v=DMARC1; p=none; pct=100; rua=mailto:postmaster@nipil.org;"
+_dmarc.isis                    60 IN TXT    "v=DMARC1; p=reject; pct=100; rua=mailto:postmaster@isis.nipil.org;"
+axis                              IN MX 10  axis.nipil.org.
+axis                              IN A      37.187.7.187
+axis                              IN AAAA   2001:41d0:a:7bb::1
+axis                          600 IN TXT    "v=spf1 mx -all"
+home                              IN CNAME  homenipilorg.ddns.net.
+isis                              IN MX 10  isis.nipil.org.
+isis                              IN A      91.121.167.150
+isis                              IN AAAA   2001:41D0:1:E896::1
+isis                          600 IN TXT    "v=spf1 mx -all"
+
+$ dig nipil.org +trace
+
+; <<>> DiG 9.10.3-P4-Ubuntu <<>> nipil.org +trace
+;; global options: +cmd
+.                       454727  IN      NS      e.root-servers.net.
+.                       454727  IN      NS      j.root-servers.net.
+.                       454727  IN      NS      k.root-servers.net.
+.                       454727  IN      NS      a.root-servers.net.
+.                       454727  IN      NS      d.root-servers.net.
+.                       454727  IN      NS      i.root-servers.net.
+.                       454727  IN      NS      h.root-servers.net.
+.                       454727  IN      NS      m.root-servers.net.
+.                       454727  IN      NS      c.root-servers.net.
+.                       454727  IN      NS      l.root-servers.net.
+.                       454727  IN      NS      f.root-servers.net.
+.                       454727  IN      NS      g.root-servers.net.
+.                       454727  IN      NS      b.root-servers.net.
+.                       518385  IN      RRSIG   NS 8 0 518400 20171018050000 20171005040000 46809 . Gqx4rurS7g34OaTMZuVqeULR0YKkHJSDbeq6MhUrf2Zs9k4S+EfYYTun 9qcns+xkDlrHkcrPYMQpOjRTLHXasaZnWcnr+t2ok7MlGefnLT8OCZBh UDcDw0gO/0V4oPn6R9dkTA7l2ZOaQl5UdHh1E6GRynr5JDaqZp5R0iX3 PZaaR9oL9GxvTW5cED4C5auIVt4TCOLSuaeotMyuuNKlVUXZkAXGHKtz Nqpzj0cm+NWMATzqOHT1yJzh9BoB1POZdMNIhsksyyX3idDu4VAQIrwR zeQdHPIZhrJ4Hc+7JVEkLC6tXI56GVb+eBlFY1Q6q0M1zWi7+DjcGJJU fjsVzA==
+;; Received 525 bytes from 127.0.1.1#53(127.0.1.1) in 9 ms
+
+org.                    172800  IN      NS      b0.org.afilias-nst.org.
+org.                    172800  IN      NS      a0.org.afilias-nst.info.
+org.                    172800  IN      NS      c0.org.afilias-nst.info.
+org.                    172800  IN      NS      b2.org.afilias-nst.org.
+org.                    172800  IN      NS      d0.org.afilias-nst.org.
+org.                    172800  IN      NS      a2.org.afilias-nst.info.
+org.                    86400   IN      DS      9795 7 1 364DFAB3DAF254CAB477B5675B10766DDAA24982
+org.                    86400   IN      DS      9795 7 2 3922B31B6F3A4EA92B19EB7B52120F031FD8E05FF0B03BAFCF9F891B FE7FF8E5
+org.                    86400   IN      RRSIG   DS 8 1 86400 20171018050000 20171005040000 46809 . WCtyce7S1hwxD/yirA2kl0M4RBD3ijxAJrgyQ1pOrNAJR7tyzpPC8Tsl njkvLQ0sRR4LEco2INvHNUZgvpaVEggNpvux6bL5RMJ99YaE6q/PqF2j ufLHsVChfzFUEhYaeeGOtPCii+fyYc/6J4xsSts+PiH2scHuAlwF1zE6 CM8bif9MjIaiKwF7jNBhftkEgYhsWoNsdH01zyOf0kE65BPeSdClCl/B xRhdNLUYlTYqe0ox6MHpsAUZnV1aluBiQ0gLV7zLhn6y6C1mTpH0lWAF H3oPKbXswo3ipc9raHo7oiivOi7xE2W56BlbqwDjCdjJ0mkcvXimdYzS O9q9aw==
+;; Received 811 bytes from 2001:dc3::35#53(m.root-servers.net) in 20 ms
+
+nipil.org.              86400   IN      NS      ns108.ovh.net.
+nipil.org.              86400   IN      NS      dns108.ovh.net.
+nipil.org.              86400   IN      DS      3285 7 2 F1197E414D0EE77097AD02AC90C5E086C99F17F11E2FC2784FE77F62 21C450ED
+nipil.org.              86400   IN      RRSIG   DS 7 2 86400 20171022152331 20171001142331 3947 org. VO05V6AzTerkbDBmdg2ZjO2JCZ5EHBa7ZJf6T3jjajWxKd9x6T+zMEkF UVERADOGcPUzvr7Kh50KHHCc2CeLdpWVYAdUJhZZgnTJDrg06TLOYM8U tZkKCMPK0G5PvK1OLmeSZIDSo8u/LJx+6yKU8nssTpySINCXDUNXPG0J jrI=
+;; Received 297 bytes from 199.249.120.1#53(b2.org.afilias-nst.org) in 80 ms
+
+nipil.org.              60      IN      A       91.121.167.150
+nipil.org.              60      IN      RRSIG   A 7 2 60 20171104062210 20171005062210 45578 nipil.org. uuoidYbJPncbXkJaENPgO/YYfwk+wyxX7HgQ+vbyeQ7fwVvM39NWL7DG jQRwmKmHw1aL8Pc51p5eM4srkmt7hTXIT3V65sock8XxGH/Pr5Y8mh6z EPD21ErqiuN8ULEn/1pn7XFU+L9Enl5oyMURP5iE0gNOks5ON37sjoyv vRM=
+;; Received 223 bytes from 2001:41d0:1:1998::1#53(ns108.ovh.net) in 7 ms
+
+
+
+
+https://docs.ovh.com/fr/fr/cloud/dedicated/dns-configuration/
+
+ns108.ovh.net
+dns108.ovh.net
+
+https://www.zonemaster.net/
+
+
+serveurs
+
+https://docs.ovh.com/fr/fr/web/domains/generalites-serveurs-dns/
+https://docs.ovh.com/fr/fr/web/domains/zonecheck-de-votre-domaine/
+
+GLUE
+
+
+
+https://docs.ovh.com/fr/fr/web/domains/glue-registry/
+
+
+
+
+
+DS records
+
+
+
+https://docs.ovh.com/fr/fr/web/domains/securiser-votre-domaine-avec-dnssec/
+
+
+
+37.187.7.187 2001:41d0:a:7bb::1
+
+
+
