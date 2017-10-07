@@ -2,6 +2,7 @@
 layout: post
 title: Serveur DNS personnel, le retour !
 --
+
 :toc:
 :toc-title: Table des matières
 
@@ -12,57 +13,99 @@ Cet article est un mémo permettant de configurer des serveurs DNS faisant autho
 Matériel
 
 * disposer de _deux_ hôtes Linux au minimum
-* chacun disposant :
-** d'une adresse IPv4 externe _fixe_
+* chacun :
+** disposant d'une adresse IPv4 externe _fixe_
+** disposant d'une adresse IPv6 externe _fixe_
 ** joignable depuis internet sur les ports UDP 53 et TCP 53
 ** pouvant se joindre entre eux sur les même ports
-** disposant d'une adresse IPv6 fixe
-** ayant configuré les "reverse-DNS" IPv4 et IPv6 pour qu'ils soient des noms appartenant à votre domaine
+** ayant un "reverse-DNS" IPv4 et IPv6 pointant sur leur noms DNS
 
 Noms de domaine
 
 * disposer d'un (ou plusieurs) noms de domaines
-* le(s) registrar(s) auxquels sont loués les noms de domaine doivent
-**  permettrent d'utiliser ses propres serveurs DNS
-** permettrent de positionner nos singatures DNSSEC ("DS records") dans la hiérarchie DNS
-
-Informations annexes
-
-* j'utilise OVH comme fournisseur de nom de domaine ("registrar")
-* j'utilise la distribution Ubuntu 16.04 LTS
+* le bureau d'enregistrement de ces noms de domaine doit :
+** permettrent d'utiliser ses propres serveurs DNS
+** permettrent de positionner nos signatures DNSSEC ("DS records")
 
 Logiciels
 
-* installer le package `bind9` sur chaque serveur
+* installer `bind9` sur chaque serveur (version 9.10.3)
+
+Informations annexes
+
+* j'utilise OVH comme fournisseur de nom de domaine
+* j'utilise la distribution Ubuntu 16.04 LTS (avec bind 9.10.x)
 
 La suite s'appuie sur l'ensemble des points ci-dessus. Si votre situation diffère, à vous de faire le nécessaire pour adapter.
 
 == Variables
 
-Dans toute la suite, on remplacera bien sûr les variables par les valeurs réelles correspondantes pour votre environnement :
-
-* IPV4_MASTER : l'adresse IPv4 externe du serveur qui sera maître (pour moi, `37.187.7.187`)
-* IPV6_MASTER : l'adresse IPv6 externe du serveur qui sera maître (pour moi, `2001:41d0:a:7bb::1`)
-* IPV4_MASTER_PTR : récupéré par `dig -x IPV4_MASTER` (pour moi, `axis.nipil.org`)
-* IPV6_MASTER_PTR : récupéré par `dig -x IPV6_MASTER` (pour moi, `axis.nipil.org`)
-* IPV4_SLAVE : l'adresse IPv4 externe du serveur qui sera esclave (pour moi, `91.121.167.150`)
-* IPV6_SLAVE : l'adresse IPv6 externe du serveur qui sera esclave (pour moi, `2001:41d0:1:e896::1`)
-* IPV4_SLAVE_PTR : récupéré par `dig -x IPV4_SLAVE` (pour moi, `isis.nipil.org`)
-* IPV6_SLAVE_PTR : récupéré par `dig -x IPV6_SLAVE` (pour moi, `isis.nipil.org`)
-* DOMAIN : nom de domaine (pour moi, `nipil.org`)
-
-== Serveur master
-
-On suivra les link:https://ftp.isc.org/isc/dnssec-guide/html/dnssec-guide.html#signing-easy-start-generate-keys[bonnes pratiques du guide DNSSEC de l'ISC] (Internet Systems Consortium, les mainteneurs de Bind) concernant les algorithmes de signature et la longueur des clés.
-
-Pour chaque DOMAIN (par ex, `example.com`) on générera des clés :
+Ci-après, mes éléments de configuration (à adapter, bien sûr !)
 
 ----
-mkdir -p /etc/bind/keys/DOMAIN
-cd /etc/bind/keys/DOMAIN
-dnssec-keygen -a RSASHA256 -b 1024 DOMAIN
-dnssec-keygen -a RSASHA256 -b 2048 -f KSK DOMAIN
+# un des noms de domaine gérés par nos serveurs
+export DOMAIN="nipil.org"
+
+# le répertoire où les clés utilisées seront stockées
+export KEYDIR=/etc/bind/keys/${DOMAIN}
+# le répertoire où les clés utilisées seront stockées
+export RECOVERYKEYDIR=${KEYDIR}/recovery
+
+# les caractéristiques cryptographiques sont définies dans les bonnes pratiques
+# https://ftp.isc.org/isc/dnssec-guide/html/dnssec-guide.html#signing-easy-start-generate-keys
+export KEY_ALGO=RSASHA256
+export KSK_SIZE=2048
+export ZSK_SIZE=1024
+
+# l'adresse IPv4 externe du serveur qui sera maître
+export IPV4_MASTER="37.187.7.187"
+# l'adresse IPv6 externe du serveur qui sera maître
+export IPV6_MASTER="2001:41d0:a:7bb::1"
+# le nom dns complet du serveur maître
+export IPV4_MASTER_FQDN="axis.nipil.org"
+# l'adresse IPv4 externe du serveur qui sera slave
+export IPV4_SLAVE="91.121.167.150"
+# l'adresse IPv6 externe du serveur qui sera slave
+export IPV6_SLAVE="2001:41d0:1:e896::1"
+# le nom dns complet du serveur slave
+export IPV6_SLAVE_FQDN="isis.nipil.org"
 ----
+
+Dans l'ensemble des commandes suivantes, on remplacera les variables par les valeurs correspondantes (utiliser celles pour *votre* environnement !)
+
+== Clés DNSSEC
+
+On crééra une clé de signature de zone (`ZSK`) _active_ qui signera les entrées (`A`, `CNAME`, `TXT`...) du nom de domaine, ainsi qu'une clé de signature de clé (`KSK`) _active_ qui signera toutes les clés `ZSK`
+
+Et pour assurer la continuité de service en cas de hack ou de perte du serveur, on crééra une clé de signature de clé (`KSK`) _de secours_ qui sera utilisée en en cas de hack ou de perte du serveur. On en pré-publiera la partie _publique_, et on archivera hors-site la partie _privée_, puis on devra _supprimer_ la partie privée du serveur une fois sauvegardée, afin de protéger la clé de secours.
+
+----
+mkdir -p -v ${KEYDIR} ${RECOVERYKEYDIR} && \
+dnssec-keygen -a ${KEY_ALGO} -b ${ZSK_SIZE} -K ${KEYDIR} ${DOMAIN} && \
+dnssec-keygen -a ${KEY_ALGO} -b ${KSK_SIZE} -K ${KEYDIR} -f KSK ${DOMAIN} && \
+dnssec-keygen -a ${KEY_ALGO} -b ${KSK_SIZE} -K ${RECOVERYKEYDIR} -f KSK ${DOMAIN} && \
+find ${KEYDIR} -type f | xargs chown -v root:bind && \
+find ${KEYDIR} -type f -name '*.key' | xargs chmod -v 644 && \
+find ${KEYDIR} -type f -name '*.private' | xargs chmod -v 640 && \
+cp -a -v ${RECOVERYKEYDIR}/*.key ${KEYDIR}
+----
+
+
+La clé `KSK` de secours se trouve dans `${RECOVERYKEYDIR}` :
+
+* les fichiers présents doivent être *sauvegardés hors du serveur*
+* une fois sauvegardée, ils doivent être *supprimés du serveur*
+* à noter que la partie publique a déjà été insérée dans `${KEYDIR}`
+
+
+
+
+
+
+
+
+
+
 
 .named.conf.options
 ----
@@ -164,7 +207,8 @@ chmod g+r /etc/bind/keys/${DOMAIN}/*
  link:https://www.enisa.europa.eu/publications/gpgdnssec[DNSSEC best practices ENISA (eu)]
  link:https://csrc.nist.gov/publications/detail/sp/800-81/rev-1/archive/2010-04-30[DNSSEC best practices NIST (us)]
  link:https://linux.die.net/man/8/dnssec-keygen[Man page de dnssec-keygen]
-
+link:https://www.cloudflare.com/dns/dnssec/how-dnssec-works/[cloudflare dnssec guide]
+link:https://www.iana.org/assignments/dns-sec-alg-numbers/dns-sec-alg-numbers.xhtml[DNSSEC Algorithm numeric values]
 == Serveur autoritaire
 
 == Serveur master/slave
