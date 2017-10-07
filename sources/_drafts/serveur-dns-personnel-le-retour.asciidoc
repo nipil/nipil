@@ -13,12 +13,11 @@ Cet article est un mémo permettant de configurer des serveurs DNS faisant autho
 Matériel
 
 * disposer de _deux_ hôtes Linux au minimum
-* chacun :
-** disposant d'une adresse IPv4 externe _fixe_
-** disposant d'une adresse IPv6 externe _fixe_
-** joignable depuis internet sur les ports UDP 53 et TCP 53
-** pouvant se joindre entre eux sur les même ports
-** ayant un "reverse-DNS" IPv4 et IPv6 pointant sur leur noms DNS
+* chacun disposant d'une adresse IPv4 externe _fixe_
+* chacun disposant d'une adresse IPv6 externe _fixe_
+* chacun joignable depuis internet sur les ports UDP 53 et TCP 53
+* chacun pouvant se joindre entre eux sur les même ports
+* chacun ayant un "reverse-DNS" IPv4 et IPv6 pointant sur leur noms DNS
 
 Noms de domaine
 
@@ -38,6 +37,18 @@ Informations annexes
 
 La suite s'appuie sur l'ensemble des points ci-dessus. Si votre situation diffère, à vous de faire le nécessaire pour adapter.
 
+== Documentation
+
+* link:https://www.isc.org/downloads/bind/doc/[Bind9 documentation]
+* link:https://ftp.isc.org/isc/pubs/tn/isc-tn-2002-2.html[How to configure and authorative-only nameserver]
+* link:https://ftp.isc.org/isc/dnssec-guide/html/dnssec-guide.html[How to configure DNSSEC guide]
+* link:https://tools.ietf.org/html/rfc6781[DNSSEC best practices IETF]
+* link:https://www.enisa.europa.eu/publications/gpgdnssec[DNSSEC best practices ENISA (eu)]
+* link:https://csrc.nist.gov/publications/detail/sp/800-81/rev-1/archive/2010-04-30[DNSSEC best practices NIST (us)]
+* link:https://linux.die.net/man/8/dnssec-keygen[Man page de dnssec-keygen]
+* link:https://www.cloudflare.com/dns/dnssec/how-dnssec-works/[cloudflare dnssec guide]
+* link:https://www.iana.org/assignments/dns-sec-alg-numbers/dns-sec-alg-numbers.xhtml[DNSSEC Algorithm numeric values]
+
 == Variables
 
 Ci-après, mes éléments de configuration (à adapter, bien sûr !)
@@ -48,8 +59,6 @@ export DOMAIN="nipil.org"
 
 # le répertoire où les clés utilisées seront stockées
 export KEYDIR=/etc/bind/keys/${DOMAIN}
-# le répertoire où les clés utilisées seront stockées
-export RECOVERYKEYDIR=/etc/bind/keys/recovery/${DOMAIN}
 
 # les caractéristiques cryptographiques sont définies dans les bonnes pratiques
 # https://ftp.isc.org/isc/dnssec-guide/html/dnssec-guide.html#signing-easy-start-generate-keys
@@ -61,14 +70,19 @@ export ZSK_SIZE=1024
 export IPV4_MASTER="37.187.7.187"
 # l'adresse IPv6 externe du serveur qui sera maître
 export IPV6_MASTER="2001:41d0:a:7bb::1"
-# le nom dns complet du serveur maître
-export IPV4_MASTER_FQDN="axis.nipil.org"
 # l'adresse IPv4 externe du serveur qui sera slave
 export IPV4_SLAVE="91.121.167.150"
 # l'adresse IPv6 externe du serveur qui sera slave
 export IPV6_SLAVE="2001:41d0:1:e896::1"
+
+# le nom dns complet du serveur maître
+export MASTER_NAME="axis"
 # le nom dns complet du serveur slave
-export IPV6_SLAVE_FQDN="isis.nipil.org"
+export SLAVE_NAME="isis"
+# le nom dns complet du serveur maître
+export MASTER_FQDN="${MASTER_NAME}.${DOMAIN}"
+# le nom dns complet du serveur slave
+export SLAVE_FQDN="${SLAVE_NAME}.${DOMAIN}"
 ----
 
 Dans l'ensemble des commandes suivantes, on remplacera les variables par les valeurs correspondantes (utiliser celles pour *votre* environnement !)
@@ -77,149 +91,178 @@ Dans l'ensemble des commandes suivantes, on remplacera les variables par les val
 
 On crééra une clé de signature de zone (`ZSK`) _active_ qui signera les entrées (`A`, `CNAME`, `TXT`...) du nom de domaine, ainsi qu'une clé de signature de clé (`KSK`) _active_ qui signera toutes les clés `ZSK`
 
-Et pour assurer la continuité de service en cas de hack ou de perte du serveur, on crééra une clé de signature de clé (`KSK`) _de secours_ qui sera utilisée en en cas de hack ou de perte du serveur. On en pré-publiera la partie _publique_, et on archivera hors-site la partie _privée_, puis on devra _supprimer_ la partie privée du serveur une fois sauvegardée, afin de protéger la clé de secours.
-
 ----
-mkdir -p -v ${KEYDIR} ${RECOVERYKEYDIR} && \
+mkdir -p -v ${KEYDIR} && \
 dnssec-keygen -a ${KEY_ALGO} -b ${ZSK_SIZE} -K ${KEYDIR} ${DOMAIN} && \
 dnssec-keygen -a ${KEY_ALGO} -b ${KSK_SIZE} -K ${KEYDIR} -f KSK ${DOMAIN} && \
-dnssec-keygen -a ${KEY_ALGO} -b ${KSK_SIZE} -K ${RECOVERYKEYDIR} -f KSK ${DOMAIN} && \
 find ${KEYDIR} -type f | xargs chown -v root:bind && \
 find ${KEYDIR} -type f -name '*.key' | xargs chmod -v 644 && \
-find ${KEYDIR} -type f -name '*.private' | xargs chmod -v 640 && \
-cp -a -v ${RECOVERYKEYDIR}/*.key ${KEYDIR}
+find ${KEYDIR} -type f -name '*.private' | xargs chmod -v 640
 ----
 
+Pour info, le premier chiffre dans le nom d'une clé correspond à la représentation de l'algorithme utilisé, le deuxième nombre est l'identifiant de la clé :
 
-La clé `KSK` de secours se trouve dans `${RECOVERYKEYDIR}` :
+Ce sont les clés privées (les fichiers `.private`) qui contiennent les dates de validité de la clé concernée. On peut les consulter et les modifier avec la commande `dnssec-settime` :
 
-* les fichiers présents doivent être *sauvegardés hors du serveur*
-* une fois sauvegardée, ils doivent être *supprimés du serveur*
-* à noter que la partie publique a déjà été insérée dans `${KEYDIR}`
+----
+dnssec-settime -p all Knipil.org.+008+26493.private
+Created: Thu Oct  5 06:25:46 2017
+Publish: Thu Oct  5 06:25:46 2017
+Activate: Thu Oct  5 06:25:46 2017
+Revoke: UNSET
+Inactive: UNSET
+Delete: UNSET
+----
 
+----
+dnssec-settime -p all Knipil.org.+008+32707.private
+Created: Sat Oct  7 15:16:42 2017
+Publish: Sat Oct  7 15:16:42 2017
+Activate: Sat Oct  7 15:16:42 2017
+Revoke: UNSET
+Inactive: UNSET
+Delete: UNSET
+----
 
+Ce sont les clés publiques (les fichiers `.key`) qui contiennent le type de la clé concernées, et l'empreinte qui sera utilisée pour publier les `DS record` dans la zone parente :
 
+----
+cat Knipil.org.+008+26493.key
+; This is a zone-signing key, keyid 26493, for nipil.org.
+; Created: 20171005062546 (Thu Oct  5 06:25:46 2017)
+; Publish: 20171005062546 (Thu Oct  5 06:25:46 2017)
+; Activate: 20171005062546 (Thu Oct  5 06:25:46 2017)
+nipil.org. IN DNSKEY 256 3 8
+    AwEAAbnimJ65KZhcH1WjoTxMhus6diIExGryJmNNzp8c2/kuGDVYFL+l
+    uviQWz2C+Lj+Z1lzRZ89mgxhZs9ZjpLJSbIxfo4R+ayW5pj+XJVTaVm5
+    2N2vgNNsY/qWl2oPxitWLkt0Ore7pHmf3hI1eL6QWYNmoqK/yUKQw7q1
+    hICsJZ/3
+----
 
+----
+cat Knipil.org.+008+32707.key
+; This is a key-signing key, keyid 32707, for nipil.org.
+; Created: 20171007151642 (Sat Oct  7 15:16:42 2017)
+; Publish: 20171007151642 (Sat Oct  7 15:16:42 2017)
+; Activate: 20171007151642 (Sat Oct  7 15:16:42 2017)
+nipil.org. IN DNSKEY 257 3 8
+    AwEAAcZpaxDC2FTSRrY4byNOZzaONLUcnwm2VID+SscCE6D2LFOMiaSU
+    8O6ULTTy6FgEliI1zaYNgWf+tcNvQHayOjaaEuKSDIvuO+MkO0zd2RK8
+    nMpyt/9uCXwaBjKZ+ZYnpiBimKV00FCsns06V5oBD5sQVDvpN3R6L5sG
+    mbvx14433mzQzB41bG0onI3e2tp8+3nk9HKwaouhzw7bmw75o6YClvAK
+    Ftbh7AlzW4foi4U+3Lx2siu8sxVyMLRBYjbY041K/Sy1k14abMh3+BB8
+    4moaXBe19SMkVNTODkEzKFJWc2A3NIPIoNREcmUzBYoMi0etpXr9JFeC
+    gG2/1OTKYI0=
+----
 
-
-
-
-
-
+== Configuration maître
 
 .named.conf.options
 ----
 options {
-  directory "/var/cache/bind";
-  dnssec-validation auto;
-  auth-nxdomain no; # conform to RFC1035
-  listen-on-v6 { any; };
-  allow-query     { any; };
-  allow-transfer  {
-    localhost;
-    IPV4_SLAVE; IPV6_SLAVE;
-  };
-  recursion no;
+    directory "/var/cache/bind";
+    dnssec-validation auto;
+    auth-nxdomain no; # conform to RFC1035
+    listen-on-v6 { any; };
+    allow-query { any; };
+    allow-transfer {
+        localhost;
+        ${IPV4_SLAVE};
+        ${IPV6_SLAVE};
+    };
+    recursion no;
 };
 ----
 
 .named.conf.local
 ----
-zone "DOMAIN" {
-  type master;
-  file "/var/cache/bind/db.DOMAIN";
-  key-directory "/etc/bind/keys/DOMAIN";
-  inline-signing yes;
-  auto-dnssec maintain;
+zone "${DOMAIN}" {
+    type master;
+    file "/var/cache/bind/db.${DOMAIN}";
+    key-directory "/etc/bind/keys/${DOMAIN}";
+    inline-signing yes;
+    auto-dnssec maintain;
 };
 ----
 
 On configure chaque zone de manière minimale :
 
-./var/cache/bind/db.DOMAIN
+./var/cache/bind/db.${DOMAIN}
 ----
-$TTL 3H
-@ IN SOA ${IPV4_MASTER_PTR}. hostmaster.nipil.org. (
+$TTL 5M
+@ IN SOA ${MASTER_FQDN}. postmaster.${DOMAIN}. (
   56   ; serial
   4H   ; refresh
   1H   ; retry
   1W   ; expire
   3H ) ; minimum
-@            IN   NS     IPV4_MASTER_PTR.
-@            IN   NS     IPV4_SLAVE_PTR.
-axis         IN   A      37.187.7.187
-axis         IN   AAAA   2001:41d0:a:7bb::1
-isis         IN   A      91.121.167.150
-isis         IN   AAAA   2001:41d0:1:e896::1
+@              IN   NS     ${MASTER_FQDN}.
+@              IN   NS     ${SLAVE_FQDN}.
+${MASTER_NAME} IN   A      ${IPV4_MASTER}
+${MASTER_NAME} IN   AAAA   ${IPV6_MASTER}
+${SLAVE_NAME}  IN   A      ${IPV4_SLAVE}
+${SLAVE_NAME}  IN   AAAA   ${IPV4_SLAVE}
 ----
 
+== Vérifications master
 
+On vérifie la zone
 
-On redémarre bind, et on vérifie ce que ça donne :
+----
+named-checkzone ${DOMAIN} /var/cache/bind/db.${DOMAIN}
+----
 
+On vérifie la configuration
 
+----
+named-checkconf -z
+----
 
+On recharge la configuration
 
+----
+rndc reload
+----
 
+On demande la signature de la zone
 
-
-
-
-== Vérification master
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Attention : chez OVH, la link:https://docs.ovh.com/fr/fr/web/domains/generalites-serveurs-dns/[documentation] dit explicitement que "Toutes modifications de vos serveurs DNS peut prendre jusqu’à 48h"
-
-
-
-Pour info, le premier chiffre dans le nom correspond à la représentation de l'algorithme utilisé, le deuxième est l'empreinte de la clé.
-
-
-assurer que les clés sont lisibles de l'utilisateur bind
-
-sudo -u bind md5sum /etc/bind/keys/${DOMAIN}/* >&- && echo "OK: can read keys" || echo "ERROR: cannot read keys"
-
-Si ça n'est pas le cas, s'en assurer en permettant au user bind de les lire :
-
-chown -v :bind /etc/bind/keys/${DOMAIN}/*
-chmod g+r /etc/bind/keys/${DOMAIN}/*
-
-
-== Documentation
-
- link:https://www.isc.org/downloads/bind/doc/[Bind9 documentation ]
- link:https://ftp.isc.org/isc/pubs/tn/isc-tn-2002-2.html[How to configure and authorative-only nameserver]
- link:https://ftp.isc.org/isc/dnssec-guide/html/dnssec-guide.html[How to configure DNSSEC guide]
- link:https://tools.ietf.org/html/rfc6781[DNSSEC best practices IETF]
- link:https://www.enisa.europa.eu/publications/gpgdnssec[DNSSEC best practices ENISA (eu)]
- link:https://csrc.nist.gov/publications/detail/sp/800-81/rev-1/archive/2010-04-30[DNSSEC best practices NIST (us)]
- link:https://linux.die.net/man/8/dnssec-keygen[Man page de dnssec-keygen]
-link:https://www.cloudflare.com/dns/dnssec/how-dnssec-works/[cloudflare dnssec guide]
-link:https://www.iana.org/assignments/dns-sec-alg-numbers/dns-sec-alg-numbers.xhtml[DNSSEC Algorithm numeric values]
-== Serveur autoritaire
-
-== Serveur master/slave
-
-== Fonctionnalité DNSSEC
-
-Et revérifier à l'aide de la commande précédente
+----
+rndc sign ${DOMAIN}
+----
 
 Pour information, le serial de la version signée transmise aux slaves est en avance sur le serial de la version non-signée, on le voit dans le log bind sur le master :
 
+----
 named[8251]: zone nipil.org/IN (signed): serial 17 (unsigned 14)
+----
+
+On vérifie le transfert de zone en local
+
+----
+dig @localhost ${DOMAIN} axfr
+----
+
+On prendra soin de consulter le log (généralement `syslog`) pour voir l'ensemble des message (éventuellement d'erreur) liés au process `bind` !
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 on vérifie que tout est bon au niveau de notre serveur master :
 
