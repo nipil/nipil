@@ -49,7 +49,7 @@ export DOMAIN="nipil.org"
 # le répertoire où les clés utilisées seront stockées
 export KEYDIR=/etc/bind/keys/${DOMAIN}
 # le répertoire où les clés utilisées seront stockées
-export RECOVERYKEYDIR=${KEYDIR}/recovery
+export RECOVERYKEYDIR=/etc/bind/keys/recovery/${DOMAIN}
 
 # les caractéristiques cryptographiques sont définies dans les bonnes pratiques
 # https://ftp.isc.org/isc/dnssec-guide/html/dnssec-guide.html#signing-easy-start-generate-keys
