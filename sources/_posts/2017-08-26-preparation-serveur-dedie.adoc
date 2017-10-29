@@ -115,6 +115,14 @@ sudo ls
 apt-get -y install screen git htop ncdu iftop nload tcpdump
 ----
 
+Activate filesystem storage for systemctl-journald by changing `/etc/systemd/journald.conf` :
+
+----
+sudo sed -i -r -e 's/^[[:space:]]*#?[[:space:]]*Storage[[:space:]]*=.*$/Storage=persistent/' /etc/systemd/journald.conf
+sudo systemctl force-reload systemd-journald
+systemctl status systemd-journald
+----
+
 == Resolver
 
 ----
