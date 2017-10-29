@@ -77,20 +77,37 @@ Sans se déconnecter, re-tester la connexion root.
 
 == Utilisateurs
 
+Création de l'utilisateur administrateur
+
 ----
 adduser $USERNAME
 ----
 
+On prend soin d'ajouter une configuration pour la gestion des groupes, en cas d'erreur de gestion
+
 ----
-usermod -a -G sudo $USERNAME
+(umask 227 && echo "$USERNAME ALL=/usr/bin/gpasswd" > /etc/sudoers.d/group-recovery)
+----
+
+----
 sudo -i -u $USERNAME ssh localhost -p $SSHPORT -o StrictHostKeyChecking=no
 cat ~root/.ssh/authorized_keys2 > /home/$USERNAME/.ssh/authorized_keys
 chown $USERNAME:$USERNAME /home/$USERNAME/.ssh/authorized_keys
 ----
 
-Tester la connexion vers l'utilisateur non privilégié
+Tester la connexion automatique vers l'utilisateur non privilégié
+
+On ajoute cet utilisateur administrateur au groupe `sudo` pour qu'il puisse tout faire
+
+----
+sudo gpasswd -a $USERNAME sudo
+----
 
 Tester l'exécution de commandes via sudo
+
+----
+sudo ls
+----
 
 == Utils
 
