@@ -1,0 +1,433 @@
+---
+layout: post
+title: API vélib métropole, pas super fiable
+---
+:toc:
+:toclevels: 4
+:toc-title: Table des matières
+
+Tout a été dit sur la transition "Vélib", entre JCDecaux et Smovengo. Tout ? Non ! Je n'ai trouvé que peu d'informations sur l'aspect "informatique", et je me suis intéressé à l'accès aux données publiques liées au service, comme je l'avais fait avec le titulaire précédent (cf outil link:https://nipil.org/velib-stats/[velib-stats] basé sur les données JCDecaux). Cette analyse se base sur les constatations du 10 janvier 2018 au 16 février 2018.
+
+== Synthèse et propositions
+
+* Bon point
+** accès chiffrés et serveurs authentifiés
+* Mauvais points
+** aucune documentation
+** aucune information concernant les licenses, les droits ou restrictions sur l'utilisation des données
+** aucun versionning de l'API n'est proposé ni indiqué
+** disponibilté technique "assez faible" (99,4%)
+** pas d'authentification des utilisateurs de l'API permettant d'empêcher les abus
+** *contenu applicatif présentant de forts problèmes de cohérence*
+
+Honnêtement, ce dernier point montre un certain manque de rigueur dans la gestion des données... (voir la section <<Aspect cohérence applicative (contenu)>> pour des exemples techniques)
+
+_Le résumé de ce que j'ai pu constater, c'est qu'il y a un problème récurrent de "stations multiples", et que les erreurs qui en découlent sont "corrigées à la main"_
+
+Il est nécessaire de fiabiliser le schémas de données, pour empêcher que ce genre de cas se présente.
+
+Par exemple :
+
+- le `code` d'une station est bien unique
+- que ce `code` est numérique et pas un texte
+- au maximum, une station en l'état opérationnel par `code`
+
+Ce genre de contrôles permettrait entre autres :
+
+- de fiabiliser et de contrôler les données lors de la saisie et de la modification
+- de présenter des éléments corrects aux utilisateurs
+- aiderait à instaurer la confiance vis à vis du service
+
+_En effet, franchement, comment faire confiance au fournisseur, alors que même pour la gestion des données utiles à l'entreprise, et publiées à l'extérieur, il y a déjà de gros loupés et des incohérences ?!_
+
+Dans les sections qui suivent, chaque point est abordé plus en détails. Bonne lecture !
+
+== De quoi on parle ?
+
+De quoi parle t'on ici ? De l'API JSON mise à disposition par Smovengo, et qui est utilisée pour afficher les stations sur la carte officielle. J'imagine que c'est aussi cette même API qui est utilisée dans les applications mobiles...
+
+link:https://www.velib-metropole.fr/webapi/map/details?gpsTopLatitude=48.87170154444531&gpsTopLongitude=2.3671030998229985&gpsBotLatitude=48.863938392400414&gpsBotLongitude=2.346911430358887&zoomLevel=16[Exemple d'appel à l'API et du résultat fourni]
+
+.Détails de la requête HTTP
+----
+URL
+- https://www.velib-metropole.fr/webapi/map/details
+Méthode:
+- GET
+Paramètres
+- gpsTopLatitude=48.87170154444531
+- gpsTopLongitude=2.3671030998229985
+- gpsBotLatitude=48.863938392400414
+- gpsBotLongitude =2.346911430358887
+- zoomLevel=16
+----
+
+Qui donne ce genre de données JSON (reformaté) :
+
+----
+[
+  {
+    "station": {
+      "gps": {
+        "latitude": 48.868767787961765,
+        "longitude": 2.3502444103360176
+      },
+      "state": "Operative",
+      "name": "Aboukir - Alexandrie",
+      "code": "2016",
+      "type": "yes",
+      "dueDate": 1517356800
+    },
+    "nbBike": 2,
+    "nbEbike": 0,
+    "nbFreeDock": 0,
+    "nbFreeEDock": 19,
+    "creditCard": "no",
+    "nbDock": 0,
+    "nbEDock": 21,
+    "nbBikeOverflow": 0,
+    "nbEBikeOverflow": 0,
+    "kioskState": "yes",
+    "overflow": "yes",
+    "overflowActivation": "yes",
+    "maxBikeOverflow": 21,
+    "densityLevel": 1
+  },
+  ...
+]
+----
+
+Jusque là tout va bien, mais à mon humble avis il y a de gros manques, que je vais détailler dans les sections qui suivent.
+
+== Analyse
+
+=== Aspect documentaire
+
+Premier raté, je n'ai trouvé strictement aucune documentation concernant cette API, ce qui fait que même si on peut bien sûr deviner et estimer par rapport à ce qu'on constate quand on va voir une station "en vrai", et bien objectivement
+
+- on a aucune idée de la signification des clés qui ne sont pas "évidentes" (qu'est ce que `overflow` ou `densityLevel` ?)
+- quand une donnée n'est pas scalaire, on a aucune liste exaustive des valeurs possibles (`Operative` certe, mais quand ça sera en panne par exemple, ça sera quoi ?)
+- sémantiquement, certains types de valeur laissent dubitatif vis à vis du libellé (`kioskState` à `yes` ? ça veut dire que le kiosque marche ? et `type` à `yes` ... sortez vos boules de cristal !)
+- le fonctionnement entre les docks (mixés entre docks normaux et électriques ?) et `overflow` est tout sauf intuitif... dans l'idéal on aimerait bien comprendre comment les compteurs s'agencent entre eux (`nbBike + nbEbike + nbBikeOverflow + nbEBikeOverflow = ... ?`)
+
+En comparaison, JCDecaux dispose d'un site https://developer.jcdecaux.com où on peut consulter la documentation de leur API
+
+IMPORTANT: Si jamais il y a de la documentation pour cette API, n'hésitez surtout pas à me remonter l'information, que je corrige ce post !
+
+=== Aspect juridique
+
+À nouveau, je n'ai rien trouvé, si ça existe, n'hésitez pas à me l'indiquer.
+
+En comparaison, JCDecaux (sur le même site que la documentation) indique clairement la license couvrant l'accès, l'utilisation, et la diffusion des données.
+
+=== Aspect versioning
+
+Une API a vocation à être stable, mais "dans la vraie vie" (comme dirait un ancien collègue) les choses bougent toujours. C'est pour cette raison qu'une API doit toujours être versionnée.
+
+Le versionning d'une API? c'est ce qui permet à un programme de ne pas "casser" car en référençant explicitement une version il ne doit jamais recevoir de données dont la structure et le contenu ne correspond pas au contrat défini dans la documentation de la version de l'API utilisée.
+
+En comparaison, JCDecaux a versionné son API (cf le `v1` dans l'URL suivant : https://api.jcdecaux.com/vls/v1)
+
+=== Aspect sécurisation
+
+La sécurisation, c'est principalement une analyse selon les critères "DICPA" (disponibilité, intégrité, confidentialité, preuve, anonymat). On ignorera les deux denriers, pour se concentrer sur les trois premiers
+
+==== Côté confidentialité
+
+Les accès à l'API se font en HTTPS, ce qui permet de ne voir de l'extérieur, que le fait qu'on consulte le site "www.velib-metropole.fr"
+
+Si jamais l'API était authentifiée (elle ne l'est pas) les identifiants seraient transmis de manière sécurisée
+
+==== Côté disponibilité technique (accès)
+
+Sur la période constaté, j'ai cherché à récupérer les données de l'API une fois par minute.
+
+Synthèse : 54719 tentatives dont 323 échecs (fiabilité 99.4%)
+
+Causes d'échecs :
+
+- 307 fois "Read timeout"
+- 6 fois "500 Internal Server Error"
+- 9 fois "502 Bad Gateway"
+- 1 fois "502 Proxy Error"
+
+En termes de haute disponibilité (technique) ça n'est pas mal, même si ça n'est pas génial (cf link:https://fr.wikipedia.org/wiki/Haute_disponibilit%C3%A9#Mesure_du_taux_de_disponibilit%C3%A9[cette définition sur la Wikipedia])
+
+En _moyenne_, ça fait 50 minutes d'indisponibilité par semaine, ce que je trouve énorme pour une API qui ne fait _a priori_ (je peux me tromper) que sérialiser le résultat d'un `SELECT` en JSON.
+
+D'autre part, l'API n'étant pas authentifiée, il est difficile, sinon impossible pour le fournisseur, de réagir face à des abus d'utilisation (nombre de requêtes)ou d'attaques.
+
+En comparaison JCDecaux a mis en place un système de token d'authentification
+
+==== Côté intégrité
+
+L'intégrité technique est assurée par le transport HTTPS qui sécurise le contenu des données transmises.
+
+Par contre, dans l'intégrité on peut aussi considérer la cohérence des données produite, ce qui est fait dans la section ci-dessous.
+
+En comparaison, JCDecaux ne fait pas mieux
+
+=== Aspect cohérence applicative (contenu)
+
+Au regard du JSON présenté au début, et du fait que cette API ne réalise au final qu'une sérialisation d'une requête en base de donnée, ce que j'ai pu constater est assez effarant.
+
+D'après le JSON, on peut imaginer qu'au minimum du minimum, les contraintes suivantes seraient positionnées dans le schémas de donnée SQL :
+
+. tous les champs doivent être définis
+. `code` est une clé primaire
+. `name` est unique
+
+Et on pourrait en rajouter d'autres, comme des contrôles sur le total de vélos, de dock, vis à vis de l'agencement entre docks, edocks, et overflow...
+
+==== Stations "sans identifiant"
+
+Il y a quelques jours, pendant quasiment 48h, l'API a tranquilement publié une station dont le `code` (qui représente _a priori_ une clé primaire) n'était pas défini :
+
+----
+  {
+    "station": {
+      "gps": {
+        "latitude": 48.8740293,
+        "longitude": 2.3070946
+      },
+      "state": "Work in progress",
+      "name": "Mairie du 8ème ",
+      "code": "",
+      "type": "no",
+      "dueDate": 1518613200
+    },
+    ...
+  }
+----
+
+En se basant sur le fait que si `code` est (ou fait partie de) une clé primaire, alors cette sortie ne serait pas possible (ie la ligne ne pourrait être présente).
+
+En conséquence, je ne peux que supputer et dire que visiblement `code` n'a pas été identifié comme une clé primaire... ce qui me paraît "bizarre", et ça suggère une erreur de design.
+
+==== Stations "dupliquées"
+
+Pendant plusieurs jours (quatre, de mémoire) l'API présentait tranquilement des entrées clairement en double. Le plus drôle c'est qu'au dernier jour, un humain a visiblement constaté le problème, et a effectué des modifications pour permettre de séparer le bon grain de l'ivraie.
+
+*Le 25 janvier 2018* : une station en double, toutes indiquées comme opérationnelles :
+
+----
+  "station": {
+    "gps": {
+      "latitude": 48.84086149032458,
+      "longitude": 2.3876759782433505
+    },
+    "state": "Operative",
+    "name": "MAIRIE DU 12ème",
+    "code": "12109",
+    "type": "no",
+    "dueDate": 1517439628.501
+  },
+
+  "station": {
+    "gps": {
+      "latitude": 48.8409948,
+      "longitude": 2.3877094
+    },
+    "state": "Operative",
+    "name": "mairie du 12 eme",
+    "code": "12109",
+    "type": "no",
+    "dueDate": 1517439637.876
+  },
+----
+
+*Le 29 janvier 2018* une station en triple, toutes indiquées comme opérationnelles
+
+----
+  "station": {
+    "gps": {
+      "latitude": 48.8538327,
+      "longitude": 2.3697222
+    },
+    "state": "Operative",
+    "name": "bastille-richard lenoir",
+    "code": "11001",
+    "type": "no",
+    "dueDate": 1517785227.934
+  },
+
+  "station": {
+    "gps": {
+      "latitude": 48.8537729,
+      "longitude": 2.369944
+    },
+    "state": "Operative",
+    "name": "bastille richard lenoir",
+    "code": "11001",
+    "type": "no",
+    "dueDate": 1517785217.614
+  },
+
+  "station": {
+    "gps": {
+      "latitude": 48.8536419,
+      "longitude": 2.3695939
+    },
+    "state": "Operative",
+    "name": "bastille Richard lenoir",
+    "code": "11001",
+    "type": "no",
+    "dueDate": 1517785214.542
+  },
+----
+
+*Le 31 janvier 2018* ... alors là c'est la fête du slip : 4 stations concernées par le "problème"
+
+Ce qui est marrant, c'est qu'un "nettoyage" a été fait. Les stations "en trop" ont été renommées, et le `code` changé pour mettre "0000" (ce qui indique en plus que le code en base de donnée n'est pas un entier mais une chaîne de caractères, mais passons ...).
+
+Et ça donne ça :
+
+.Nettoyage Richard Lenoir
+----
+  "station": {
+    "gps": {
+      "latitude": 48.8538327,
+      "longitude": 2.3697222
+    },
+    "state": "Operative",
+    "name": "Bastille - Richard Lenoir",
+    "code": "11001",
+    "type": "no",
+    "dueDate": 1517785227.934
+  },
+
+  "station": {
+    "gps": {
+      "latitude": 48.8537729,
+      "longitude": 2.369944
+    },
+    "state": "Operative",
+    "name": "ZZZ-doublon bastille richard lenoir",
+    "code": "0000",
+    "type": "no",
+    "dueDate": 1517785217.614
+  },
+
+  "station": {
+    "gps": {
+      "latitude": 48.8536419,
+      "longitude": 2.3695939
+    },
+    "state": "Operative",
+    "name": "ZZZ- triplon bastille Richard lenoir",
+    "code": "0000",
+    "type": "no",
+    "dueDate": 1517785214.542
+  },
+----
+
+.Nettoyage Boulevard Voltaire
+----
+  "station": {
+    "gps": {
+      "latitude": 48.858925,
+      "longitude": 2.3789759
+    },
+    "state": "Operative",
+    "name": "Boulevard Voltaire",
+    "code": "11024",
+    "type": "no",
+    "dueDate": 1517227200
+  },
+
+  "station": {
+    "gps": {
+      "latitude": 48.8588294,
+      "longitude": 2.3787513
+    },
+    "state": "Operative",
+    "name": "ZZZ - doublon boulevard Voltaire ",
+    "code": "0000",
+    "type": "no",
+    "dueDate": 1517785219.509
+  },
+----
+
+.Nettoyage Javel André Citroen
+----
+  "station": {
+    "gps": {
+      "latitude": 48.846276485475,
+      "longitude": 2.2786368057131767
+    },
+    "state": "Operative",
+    "name": "Javel - André Citroen",
+    "code": "15064",
+    "type": "no",
+    "dueDate": 1517356800
+  },
+
+  "station": {
+    "gps": {
+      "latitude": 48.84629491826888,
+      "longitude": 2.278413912593796
+    },
+    "state": "Operative",
+    "name": "ZZZ - doublon Javel - André Citroën",
+    "code": "0000",
+    "type": "no",
+    "dueDate": 1517356800
+  },
+----
+
+.Nettoyage Place Jacques Madaule
+----
+  "station": {
+    "gps": {
+      "latitude": 48.82380377277954,
+      "longitude": 2.2604189068078995
+    },
+    "state": "Operative",
+    "name": "Place Jacques Madaule",
+    "code": "21305",
+    "type": "no",
+    "dueDate": 1517526015.96
+  },
+
+  "station": {
+    "gps": {
+      "latitude": 48.82412590462087,
+      "longitude": 2.260645985489782
+    },
+    "state": "Operative",
+    "name": "ZZZ Doublon madaule",
+    "code": "0000",
+    "type": "no",
+    "dueDate": 1517356800
+  },
+----
+
+*Le 13 février 2018* une station en double, toutes marquées comme opérationnelles
+
+----
+  "station": {
+    "gps": {
+      "latitude": 48.87983634400552,
+      "longitude": 2.345290370285511
+    },
+    "state": "Operative",
+    "name": "condorcet-turgot",
+    "code": "9007",
+    "type": "no",
+    "dueDate": 1519081209
+  },
+
+  "station": {
+    "gps": {
+      "latitude": 48.87985155789093,
+      "longitude": 2.345232367515564
+    },
+    "state": "Operative",
+    "name": "Condorcet-Turgot",
+    "code": "9007",
+    "type": "no",
+    "dueDate": 1519081232
+  },
+----
+
+Et plutôt que de les inscrire ici au tréfond de la vue technique, j'ai placé les conseils et suggestions en tête d'article !
