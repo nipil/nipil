@@ -430,4 +430,36 @@ Et ça donne ça :
   },
 ----
 
+*Mise à jour 21 février 2018*: une station "erreur" corrigée à la main, avec encore un code de type illogique
+
+----
+  {
+    "station": {
+      "gps": {
+        "latitude": 48.87798402750352,
+        "longitude": 2.318404862782852
+      },
+      "state": "Work in progress",
+      "name": "ZZZ - erreur de saisie",
+      "code": "ZZ",
+      "type": "yes",
+      "dueDate": 1519858800
+    },
+    "nbBike": 0,
+    "nbEbike": 0,
+    "nbFreeDock": 0,
+    "nbFreeEDock": 0,
+    "creditCard": "no",
+    "nbDock": 0,
+    "nbEDock": 0,
+    "nbBikeOverflow": 0,
+    "nbEBikeOverflow": 0,
+    "kioskState": "yes",
+    "overflow": "no",
+    "overflowActivation": "no",
+    "maxBikeOverflow": 0,
+    "densityLevel": 1
+  },
+----
+
 Et plutôt que de les inscrire ici au tréfond de la vue technique, j'ai placé les conseils et suggestions en tête d'article !
