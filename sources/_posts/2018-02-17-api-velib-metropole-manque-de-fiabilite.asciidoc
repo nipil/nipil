@@ -462,4 +462,14 @@ Et ça donne ça :
   },
 ----
 
+*Mise à jour 1er mars 2018* une station en double, toutes marquées comme opérationnelles
+
+----
+Operative, Tiron - Rivoli, 4012, 1519858800,
+    48.85579663740384, 2.357907882135172
+
+Operative, Ecouffes - Rivoli , False, 4012, 1519772434,
+    48.85588659928834, 2.3579852655529976
+----
+
 Et plutôt que de les inscrire ici au tréfond de la vue technique, j'ai placé les conseils et suggestions en tête d'article !
