@@ -2,40 +2,62 @@
 
 # license
 
-Every file of this project is covered by the MIT license, EXCEPT FOR the files in sources/_posts/ and sources/files which are Copyright (C) nipil@users.noreply.github.com
+Every file of this project is covered by the MIT license
+Copyright (C) nipil@users.noreply.github.com
 
 # install
 
-## system packages
+Install system packages
 
-  ruby 2.1.5+
-  ruby-dev
-  gem
+    ruby
+    ruby-dev
+    gem
+    build-essential
 
-## bundler gem
+Add this to your `~/.bashrc` and logout/login to update your shell
 
-  gem install --user-install bundler
+    if which ruby >/dev/null && which gem >/dev/null; then
+      PATH="$(ruby -r rubygems -e 'puts Gem.user_dir')/bin:$PATH"
+    fi
 
-## website gems
+Install bundler gem in your local profile
 
-For development
+    gem install --user-install bundler
+    
+Define a subdirectory of the repository for local dependancies 
+ 
+    bundle config set --local path 'vendor/bundle'
 
-  bundler config path vendor/bundler
-  bundler install
-  bundler clean
+When you want it you can upgrade your dependencies
 
-For production
+    rm -Rf Gemfile Gemfile.lock vendor/
+    bundle init
+    bundle add jekyll
 
-  bundler install --deployment
-  bundler clean
+Generate a new site
+
+    bundle exec jekyll new foo
+ 
+Get the bundle files
+
+    mv foo/Gemfile .
+    rm Gemfile.lock
+    
+Then add your plugins to `Gemfile`
+
+    gem "jekyll-asciidoc"
+
+Install the gems
+
+    bundler install
+    bundler clean
 
 # generate
 
 For development
 
-  bundler exec jekyll serve --drafts --source sources/
+    bundle exec jekyll serve --drafts
 
 For production
 
-  bundler exec jekyll build --source sources/
-
+    bundle exec jekyll build
